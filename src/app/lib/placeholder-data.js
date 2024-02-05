@@ -1,17 +1,21 @@
-const tasks = [
+export let tasks = [
     {
-        id: '1',
-        title: 'Brush teeth',
+        taskId: '1',
+        time: 0,
+        startDate: '',
+        name: 'Brush teeth',
         type: 'to-do',
         duration: '',
         deadline: '',
-        timeOfDay: ['morning', 'evening'],
+        preferredTimesOfDay: ['morning', 'evening'],
+        preferredDaysOfWeek: [],
         frequency: [2, 'day'],
-        category: '',
-        causalLinks: {
-            before: '',
-            after: '',
-            during: ''
+        mindset: '',
+        taskChains: {
+            prevTask: [],
+            nextTask: [],
+            prevTaskBlock: [],
+            nextTaskBlock: []
         },
         notes: '',
 
