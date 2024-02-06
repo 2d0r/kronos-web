@@ -11,7 +11,7 @@
     "db:migrate:undo": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' knex migrate:down",
     "db:migrate:make": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' knex migrate:make",
     "db:migrate:rollback": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' knex migrate:rollback",
-    "vercel-build": "prisma generate && pnpm db:migrate && next build"
+    "vercel-build": "pnpm prisma generate && pnpm db:migrate && next build"
   },
   "dependencies": {
     "@prisma/client": "5.9.1",
