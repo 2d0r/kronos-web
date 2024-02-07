@@ -17,6 +17,11 @@ export type MindsetField = {
     name: string;
 }
 
+export type StatusField = {
+    id: string;
+    name: string;
+}
+
 export const MINDSETS = [
     'solve',
     'create',

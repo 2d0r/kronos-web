@@ -18,6 +18,16 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  * 
  */
 export type Task = $Result.DefaultSelection<Prisma.$TaskPayload>
+/**
+ * Model Mindset
+ * 
+ */
+export type Mindset = $Result.DefaultSelection<Prisma.$MindsetPayload>
+/**
+ * Model Status
+ * 
+ */
+export type Status = $Result.DefaultSelection<Prisma.$StatusPayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -150,6 +160,26 @@ export class PrismaClient<
     * ```
     */
   get task(): Prisma.TaskDelegate<ExtArgs>;
+
+  /**
+   * `prisma.mindset`: Exposes CRUD operations for the **Mindset** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Mindsets
+    * const mindsets = await prisma.mindset.findMany()
+    * ```
+    */
+  get mindset(): Prisma.MindsetDelegate<ExtArgs>;
+
+  /**
+   * `prisma.status`: Exposes CRUD operations for the **Status** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Statuses
+    * const statuses = await prisma.status.findMany()
+    * ```
+    */
+  get status(): Prisma.StatusDelegate<ExtArgs>;
 }
 
 export namespace Prisma {
@@ -620,7 +650,9 @@ export namespace Prisma {
 
 
   export const ModelName: {
-    Task: 'Task'
+    Task: 'Task',
+    Mindset: 'Mindset',
+    Status: 'Status'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -637,7 +669,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     meta: {
-      modelProps: 'task'
+      modelProps: 'task' | 'mindset' | 'status'
       txIsolationLevel: Prisma.TransactionIsolationLevel
     },
     model: {
@@ -704,6 +736,138 @@ export namespace Prisma {
           count: {
             args: Prisma.TaskCountArgs<ExtArgs>,
             result: $Utils.Optional<TaskCountAggregateOutputType> | number
+          }
+        }
+      }
+      Mindset: {
+        payload: Prisma.$MindsetPayload<ExtArgs>
+        fields: Prisma.MindsetFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MindsetFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$MindsetPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MindsetFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$MindsetPayload>
+          }
+          findFirst: {
+            args: Prisma.MindsetFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$MindsetPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MindsetFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$MindsetPayload>
+          }
+          findMany: {
+            args: Prisma.MindsetFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$MindsetPayload>[]
+          }
+          create: {
+            args: Prisma.MindsetCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$MindsetPayload>
+          }
+          createMany: {
+            args: Prisma.MindsetCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.MindsetDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$MindsetPayload>
+          }
+          update: {
+            args: Prisma.MindsetUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$MindsetPayload>
+          }
+          deleteMany: {
+            args: Prisma.MindsetDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MindsetUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.MindsetUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$MindsetPayload>
+          }
+          aggregate: {
+            args: Prisma.MindsetAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateMindset>
+          }
+          groupBy: {
+            args: Prisma.MindsetGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<MindsetGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MindsetCountArgs<ExtArgs>,
+            result: $Utils.Optional<MindsetCountAggregateOutputType> | number
+          }
+        }
+      }
+      Status: {
+        payload: Prisma.$StatusPayload<ExtArgs>
+        fields: Prisma.StatusFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.StatusFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$StatusPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.StatusFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$StatusPayload>
+          }
+          findFirst: {
+            args: Prisma.StatusFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$StatusPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.StatusFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$StatusPayload>
+          }
+          findMany: {
+            args: Prisma.StatusFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$StatusPayload>[]
+          }
+          create: {
+            args: Prisma.StatusCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$StatusPayload>
+          }
+          createMany: {
+            args: Prisma.StatusCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.StatusDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$StatusPayload>
+          }
+          update: {
+            args: Prisma.StatusUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$StatusPayload>
+          }
+          deleteMany: {
+            args: Prisma.StatusDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.StatusUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.StatusUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<Prisma.$StatusPayload>
+          }
+          aggregate: {
+            args: Prisma.StatusAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateStatus>
+          }
+          groupBy: {
+            args: Prisma.StatusGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<StatusGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.StatusCountArgs<ExtArgs>,
+            result: $Utils.Optional<StatusCountAggregateOutputType> | number
           }
         }
       }
@@ -851,6 +1015,73 @@ export namespace Prisma {
    */
 
 
+  /**
+   * Count Type MindsetCountOutputType
+   */
+
+  export type MindsetCountOutputType = {
+    tasks: number
+  }
+
+  export type MindsetCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    tasks?: boolean | MindsetCountOutputTypeCountTasksArgs
+  }
+
+  // Custom InputTypes
+
+  /**
+   * MindsetCountOutputType without action
+   */
+  export type MindsetCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MindsetCountOutputType
+     */
+    select?: MindsetCountOutputTypeSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * MindsetCountOutputType without action
+   */
+  export type MindsetCountOutputTypeCountTasksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskWhereInput
+  }
+
+
+
+  /**
+   * Count Type StatusCountOutputType
+   */
+
+  export type StatusCountOutputType = {
+    tasks: number
+  }
+
+  export type StatusCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    tasks?: boolean | StatusCountOutputTypeCountTasksArgs
+  }
+
+  // Custom InputTypes
+
+  /**
+   * StatusCountOutputType without action
+   */
+  export type StatusCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the StatusCountOutputType
+     */
+    select?: StatusCountOutputTypeSelect<ExtArgs> | null
+  }
+
+
+  /**
+   * StatusCountOutputType without action
+   */
+  export type StatusCountOutputTypeCountTasksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TaskWhereInput
+  }
+
+
 
   /**
    * Models
@@ -869,6 +1100,8 @@ export namespace Prisma {
   export type TaskMinAggregateOutputType = {
     id: string | null
     title: string | null
+    mindsetId: string | null
+    statusId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -876,6 +1109,8 @@ export namespace Prisma {
   export type TaskMaxAggregateOutputType = {
     id: string | null
     title: string | null
+    mindsetId: string | null
+    statusId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -883,6 +1118,8 @@ export namespace Prisma {
   export type TaskCountAggregateOutputType = {
     id: number
     title: number
+    mindsetId: number
+    statusId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -892,6 +1129,8 @@ export namespace Prisma {
   export type TaskMinAggregateInputType = {
     id?: true
     title?: true
+    mindsetId?: true
+    statusId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -899,6 +1138,8 @@ export namespace Prisma {
   export type TaskMaxAggregateInputType = {
     id?: true
     title?: true
+    mindsetId?: true
+    statusId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -906,6 +1147,8 @@ export namespace Prisma {
   export type TaskCountAggregateInputType = {
     id?: true
     title?: true
+    mindsetId?: true
+    statusId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -986,6 +1229,8 @@ export namespace Prisma {
   export type TaskGroupByOutputType = {
     id: string
     title: string
+    mindsetId: string
+    statusId: string
     createdAt: Date
     updatedAt: Date
     _count: TaskCountAggregateOutputType | null
@@ -1010,24 +1255,40 @@ export namespace Prisma {
   export type TaskSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     title?: boolean
+    mindsetId?: boolean
+    statusId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    mindset?: boolean | MindsetDefaultArgs<ExtArgs>
+    status?: boolean | StatusDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["task"]>
 
   export type TaskSelectScalar = {
     id?: boolean
     title?: boolean
+    mindsetId?: boolean
+    statusId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+  }
+
+  export type TaskInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    mindset?: boolean | MindsetDefaultArgs<ExtArgs>
+    status?: boolean | StatusDefaultArgs<ExtArgs>
   }
 
 
   export type $TaskPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Task"
-    objects: {}
+    objects: {
+      mindset: Prisma.$MindsetPayload<ExtArgs>
+      status: Prisma.$StatusPayload<ExtArgs>
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       title: string
+      mindsetId: string
+      statusId: string
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["task"]>
@@ -1395,6 +1656,9 @@ export namespace Prisma {
   export interface Prisma__TaskClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: 'PrismaPromise';
 
+    mindset<T extends MindsetDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MindsetDefaultArgs<ExtArgs>>): Prisma__MindsetClient<$Result.GetResult<Prisma.$MindsetPayload<ExtArgs>, T, 'findUniqueOrThrow'> | Null, Null, ExtArgs>;
+
+    status<T extends StatusDefaultArgs<ExtArgs> = {}>(args?: Subset<T, StatusDefaultArgs<ExtArgs>>): Prisma__StatusClient<$Result.GetResult<Prisma.$StatusPayload<ExtArgs>, T, 'findUniqueOrThrow'> | Null, Null, ExtArgs>;
 
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1426,6 +1690,8 @@ export namespace Prisma {
   interface TaskFieldRefs {
     readonly id: FieldRef<"Task", 'String'>
     readonly title: FieldRef<"Task", 'String'>
+    readonly mindsetId: FieldRef<"Task", 'String'>
+    readonly statusId: FieldRef<"Task", 'String'>
     readonly createdAt: FieldRef<"Task", 'DateTime'>
     readonly updatedAt: FieldRef<"Task", 'DateTime'>
   }
@@ -1442,6 +1708,10 @@ export namespace Prisma {
      */
     select?: TaskSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
      * Filter, which Task to fetch.
      */
     where: TaskWhereUniqueInput
@@ -1457,6 +1727,10 @@ export namespace Prisma {
      */
     select?: TaskSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
      * Filter, which Task to fetch.
      */
     where: TaskWhereUniqueInput
@@ -1471,6 +1745,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the Task
      */
     select?: TaskSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
     /**
      * Filter, which Task to fetch.
      */
@@ -1517,6 +1795,10 @@ export namespace Prisma {
      */
     select?: TaskSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
      * Filter, which Task to fetch.
      */
     where?: TaskWhereInput
@@ -1562,6 +1844,10 @@ export namespace Prisma {
      */
     select?: TaskSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
      * Filter, which Tasks to fetch.
      */
     where?: TaskWhereInput
@@ -1602,6 +1888,10 @@ export namespace Prisma {
      */
     select?: TaskSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
      * The data needed to create a Task.
      */
     data: XOR<TaskCreateInput, TaskUncheckedCreateInput>
@@ -1628,6 +1918,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the Task
      */
     select?: TaskSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
     /**
      * The data needed to update a Task.
      */
@@ -1663,6 +1957,10 @@ export namespace Prisma {
      */
     select?: TaskSelect<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
+    /**
      * The filter to search for the Task to update in case it exists.
      */
     where: TaskWhereUniqueInput
@@ -1685,6 +1983,10 @@ export namespace Prisma {
      * Select specific fields to fetch from the Task
      */
     select?: TaskSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
     /**
      * Filter which Task to delete.
      */
@@ -1711,6 +2013,1826 @@ export namespace Prisma {
      * Select specific fields to fetch from the Task
      */
     select?: TaskSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
+  }
+
+
+
+  /**
+   * Model Mindset
+   */
+
+  export type AggregateMindset = {
+    _count: MindsetCountAggregateOutputType | null
+    _min: MindsetMinAggregateOutputType | null
+    _max: MindsetMaxAggregateOutputType | null
+  }
+
+  export type MindsetMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+  }
+
+  export type MindsetMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+  }
+
+  export type MindsetCountAggregateOutputType = {
+    id: number
+    name: number
+    _all: number
+  }
+
+
+  export type MindsetMinAggregateInputType = {
+    id?: true
+    name?: true
+  }
+
+  export type MindsetMaxAggregateInputType = {
+    id?: true
+    name?: true
+  }
+
+  export type MindsetCountAggregateInputType = {
+    id?: true
+    name?: true
+    _all?: true
+  }
+
+  export type MindsetAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Mindset to aggregate.
+     */
+    where?: MindsetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Mindsets to fetch.
+     */
+    orderBy?: MindsetOrderByWithRelationInput | MindsetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MindsetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Mindsets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Mindsets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Mindsets
+    **/
+    _count?: true | MindsetCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MindsetMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MindsetMaxAggregateInputType
+  }
+
+  export type GetMindsetAggregateType<T extends MindsetAggregateArgs> = {
+        [P in keyof T & keyof AggregateMindset]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMindset[P]>
+      : GetScalarType<T[P], AggregateMindset[P]>
+  }
+
+
+
+
+  export type MindsetGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MindsetWhereInput
+    orderBy?: MindsetOrderByWithAggregationInput | MindsetOrderByWithAggregationInput[]
+    by: MindsetScalarFieldEnum[] | MindsetScalarFieldEnum
+    having?: MindsetScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MindsetCountAggregateInputType | true
+    _min?: MindsetMinAggregateInputType
+    _max?: MindsetMaxAggregateInputType
+  }
+
+  export type MindsetGroupByOutputType = {
+    id: string
+    name: string
+    _count: MindsetCountAggregateOutputType | null
+    _min: MindsetMinAggregateOutputType | null
+    _max: MindsetMaxAggregateOutputType | null
+  }
+
+  type GetMindsetGroupByPayload<T extends MindsetGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MindsetGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MindsetGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MindsetGroupByOutputType[P]>
+            : GetScalarType<T[P], MindsetGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MindsetSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    tasks?: boolean | Mindset$tasksArgs<ExtArgs>
+    _count?: boolean | MindsetCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mindset"]>
+
+  export type MindsetSelectScalar = {
+    id?: boolean
+    name?: boolean
+  }
+
+  export type MindsetInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    tasks?: boolean | Mindset$tasksArgs<ExtArgs>
+    _count?: boolean | MindsetCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+
+  export type $MindsetPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Mindset"
+    objects: {
+      tasks: Prisma.$TaskPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+    }, ExtArgs["result"]["mindset"]>
+    composites: {}
+  }
+
+
+  type MindsetGetPayload<S extends boolean | null | undefined | MindsetDefaultArgs> = $Result.GetResult<Prisma.$MindsetPayload, S>
+
+  type MindsetCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<MindsetFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: MindsetCountAggregateInputType | true
+    }
+
+  export interface MindsetDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Mindset'], meta: { name: 'Mindset' } }
+    /**
+     * Find zero or one Mindset that matches the filter.
+     * @param {MindsetFindUniqueArgs} args - Arguments to find a Mindset
+     * @example
+     * // Get one Mindset
+     * const mindset = await prisma.mindset.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUnique<T extends MindsetFindUniqueArgs<ExtArgs>>(
+      args: SelectSubset<T, MindsetFindUniqueArgs<ExtArgs>>
+    ): Prisma__MindsetClient<$Result.GetResult<Prisma.$MindsetPayload<ExtArgs>, T, 'findUnique'> | null, null, ExtArgs>
+
+    /**
+     * Find one Mindset that matches the filter or throw an error  with `error.code='P2025'` 
+     *     if no matches were found.
+     * @param {MindsetFindUniqueOrThrowArgs} args - Arguments to find a Mindset
+     * @example
+     * // Get one Mindset
+     * const mindset = await prisma.mindset.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUniqueOrThrow<T extends MindsetFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, MindsetFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__MindsetClient<$Result.GetResult<Prisma.$MindsetPayload<ExtArgs>, T, 'findUniqueOrThrow'>, never, ExtArgs>
+
+    /**
+     * Find the first Mindset that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MindsetFindFirstArgs} args - Arguments to find a Mindset
+     * @example
+     * // Get one Mindset
+     * const mindset = await prisma.mindset.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirst<T extends MindsetFindFirstArgs<ExtArgs>>(
+      args?: SelectSubset<T, MindsetFindFirstArgs<ExtArgs>>
+    ): Prisma__MindsetClient<$Result.GetResult<Prisma.$MindsetPayload<ExtArgs>, T, 'findFirst'> | null, null, ExtArgs>
+
+    /**
+     * Find the first Mindset that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MindsetFindFirstOrThrowArgs} args - Arguments to find a Mindset
+     * @example
+     * // Get one Mindset
+     * const mindset = await prisma.mindset.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirstOrThrow<T extends MindsetFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, MindsetFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__MindsetClient<$Result.GetResult<Prisma.$MindsetPayload<ExtArgs>, T, 'findFirstOrThrow'>, never, ExtArgs>
+
+    /**
+     * Find zero or more Mindsets that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MindsetFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Mindsets
+     * const mindsets = await prisma.mindset.findMany()
+     * 
+     * // Get first 10 Mindsets
+     * const mindsets = await prisma.mindset.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mindsetWithIdOnly = await prisma.mindset.findMany({ select: { id: true } })
+     * 
+    **/
+    findMany<T extends MindsetFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, MindsetFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MindsetPayload<ExtArgs>, T, 'findMany'>>
+
+    /**
+     * Create a Mindset.
+     * @param {MindsetCreateArgs} args - Arguments to create a Mindset.
+     * @example
+     * // Create one Mindset
+     * const Mindset = await prisma.mindset.create({
+     *   data: {
+     *     // ... data to create a Mindset
+     *   }
+     * })
+     * 
+    **/
+    create<T extends MindsetCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, MindsetCreateArgs<ExtArgs>>
+    ): Prisma__MindsetClient<$Result.GetResult<Prisma.$MindsetPayload<ExtArgs>, T, 'create'>, never, ExtArgs>
+
+    /**
+     * Create many Mindsets.
+     *     @param {MindsetCreateManyArgs} args - Arguments to create many Mindsets.
+     *     @example
+     *     // Create many Mindsets
+     *     const mindset = await prisma.mindset.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends MindsetCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, MindsetCreateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Mindset.
+     * @param {MindsetDeleteArgs} args - Arguments to delete one Mindset.
+     * @example
+     * // Delete one Mindset
+     * const Mindset = await prisma.mindset.delete({
+     *   where: {
+     *     // ... filter to delete one Mindset
+     *   }
+     * })
+     * 
+    **/
+    delete<T extends MindsetDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, MindsetDeleteArgs<ExtArgs>>
+    ): Prisma__MindsetClient<$Result.GetResult<Prisma.$MindsetPayload<ExtArgs>, T, 'delete'>, never, ExtArgs>
+
+    /**
+     * Update one Mindset.
+     * @param {MindsetUpdateArgs} args - Arguments to update one Mindset.
+     * @example
+     * // Update one Mindset
+     * const mindset = await prisma.mindset.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    update<T extends MindsetUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, MindsetUpdateArgs<ExtArgs>>
+    ): Prisma__MindsetClient<$Result.GetResult<Prisma.$MindsetPayload<ExtArgs>, T, 'update'>, never, ExtArgs>
+
+    /**
+     * Delete zero or more Mindsets.
+     * @param {MindsetDeleteManyArgs} args - Arguments to filter Mindsets to delete.
+     * @example
+     * // Delete a few Mindsets
+     * const { count } = await prisma.mindset.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+    **/
+    deleteMany<T extends MindsetDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, MindsetDeleteManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Mindsets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MindsetUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Mindsets
+     * const mindset = await prisma.mindset.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    updateMany<T extends MindsetUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, MindsetUpdateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Mindset.
+     * @param {MindsetUpsertArgs} args - Arguments to update or create a Mindset.
+     * @example
+     * // Update or create a Mindset
+     * const mindset = await prisma.mindset.upsert({
+     *   create: {
+     *     // ... data to create a Mindset
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Mindset we want to update
+     *   }
+     * })
+    **/
+    upsert<T extends MindsetUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, MindsetUpsertArgs<ExtArgs>>
+    ): Prisma__MindsetClient<$Result.GetResult<Prisma.$MindsetPayload<ExtArgs>, T, 'upsert'>, never, ExtArgs>
+
+    /**
+     * Count the number of Mindsets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MindsetCountArgs} args - Arguments to filter Mindsets to count.
+     * @example
+     * // Count the number of Mindsets
+     * const count = await prisma.mindset.count({
+     *   where: {
+     *     // ... the filter for the Mindsets we want to count
+     *   }
+     * })
+    **/
+    count<T extends MindsetCountArgs>(
+      args?: Subset<T, MindsetCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MindsetCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Mindset.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MindsetAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MindsetAggregateArgs>(args: Subset<T, MindsetAggregateArgs>): Prisma.PrismaPromise<GetMindsetAggregateType<T>>
+
+    /**
+     * Group by Mindset.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MindsetGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MindsetGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MindsetGroupByArgs['orderBy'] }
+        : { orderBy?: MindsetGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MindsetGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMindsetGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Mindset model
+   */
+  readonly fields: MindsetFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Mindset.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MindsetClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: 'PrismaPromise';
+
+    tasks<T extends Mindset$tasksArgs<ExtArgs> = {}>(args?: Subset<T, Mindset$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, 'findMany'> | Null>;
+
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>;
+  }
+
+
+
+  /**
+   * Fields of the Mindset model
+   */ 
+  interface MindsetFieldRefs {
+    readonly id: FieldRef<"Mindset", 'String'>
+    readonly name: FieldRef<"Mindset", 'String'>
+  }
+    
+
+  // Custom InputTypes
+
+  /**
+   * Mindset findUnique
+   */
+  export type MindsetFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Mindset
+     */
+    select?: MindsetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: MindsetInclude<ExtArgs> | null
+    /**
+     * Filter, which Mindset to fetch.
+     */
+    where: MindsetWhereUniqueInput
+  }
+
+
+  /**
+   * Mindset findUniqueOrThrow
+   */
+  export type MindsetFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Mindset
+     */
+    select?: MindsetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: MindsetInclude<ExtArgs> | null
+    /**
+     * Filter, which Mindset to fetch.
+     */
+    where: MindsetWhereUniqueInput
+  }
+
+
+  /**
+   * Mindset findFirst
+   */
+  export type MindsetFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Mindset
+     */
+    select?: MindsetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: MindsetInclude<ExtArgs> | null
+    /**
+     * Filter, which Mindset to fetch.
+     */
+    where?: MindsetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Mindsets to fetch.
+     */
+    orderBy?: MindsetOrderByWithRelationInput | MindsetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Mindsets.
+     */
+    cursor?: MindsetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Mindsets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Mindsets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Mindsets.
+     */
+    distinct?: MindsetScalarFieldEnum | MindsetScalarFieldEnum[]
+  }
+
+
+  /**
+   * Mindset findFirstOrThrow
+   */
+  export type MindsetFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Mindset
+     */
+    select?: MindsetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: MindsetInclude<ExtArgs> | null
+    /**
+     * Filter, which Mindset to fetch.
+     */
+    where?: MindsetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Mindsets to fetch.
+     */
+    orderBy?: MindsetOrderByWithRelationInput | MindsetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Mindsets.
+     */
+    cursor?: MindsetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Mindsets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Mindsets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Mindsets.
+     */
+    distinct?: MindsetScalarFieldEnum | MindsetScalarFieldEnum[]
+  }
+
+
+  /**
+   * Mindset findMany
+   */
+  export type MindsetFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Mindset
+     */
+    select?: MindsetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: MindsetInclude<ExtArgs> | null
+    /**
+     * Filter, which Mindsets to fetch.
+     */
+    where?: MindsetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Mindsets to fetch.
+     */
+    orderBy?: MindsetOrderByWithRelationInput | MindsetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Mindsets.
+     */
+    cursor?: MindsetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Mindsets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Mindsets.
+     */
+    skip?: number
+    distinct?: MindsetScalarFieldEnum | MindsetScalarFieldEnum[]
+  }
+
+
+  /**
+   * Mindset create
+   */
+  export type MindsetCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Mindset
+     */
+    select?: MindsetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: MindsetInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Mindset.
+     */
+    data: XOR<MindsetCreateInput, MindsetUncheckedCreateInput>
+  }
+
+
+  /**
+   * Mindset createMany
+   */
+  export type MindsetCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Mindsets.
+     */
+    data: MindsetCreateManyInput | MindsetCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+
+  /**
+   * Mindset update
+   */
+  export type MindsetUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Mindset
+     */
+    select?: MindsetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: MindsetInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Mindset.
+     */
+    data: XOR<MindsetUpdateInput, MindsetUncheckedUpdateInput>
+    /**
+     * Choose, which Mindset to update.
+     */
+    where: MindsetWhereUniqueInput
+  }
+
+
+  /**
+   * Mindset updateMany
+   */
+  export type MindsetUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Mindsets.
+     */
+    data: XOR<MindsetUpdateManyMutationInput, MindsetUncheckedUpdateManyInput>
+    /**
+     * Filter which Mindsets to update
+     */
+    where?: MindsetWhereInput
+  }
+
+
+  /**
+   * Mindset upsert
+   */
+  export type MindsetUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Mindset
+     */
+    select?: MindsetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: MindsetInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Mindset to update in case it exists.
+     */
+    where: MindsetWhereUniqueInput
+    /**
+     * In case the Mindset found by the `where` argument doesn't exist, create a new Mindset with this data.
+     */
+    create: XOR<MindsetCreateInput, MindsetUncheckedCreateInput>
+    /**
+     * In case the Mindset was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MindsetUpdateInput, MindsetUncheckedUpdateInput>
+  }
+
+
+  /**
+   * Mindset delete
+   */
+  export type MindsetDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Mindset
+     */
+    select?: MindsetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: MindsetInclude<ExtArgs> | null
+    /**
+     * Filter which Mindset to delete.
+     */
+    where: MindsetWhereUniqueInput
+  }
+
+
+  /**
+   * Mindset deleteMany
+   */
+  export type MindsetDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Mindsets to delete
+     */
+    where?: MindsetWhereInput
+  }
+
+
+  /**
+   * Mindset.tasks
+   */
+  export type Mindset$tasksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
+    where?: TaskWhereInput
+    orderBy?: TaskOrderByWithRelationInput | TaskOrderByWithRelationInput[]
+    cursor?: TaskWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TaskScalarFieldEnum | TaskScalarFieldEnum[]
+  }
+
+
+  /**
+   * Mindset without action
+   */
+  export type MindsetDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Mindset
+     */
+    select?: MindsetSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: MindsetInclude<ExtArgs> | null
+  }
+
+
+
+  /**
+   * Model Status
+   */
+
+  export type AggregateStatus = {
+    _count: StatusCountAggregateOutputType | null
+    _min: StatusMinAggregateOutputType | null
+    _max: StatusMaxAggregateOutputType | null
+  }
+
+  export type StatusMinAggregateOutputType = {
+    id: string | null
+    name: string | null
+  }
+
+  export type StatusMaxAggregateOutputType = {
+    id: string | null
+    name: string | null
+  }
+
+  export type StatusCountAggregateOutputType = {
+    id: number
+    name: number
+    _all: number
+  }
+
+
+  export type StatusMinAggregateInputType = {
+    id?: true
+    name?: true
+  }
+
+  export type StatusMaxAggregateInputType = {
+    id?: true
+    name?: true
+  }
+
+  export type StatusCountAggregateInputType = {
+    id?: true
+    name?: true
+    _all?: true
+  }
+
+  export type StatusAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Status to aggregate.
+     */
+    where?: StatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Statuses to fetch.
+     */
+    orderBy?: StatusOrderByWithRelationInput | StatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: StatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Statuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Statuses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Statuses
+    **/
+    _count?: true | StatusCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: StatusMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: StatusMaxAggregateInputType
+  }
+
+  export type GetStatusAggregateType<T extends StatusAggregateArgs> = {
+        [P in keyof T & keyof AggregateStatus]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateStatus[P]>
+      : GetScalarType<T[P], AggregateStatus[P]>
+  }
+
+
+
+
+  export type StatusGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: StatusWhereInput
+    orderBy?: StatusOrderByWithAggregationInput | StatusOrderByWithAggregationInput[]
+    by: StatusScalarFieldEnum[] | StatusScalarFieldEnum
+    having?: StatusScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: StatusCountAggregateInputType | true
+    _min?: StatusMinAggregateInputType
+    _max?: StatusMaxAggregateInputType
+  }
+
+  export type StatusGroupByOutputType = {
+    id: string
+    name: string
+    _count: StatusCountAggregateOutputType | null
+    _min: StatusMinAggregateOutputType | null
+    _max: StatusMaxAggregateOutputType | null
+  }
+
+  type GetStatusGroupByPayload<T extends StatusGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<StatusGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof StatusGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], StatusGroupByOutputType[P]>
+            : GetScalarType<T[P], StatusGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type StatusSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    tasks?: boolean | Status$tasksArgs<ExtArgs>
+    _count?: boolean | StatusCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["status"]>
+
+  export type StatusSelectScalar = {
+    id?: boolean
+    name?: boolean
+  }
+
+  export type StatusInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    tasks?: boolean | Status$tasksArgs<ExtArgs>
+    _count?: boolean | StatusCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+
+  export type $StatusPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Status"
+    objects: {
+      tasks: Prisma.$TaskPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      name: string
+    }, ExtArgs["result"]["status"]>
+    composites: {}
+  }
+
+
+  type StatusGetPayload<S extends boolean | null | undefined | StatusDefaultArgs> = $Result.GetResult<Prisma.$StatusPayload, S>
+
+  type StatusCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<StatusFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: StatusCountAggregateInputType | true
+    }
+
+  export interface StatusDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Status'], meta: { name: 'Status' } }
+    /**
+     * Find zero or one Status that matches the filter.
+     * @param {StatusFindUniqueArgs} args - Arguments to find a Status
+     * @example
+     * // Get one Status
+     * const status = await prisma.status.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUnique<T extends StatusFindUniqueArgs<ExtArgs>>(
+      args: SelectSubset<T, StatusFindUniqueArgs<ExtArgs>>
+    ): Prisma__StatusClient<$Result.GetResult<Prisma.$StatusPayload<ExtArgs>, T, 'findUnique'> | null, null, ExtArgs>
+
+    /**
+     * Find one Status that matches the filter or throw an error  with `error.code='P2025'` 
+     *     if no matches were found.
+     * @param {StatusFindUniqueOrThrowArgs} args - Arguments to find a Status
+     * @example
+     * // Get one Status
+     * const status = await prisma.status.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUniqueOrThrow<T extends StatusFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, StatusFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__StatusClient<$Result.GetResult<Prisma.$StatusPayload<ExtArgs>, T, 'findUniqueOrThrow'>, never, ExtArgs>
+
+    /**
+     * Find the first Status that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StatusFindFirstArgs} args - Arguments to find a Status
+     * @example
+     * // Get one Status
+     * const status = await prisma.status.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirst<T extends StatusFindFirstArgs<ExtArgs>>(
+      args?: SelectSubset<T, StatusFindFirstArgs<ExtArgs>>
+    ): Prisma__StatusClient<$Result.GetResult<Prisma.$StatusPayload<ExtArgs>, T, 'findFirst'> | null, null, ExtArgs>
+
+    /**
+     * Find the first Status that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StatusFindFirstOrThrowArgs} args - Arguments to find a Status
+     * @example
+     * // Get one Status
+     * const status = await prisma.status.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirstOrThrow<T extends StatusFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, StatusFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__StatusClient<$Result.GetResult<Prisma.$StatusPayload<ExtArgs>, T, 'findFirstOrThrow'>, never, ExtArgs>
+
+    /**
+     * Find zero or more Statuses that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StatusFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Statuses
+     * const statuses = await prisma.status.findMany()
+     * 
+     * // Get first 10 Statuses
+     * const statuses = await prisma.status.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const statusWithIdOnly = await prisma.status.findMany({ select: { id: true } })
+     * 
+    **/
+    findMany<T extends StatusFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, StatusFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Result.GetResult<Prisma.$StatusPayload<ExtArgs>, T, 'findMany'>>
+
+    /**
+     * Create a Status.
+     * @param {StatusCreateArgs} args - Arguments to create a Status.
+     * @example
+     * // Create one Status
+     * const Status = await prisma.status.create({
+     *   data: {
+     *     // ... data to create a Status
+     *   }
+     * })
+     * 
+    **/
+    create<T extends StatusCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, StatusCreateArgs<ExtArgs>>
+    ): Prisma__StatusClient<$Result.GetResult<Prisma.$StatusPayload<ExtArgs>, T, 'create'>, never, ExtArgs>
+
+    /**
+     * Create many Statuses.
+     *     @param {StatusCreateManyArgs} args - Arguments to create many Statuses.
+     *     @example
+     *     // Create many Statuses
+     *     const status = await prisma.status.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends StatusCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, StatusCreateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Status.
+     * @param {StatusDeleteArgs} args - Arguments to delete one Status.
+     * @example
+     * // Delete one Status
+     * const Status = await prisma.status.delete({
+     *   where: {
+     *     // ... filter to delete one Status
+     *   }
+     * })
+     * 
+    **/
+    delete<T extends StatusDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, StatusDeleteArgs<ExtArgs>>
+    ): Prisma__StatusClient<$Result.GetResult<Prisma.$StatusPayload<ExtArgs>, T, 'delete'>, never, ExtArgs>
+
+    /**
+     * Update one Status.
+     * @param {StatusUpdateArgs} args - Arguments to update one Status.
+     * @example
+     * // Update one Status
+     * const status = await prisma.status.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    update<T extends StatusUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, StatusUpdateArgs<ExtArgs>>
+    ): Prisma__StatusClient<$Result.GetResult<Prisma.$StatusPayload<ExtArgs>, T, 'update'>, never, ExtArgs>
+
+    /**
+     * Delete zero or more Statuses.
+     * @param {StatusDeleteManyArgs} args - Arguments to filter Statuses to delete.
+     * @example
+     * // Delete a few Statuses
+     * const { count } = await prisma.status.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+    **/
+    deleteMany<T extends StatusDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, StatusDeleteManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Statuses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StatusUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Statuses
+     * const status = await prisma.status.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    updateMany<T extends StatusUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, StatusUpdateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Status.
+     * @param {StatusUpsertArgs} args - Arguments to update or create a Status.
+     * @example
+     * // Update or create a Status
+     * const status = await prisma.status.upsert({
+     *   create: {
+     *     // ... data to create a Status
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Status we want to update
+     *   }
+     * })
+    **/
+    upsert<T extends StatusUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, StatusUpsertArgs<ExtArgs>>
+    ): Prisma__StatusClient<$Result.GetResult<Prisma.$StatusPayload<ExtArgs>, T, 'upsert'>, never, ExtArgs>
+
+    /**
+     * Count the number of Statuses.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StatusCountArgs} args - Arguments to filter Statuses to count.
+     * @example
+     * // Count the number of Statuses
+     * const count = await prisma.status.count({
+     *   where: {
+     *     // ... the filter for the Statuses we want to count
+     *   }
+     * })
+    **/
+    count<T extends StatusCountArgs>(
+      args?: Subset<T, StatusCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], StatusCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Status.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StatusAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends StatusAggregateArgs>(args: Subset<T, StatusAggregateArgs>): Prisma.PrismaPromise<GetStatusAggregateType<T>>
+
+    /**
+     * Group by Status.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {StatusGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends StatusGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: StatusGroupByArgs['orderBy'] }
+        : { orderBy?: StatusGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, StatusGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetStatusGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Status model
+   */
+  readonly fields: StatusFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Status.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__StatusClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: 'PrismaPromise';
+
+    tasks<T extends Status$tasksArgs<ExtArgs> = {}>(args?: Subset<T, Status$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, 'findMany'> | Null>;
+
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>;
+  }
+
+
+
+  /**
+   * Fields of the Status model
+   */ 
+  interface StatusFieldRefs {
+    readonly id: FieldRef<"Status", 'String'>
+    readonly name: FieldRef<"Status", 'String'>
+  }
+    
+
+  // Custom InputTypes
+
+  /**
+   * Status findUnique
+   */
+  export type StatusFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Status
+     */
+    select?: StatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: StatusInclude<ExtArgs> | null
+    /**
+     * Filter, which Status to fetch.
+     */
+    where: StatusWhereUniqueInput
+  }
+
+
+  /**
+   * Status findUniqueOrThrow
+   */
+  export type StatusFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Status
+     */
+    select?: StatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: StatusInclude<ExtArgs> | null
+    /**
+     * Filter, which Status to fetch.
+     */
+    where: StatusWhereUniqueInput
+  }
+
+
+  /**
+   * Status findFirst
+   */
+  export type StatusFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Status
+     */
+    select?: StatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: StatusInclude<ExtArgs> | null
+    /**
+     * Filter, which Status to fetch.
+     */
+    where?: StatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Statuses to fetch.
+     */
+    orderBy?: StatusOrderByWithRelationInput | StatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Statuses.
+     */
+    cursor?: StatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Statuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Statuses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Statuses.
+     */
+    distinct?: StatusScalarFieldEnum | StatusScalarFieldEnum[]
+  }
+
+
+  /**
+   * Status findFirstOrThrow
+   */
+  export type StatusFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Status
+     */
+    select?: StatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: StatusInclude<ExtArgs> | null
+    /**
+     * Filter, which Status to fetch.
+     */
+    where?: StatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Statuses to fetch.
+     */
+    orderBy?: StatusOrderByWithRelationInput | StatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Statuses.
+     */
+    cursor?: StatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Statuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Statuses.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Statuses.
+     */
+    distinct?: StatusScalarFieldEnum | StatusScalarFieldEnum[]
+  }
+
+
+  /**
+   * Status findMany
+   */
+  export type StatusFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Status
+     */
+    select?: StatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: StatusInclude<ExtArgs> | null
+    /**
+     * Filter, which Statuses to fetch.
+     */
+    where?: StatusWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Statuses to fetch.
+     */
+    orderBy?: StatusOrderByWithRelationInput | StatusOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Statuses.
+     */
+    cursor?: StatusWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Statuses from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Statuses.
+     */
+    skip?: number
+    distinct?: StatusScalarFieldEnum | StatusScalarFieldEnum[]
+  }
+
+
+  /**
+   * Status create
+   */
+  export type StatusCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Status
+     */
+    select?: StatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: StatusInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Status.
+     */
+    data: XOR<StatusCreateInput, StatusUncheckedCreateInput>
+  }
+
+
+  /**
+   * Status createMany
+   */
+  export type StatusCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Statuses.
+     */
+    data: StatusCreateManyInput | StatusCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+
+  /**
+   * Status update
+   */
+  export type StatusUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Status
+     */
+    select?: StatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: StatusInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Status.
+     */
+    data: XOR<StatusUpdateInput, StatusUncheckedUpdateInput>
+    /**
+     * Choose, which Status to update.
+     */
+    where: StatusWhereUniqueInput
+  }
+
+
+  /**
+   * Status updateMany
+   */
+  export type StatusUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Statuses.
+     */
+    data: XOR<StatusUpdateManyMutationInput, StatusUncheckedUpdateManyInput>
+    /**
+     * Filter which Statuses to update
+     */
+    where?: StatusWhereInput
+  }
+
+
+  /**
+   * Status upsert
+   */
+  export type StatusUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Status
+     */
+    select?: StatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: StatusInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Status to update in case it exists.
+     */
+    where: StatusWhereUniqueInput
+    /**
+     * In case the Status found by the `where` argument doesn't exist, create a new Status with this data.
+     */
+    create: XOR<StatusCreateInput, StatusUncheckedCreateInput>
+    /**
+     * In case the Status was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<StatusUpdateInput, StatusUncheckedUpdateInput>
+  }
+
+
+  /**
+   * Status delete
+   */
+  export type StatusDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Status
+     */
+    select?: StatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: StatusInclude<ExtArgs> | null
+    /**
+     * Filter which Status to delete.
+     */
+    where: StatusWhereUniqueInput
+  }
+
+
+  /**
+   * Status deleteMany
+   */
+  export type StatusDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Statuses to delete
+     */
+    where?: StatusWhereInput
+  }
+
+
+  /**
+   * Status.tasks
+   */
+  export type Status$tasksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Task
+     */
+    select?: TaskSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: TaskInclude<ExtArgs> | null
+    where?: TaskWhereInput
+    orderBy?: TaskOrderByWithRelationInput | TaskOrderByWithRelationInput[]
+    cursor?: TaskWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TaskScalarFieldEnum | TaskScalarFieldEnum[]
+  }
+
+
+  /**
+   * Status without action
+   */
+  export type StatusDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Status
+     */
+    select?: StatusSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well.
+     */
+    include?: StatusInclude<ExtArgs> | null
   }
 
 
@@ -1732,11 +3854,29 @@ export namespace Prisma {
   export const TaskScalarFieldEnum: {
     id: 'id',
     title: 'title',
+    mindsetId: 'mindsetId',
+    statusId: 'statusId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
+
+
+  export const MindsetScalarFieldEnum: {
+    id: 'id',
+    name: 'name'
+  };
+
+  export type MindsetScalarFieldEnum = (typeof MindsetScalarFieldEnum)[keyof typeof MindsetScalarFieldEnum]
+
+
+  export const StatusScalarFieldEnum: {
+    id: 'id',
+    name: 'name'
+  };
+
+  export type StatusScalarFieldEnum = (typeof StatusScalarFieldEnum)[keyof typeof StatusScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -1811,15 +3951,23 @@ export namespace Prisma {
     NOT?: TaskWhereInput | TaskWhereInput[]
     id?: StringFilter<"Task"> | string
     title?: StringFilter<"Task"> | string
+    mindsetId?: StringFilter<"Task"> | string
+    statusId?: StringFilter<"Task"> | string
     createdAt?: DateTimeFilter<"Task"> | Date | string
     updatedAt?: DateTimeFilter<"Task"> | Date | string
+    mindset?: XOR<MindsetRelationFilter, MindsetWhereInput>
+    status?: XOR<StatusRelationFilter, StatusWhereInput>
   }
 
   export type TaskOrderByWithRelationInput = {
     id?: SortOrder
     title?: SortOrder
+    mindsetId?: SortOrder
+    statusId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    mindset?: MindsetOrderByWithRelationInput
+    status?: StatusOrderByWithRelationInput
   }
 
   export type TaskWhereUniqueInput = Prisma.AtLeast<{
@@ -1828,13 +3976,19 @@ export namespace Prisma {
     OR?: TaskWhereInput[]
     NOT?: TaskWhereInput | TaskWhereInput[]
     title?: StringFilter<"Task"> | string
+    mindsetId?: StringFilter<"Task"> | string
+    statusId?: StringFilter<"Task"> | string
     createdAt?: DateTimeFilter<"Task"> | Date | string
     updatedAt?: DateTimeFilter<"Task"> | Date | string
+    mindset?: XOR<MindsetRelationFilter, MindsetWhereInput>
+    status?: XOR<StatusRelationFilter, StatusWhereInput>
   }, "id">
 
   export type TaskOrderByWithAggregationInput = {
     id?: SortOrder
     title?: SortOrder
+    mindsetId?: SortOrder
+    statusId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: TaskCountOrderByAggregateInput
@@ -1848,8 +4002,90 @@ export namespace Prisma {
     NOT?: TaskScalarWhereWithAggregatesInput | TaskScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Task"> | string
     title?: StringWithAggregatesFilter<"Task"> | string
+    mindsetId?: StringWithAggregatesFilter<"Task"> | string
+    statusId?: StringWithAggregatesFilter<"Task"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Task"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Task"> | Date | string
+  }
+
+  export type MindsetWhereInput = {
+    AND?: MindsetWhereInput | MindsetWhereInput[]
+    OR?: MindsetWhereInput[]
+    NOT?: MindsetWhereInput | MindsetWhereInput[]
+    id?: StringFilter<"Mindset"> | string
+    name?: StringFilter<"Mindset"> | string
+    tasks?: TaskListRelationFilter
+  }
+
+  export type MindsetOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    tasks?: TaskOrderByRelationAggregateInput
+  }
+
+  export type MindsetWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    name?: string
+    AND?: MindsetWhereInput | MindsetWhereInput[]
+    OR?: MindsetWhereInput[]
+    NOT?: MindsetWhereInput | MindsetWhereInput[]
+    tasks?: TaskListRelationFilter
+  }, "id" | "name">
+
+  export type MindsetOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    _count?: MindsetCountOrderByAggregateInput
+    _max?: MindsetMaxOrderByAggregateInput
+    _min?: MindsetMinOrderByAggregateInput
+  }
+
+  export type MindsetScalarWhereWithAggregatesInput = {
+    AND?: MindsetScalarWhereWithAggregatesInput | MindsetScalarWhereWithAggregatesInput[]
+    OR?: MindsetScalarWhereWithAggregatesInput[]
+    NOT?: MindsetScalarWhereWithAggregatesInput | MindsetScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Mindset"> | string
+    name?: StringWithAggregatesFilter<"Mindset"> | string
+  }
+
+  export type StatusWhereInput = {
+    AND?: StatusWhereInput | StatusWhereInput[]
+    OR?: StatusWhereInput[]
+    NOT?: StatusWhereInput | StatusWhereInput[]
+    id?: StringFilter<"Status"> | string
+    name?: StringFilter<"Status"> | string
+    tasks?: TaskListRelationFilter
+  }
+
+  export type StatusOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    tasks?: TaskOrderByRelationAggregateInput
+  }
+
+  export type StatusWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    name?: string
+    AND?: StatusWhereInput | StatusWhereInput[]
+    OR?: StatusWhereInput[]
+    NOT?: StatusWhereInput | StatusWhereInput[]
+    tasks?: TaskListRelationFilter
+  }, "id" | "name">
+
+  export type StatusOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    _count?: StatusCountOrderByAggregateInput
+    _max?: StatusMaxOrderByAggregateInput
+    _min?: StatusMinOrderByAggregateInput
+  }
+
+  export type StatusScalarWhereWithAggregatesInput = {
+    AND?: StatusScalarWhereWithAggregatesInput | StatusScalarWhereWithAggregatesInput[]
+    OR?: StatusScalarWhereWithAggregatesInput[]
+    NOT?: StatusScalarWhereWithAggregatesInput | StatusScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Status"> | string
+    name?: StringWithAggregatesFilter<"Status"> | string
   }
 
   export type TaskCreateInput = {
@@ -1857,11 +4093,15 @@ export namespace Prisma {
     title: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    mindset: MindsetCreateNestedOneWithoutTasksInput
+    status: StatusCreateNestedOneWithoutTasksInput
   }
 
   export type TaskUncheckedCreateInput = {
     id?: string
     title: string
+    mindsetId: string
+    statusId: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -1871,11 +4111,15 @@ export namespace Prisma {
     title?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    mindset?: MindsetUpdateOneRequiredWithoutTasksNestedInput
+    status?: StatusUpdateOneRequiredWithoutTasksNestedInput
   }
 
   export type TaskUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    mindsetId?: StringFieldUpdateOperationsInput | string
+    statusId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -1883,6 +4127,8 @@ export namespace Prisma {
   export type TaskCreateManyInput = {
     id?: string
     title: string
+    mindsetId: string
+    statusId: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -1897,8 +4143,88 @@ export namespace Prisma {
   export type TaskUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
+    mindsetId?: StringFieldUpdateOperationsInput | string
+    statusId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MindsetCreateInput = {
+    id?: string
+    name: string
+    tasks?: TaskCreateNestedManyWithoutMindsetInput
+  }
+
+  export type MindsetUncheckedCreateInput = {
+    id?: string
+    name: string
+    tasks?: TaskUncheckedCreateNestedManyWithoutMindsetInput
+  }
+
+  export type MindsetUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    tasks?: TaskUpdateManyWithoutMindsetNestedInput
+  }
+
+  export type MindsetUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    tasks?: TaskUncheckedUpdateManyWithoutMindsetNestedInput
+  }
+
+  export type MindsetCreateManyInput = {
+    id?: string
+    name: string
+  }
+
+  export type MindsetUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type MindsetUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type StatusCreateInput = {
+    id?: string
+    name: string
+    tasks?: TaskCreateNestedManyWithoutStatusInput
+  }
+
+  export type StatusUncheckedCreateInput = {
+    id?: string
+    name: string
+    tasks?: TaskUncheckedCreateNestedManyWithoutStatusInput
+  }
+
+  export type StatusUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    tasks?: TaskUpdateManyWithoutStatusNestedInput
+  }
+
+  export type StatusUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    tasks?: TaskUncheckedUpdateManyWithoutStatusNestedInput
+  }
+
+  export type StatusCreateManyInput = {
+    id?: string
+    name: string
+  }
+
+  export type StatusUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type StatusUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
   }
 
   export type StringFilter<$PrismaModel = never> = {
@@ -1927,9 +4253,21 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type MindsetRelationFilter = {
+    is?: MindsetWhereInput
+    isNot?: MindsetWhereInput
+  }
+
+  export type StatusRelationFilter = {
+    is?: StatusWhereInput
+    isNot?: StatusWhereInput
+  }
+
   export type TaskCountOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
+    mindsetId?: SortOrder
+    statusId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -1937,6 +4275,8 @@ export namespace Prisma {
   export type TaskMaxOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
+    mindsetId?: SortOrder
+    statusId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -1944,6 +4284,8 @@ export namespace Prisma {
   export type TaskMinOrderByAggregateInput = {
     id?: SortOrder
     title?: SortOrder
+    mindsetId?: SortOrder
+    statusId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -1980,12 +4322,164 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type TaskListRelationFilter = {
+    every?: TaskWhereInput
+    some?: TaskWhereInput
+    none?: TaskWhereInput
+  }
+
+  export type TaskOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MindsetCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+  }
+
+  export type MindsetMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+  }
+
+  export type MindsetMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+  }
+
+  export type StatusCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+  }
+
+  export type StatusMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+  }
+
+  export type StatusMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+  }
+
+  export type MindsetCreateNestedOneWithoutTasksInput = {
+    create?: XOR<MindsetCreateWithoutTasksInput, MindsetUncheckedCreateWithoutTasksInput>
+    connectOrCreate?: MindsetCreateOrConnectWithoutTasksInput
+    connect?: MindsetWhereUniqueInput
+  }
+
+  export type StatusCreateNestedOneWithoutTasksInput = {
+    create?: XOR<StatusCreateWithoutTasksInput, StatusUncheckedCreateWithoutTasksInput>
+    connectOrCreate?: StatusCreateOrConnectWithoutTasksInput
+    connect?: StatusWhereUniqueInput
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type MindsetUpdateOneRequiredWithoutTasksNestedInput = {
+    create?: XOR<MindsetCreateWithoutTasksInput, MindsetUncheckedCreateWithoutTasksInput>
+    connectOrCreate?: MindsetCreateOrConnectWithoutTasksInput
+    upsert?: MindsetUpsertWithoutTasksInput
+    connect?: MindsetWhereUniqueInput
+    update?: XOR<XOR<MindsetUpdateToOneWithWhereWithoutTasksInput, MindsetUpdateWithoutTasksInput>, MindsetUncheckedUpdateWithoutTasksInput>
+  }
+
+  export type StatusUpdateOneRequiredWithoutTasksNestedInput = {
+    create?: XOR<StatusCreateWithoutTasksInput, StatusUncheckedCreateWithoutTasksInput>
+    connectOrCreate?: StatusCreateOrConnectWithoutTasksInput
+    upsert?: StatusUpsertWithoutTasksInput
+    connect?: StatusWhereUniqueInput
+    update?: XOR<XOR<StatusUpdateToOneWithWhereWithoutTasksInput, StatusUpdateWithoutTasksInput>, StatusUncheckedUpdateWithoutTasksInput>
+  }
+
+  export type TaskCreateNestedManyWithoutMindsetInput = {
+    create?: XOR<TaskCreateWithoutMindsetInput, TaskUncheckedCreateWithoutMindsetInput> | TaskCreateWithoutMindsetInput[] | TaskUncheckedCreateWithoutMindsetInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutMindsetInput | TaskCreateOrConnectWithoutMindsetInput[]
+    createMany?: TaskCreateManyMindsetInputEnvelope
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+  }
+
+  export type TaskUncheckedCreateNestedManyWithoutMindsetInput = {
+    create?: XOR<TaskCreateWithoutMindsetInput, TaskUncheckedCreateWithoutMindsetInput> | TaskCreateWithoutMindsetInput[] | TaskUncheckedCreateWithoutMindsetInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutMindsetInput | TaskCreateOrConnectWithoutMindsetInput[]
+    createMany?: TaskCreateManyMindsetInputEnvelope
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+  }
+
+  export type TaskUpdateManyWithoutMindsetNestedInput = {
+    create?: XOR<TaskCreateWithoutMindsetInput, TaskUncheckedCreateWithoutMindsetInput> | TaskCreateWithoutMindsetInput[] | TaskUncheckedCreateWithoutMindsetInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutMindsetInput | TaskCreateOrConnectWithoutMindsetInput[]
+    upsert?: TaskUpsertWithWhereUniqueWithoutMindsetInput | TaskUpsertWithWhereUniqueWithoutMindsetInput[]
+    createMany?: TaskCreateManyMindsetInputEnvelope
+    set?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    disconnect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    delete?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    update?: TaskUpdateWithWhereUniqueWithoutMindsetInput | TaskUpdateWithWhereUniqueWithoutMindsetInput[]
+    updateMany?: TaskUpdateManyWithWhereWithoutMindsetInput | TaskUpdateManyWithWhereWithoutMindsetInput[]
+    deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
+  }
+
+  export type TaskUncheckedUpdateManyWithoutMindsetNestedInput = {
+    create?: XOR<TaskCreateWithoutMindsetInput, TaskUncheckedCreateWithoutMindsetInput> | TaskCreateWithoutMindsetInput[] | TaskUncheckedCreateWithoutMindsetInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutMindsetInput | TaskCreateOrConnectWithoutMindsetInput[]
+    upsert?: TaskUpsertWithWhereUniqueWithoutMindsetInput | TaskUpsertWithWhereUniqueWithoutMindsetInput[]
+    createMany?: TaskCreateManyMindsetInputEnvelope
+    set?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    disconnect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    delete?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    update?: TaskUpdateWithWhereUniqueWithoutMindsetInput | TaskUpdateWithWhereUniqueWithoutMindsetInput[]
+    updateMany?: TaskUpdateManyWithWhereWithoutMindsetInput | TaskUpdateManyWithWhereWithoutMindsetInput[]
+    deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
+  }
+
+  export type TaskCreateNestedManyWithoutStatusInput = {
+    create?: XOR<TaskCreateWithoutStatusInput, TaskUncheckedCreateWithoutStatusInput> | TaskCreateWithoutStatusInput[] | TaskUncheckedCreateWithoutStatusInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutStatusInput | TaskCreateOrConnectWithoutStatusInput[]
+    createMany?: TaskCreateManyStatusInputEnvelope
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+  }
+
+  export type TaskUncheckedCreateNestedManyWithoutStatusInput = {
+    create?: XOR<TaskCreateWithoutStatusInput, TaskUncheckedCreateWithoutStatusInput> | TaskCreateWithoutStatusInput[] | TaskUncheckedCreateWithoutStatusInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutStatusInput | TaskCreateOrConnectWithoutStatusInput[]
+    createMany?: TaskCreateManyStatusInputEnvelope
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+  }
+
+  export type TaskUpdateManyWithoutStatusNestedInput = {
+    create?: XOR<TaskCreateWithoutStatusInput, TaskUncheckedCreateWithoutStatusInput> | TaskCreateWithoutStatusInput[] | TaskUncheckedCreateWithoutStatusInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutStatusInput | TaskCreateOrConnectWithoutStatusInput[]
+    upsert?: TaskUpsertWithWhereUniqueWithoutStatusInput | TaskUpsertWithWhereUniqueWithoutStatusInput[]
+    createMany?: TaskCreateManyStatusInputEnvelope
+    set?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    disconnect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    delete?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    update?: TaskUpdateWithWhereUniqueWithoutStatusInput | TaskUpdateWithWhereUniqueWithoutStatusInput[]
+    updateMany?: TaskUpdateManyWithWhereWithoutStatusInput | TaskUpdateManyWithWhereWithoutStatusInput[]
+    deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
+  }
+
+  export type TaskUncheckedUpdateManyWithoutStatusNestedInput = {
+    create?: XOR<TaskCreateWithoutStatusInput, TaskUncheckedCreateWithoutStatusInput> | TaskCreateWithoutStatusInput[] | TaskUncheckedCreateWithoutStatusInput[]
+    connectOrCreate?: TaskCreateOrConnectWithoutStatusInput | TaskCreateOrConnectWithoutStatusInput[]
+    upsert?: TaskUpsertWithWhereUniqueWithoutStatusInput | TaskUpsertWithWhereUniqueWithoutStatusInput[]
+    createMany?: TaskCreateManyStatusInputEnvelope
+    set?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    disconnect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    delete?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    connect?: TaskWhereUniqueInput | TaskWhereUniqueInput[]
+    update?: TaskUpdateWithWhereUniqueWithoutStatusInput | TaskUpdateWithWhereUniqueWithoutStatusInput[]
+    updateMany?: TaskUpdateManyWithWhereWithoutStatusInput | TaskUpdateManyWithWhereWithoutStatusInput[]
+    deleteMany?: TaskScalarWhereInput | TaskScalarWhereInput[]
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -2055,15 +4549,263 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type MindsetCreateWithoutTasksInput = {
+    id?: string
+    name: string
+  }
+
+  export type MindsetUncheckedCreateWithoutTasksInput = {
+    id?: string
+    name: string
+  }
+
+  export type MindsetCreateOrConnectWithoutTasksInput = {
+    where: MindsetWhereUniqueInput
+    create: XOR<MindsetCreateWithoutTasksInput, MindsetUncheckedCreateWithoutTasksInput>
+  }
+
+  export type StatusCreateWithoutTasksInput = {
+    id?: string
+    name: string
+  }
+
+  export type StatusUncheckedCreateWithoutTasksInput = {
+    id?: string
+    name: string
+  }
+
+  export type StatusCreateOrConnectWithoutTasksInput = {
+    where: StatusWhereUniqueInput
+    create: XOR<StatusCreateWithoutTasksInput, StatusUncheckedCreateWithoutTasksInput>
+  }
+
+  export type MindsetUpsertWithoutTasksInput = {
+    update: XOR<MindsetUpdateWithoutTasksInput, MindsetUncheckedUpdateWithoutTasksInput>
+    create: XOR<MindsetCreateWithoutTasksInput, MindsetUncheckedCreateWithoutTasksInput>
+    where?: MindsetWhereInput
+  }
+
+  export type MindsetUpdateToOneWithWhereWithoutTasksInput = {
+    where?: MindsetWhereInput
+    data: XOR<MindsetUpdateWithoutTasksInput, MindsetUncheckedUpdateWithoutTasksInput>
+  }
+
+  export type MindsetUpdateWithoutTasksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type MindsetUncheckedUpdateWithoutTasksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type StatusUpsertWithoutTasksInput = {
+    update: XOR<StatusUpdateWithoutTasksInput, StatusUncheckedUpdateWithoutTasksInput>
+    create: XOR<StatusCreateWithoutTasksInput, StatusUncheckedCreateWithoutTasksInput>
+    where?: StatusWhereInput
+  }
+
+  export type StatusUpdateToOneWithWhereWithoutTasksInput = {
+    where?: StatusWhereInput
+    data: XOR<StatusUpdateWithoutTasksInput, StatusUncheckedUpdateWithoutTasksInput>
+  }
+
+  export type StatusUpdateWithoutTasksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type StatusUncheckedUpdateWithoutTasksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type TaskCreateWithoutMindsetInput = {
+    id?: string
+    title: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    status: StatusCreateNestedOneWithoutTasksInput
+  }
+
+  export type TaskUncheckedCreateWithoutMindsetInput = {
+    id?: string
+    title: string
+    statusId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskCreateOrConnectWithoutMindsetInput = {
+    where: TaskWhereUniqueInput
+    create: XOR<TaskCreateWithoutMindsetInput, TaskUncheckedCreateWithoutMindsetInput>
+  }
+
+  export type TaskCreateManyMindsetInputEnvelope = {
+    data: TaskCreateManyMindsetInput | TaskCreateManyMindsetInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TaskUpsertWithWhereUniqueWithoutMindsetInput = {
+    where: TaskWhereUniqueInput
+    update: XOR<TaskUpdateWithoutMindsetInput, TaskUncheckedUpdateWithoutMindsetInput>
+    create: XOR<TaskCreateWithoutMindsetInput, TaskUncheckedCreateWithoutMindsetInput>
+  }
+
+  export type TaskUpdateWithWhereUniqueWithoutMindsetInput = {
+    where: TaskWhereUniqueInput
+    data: XOR<TaskUpdateWithoutMindsetInput, TaskUncheckedUpdateWithoutMindsetInput>
+  }
+
+  export type TaskUpdateManyWithWhereWithoutMindsetInput = {
+    where: TaskScalarWhereInput
+    data: XOR<TaskUpdateManyMutationInput, TaskUncheckedUpdateManyWithoutMindsetInput>
+  }
+
+  export type TaskScalarWhereInput = {
+    AND?: TaskScalarWhereInput | TaskScalarWhereInput[]
+    OR?: TaskScalarWhereInput[]
+    NOT?: TaskScalarWhereInput | TaskScalarWhereInput[]
+    id?: StringFilter<"Task"> | string
+    title?: StringFilter<"Task"> | string
+    mindsetId?: StringFilter<"Task"> | string
+    statusId?: StringFilter<"Task"> | string
+    createdAt?: DateTimeFilter<"Task"> | Date | string
+    updatedAt?: DateTimeFilter<"Task"> | Date | string
+  }
+
+  export type TaskCreateWithoutStatusInput = {
+    id?: string
+    title: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    mindset: MindsetCreateNestedOneWithoutTasksInput
+  }
+
+  export type TaskUncheckedCreateWithoutStatusInput = {
+    id?: string
+    title: string
+    mindsetId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskCreateOrConnectWithoutStatusInput = {
+    where: TaskWhereUniqueInput
+    create: XOR<TaskCreateWithoutStatusInput, TaskUncheckedCreateWithoutStatusInput>
+  }
+
+  export type TaskCreateManyStatusInputEnvelope = {
+    data: TaskCreateManyStatusInput | TaskCreateManyStatusInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TaskUpsertWithWhereUniqueWithoutStatusInput = {
+    where: TaskWhereUniqueInput
+    update: XOR<TaskUpdateWithoutStatusInput, TaskUncheckedUpdateWithoutStatusInput>
+    create: XOR<TaskCreateWithoutStatusInput, TaskUncheckedCreateWithoutStatusInput>
+  }
+
+  export type TaskUpdateWithWhereUniqueWithoutStatusInput = {
+    where: TaskWhereUniqueInput
+    data: XOR<TaskUpdateWithoutStatusInput, TaskUncheckedUpdateWithoutStatusInput>
+  }
+
+  export type TaskUpdateManyWithWhereWithoutStatusInput = {
+    where: TaskScalarWhereInput
+    data: XOR<TaskUpdateManyMutationInput, TaskUncheckedUpdateManyWithoutStatusInput>
+  }
+
+  export type TaskCreateManyMindsetInput = {
+    id?: string
+    title: string
+    statusId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskUpdateWithoutMindsetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: StatusUpdateOneRequiredWithoutTasksNestedInput
+  }
+
+  export type TaskUncheckedUpdateWithoutMindsetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    statusId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskUncheckedUpdateManyWithoutMindsetInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    statusId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskCreateManyStatusInput = {
+    id?: string
+    title: string
+    mindsetId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type TaskUpdateWithoutStatusInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    mindset?: MindsetUpdateOneRequiredWithoutTasksNestedInput
+  }
+
+  export type TaskUncheckedUpdateWithoutStatusInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    mindsetId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TaskUncheckedUpdateManyWithoutStatusInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    mindsetId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
 
 
   /**
    * Aliases for legacy arg types
    */
     /**
+     * @deprecated Use MindsetCountOutputTypeDefaultArgs instead
+     */
+    export type MindsetCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = MindsetCountOutputTypeDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use StatusCountOutputTypeDefaultArgs instead
+     */
+    export type StatusCountOutputTypeArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StatusCountOutputTypeDefaultArgs<ExtArgs>
+    /**
      * @deprecated Use TaskDefaultArgs instead
      */
     export type TaskArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = TaskDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use MindsetDefaultArgs instead
+     */
+    export type MindsetArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = MindsetDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use StatusDefaultArgs instead
+     */
+    export type StatusArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StatusDefaultArgs<ExtArgs>
 
   /**
    * Batch Payload for updateMany & deleteMany & createMany

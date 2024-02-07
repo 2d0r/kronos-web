@@ -1,27 +1,26 @@
 'use server';
 
 import { z } from 'zod';
-import { MINDSETS } from './definitions';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-const TaskSchema = z.object({
+const FormSchema = z.object({
     id: z.string(),
     taskId: z.string({
         invalid_type_error: 'Please select a task.',
     }),
-    taskName: z.string(),
-    mindset: z.string(), // z.enum(MINDSETS, { invalid_type_error: 'Please select a mindset.' }),
-    status: z.enum(['To do', 'In Progress', 'Done'], { invalid_type_error: 'Please select a task status.' }),
+    taskTitle: z.string(),
+    mindset: z.enum(['solve', 'create', 'maintain', 'survive', 'learn', 'play', 'socialise', 'self-care', 'relax'], { invalid_type_error: 'Please select a mindset.' }),
+    status: z.enum(['to do', 'in progress', 'done'], { invalid_type_error: 'Please select a task status.' }),
   });
 
-const CreateTask = TaskSchema.omit({ id: true });
+const CreateTask = FormSchema.omit({ id: true });
 
 export type State = {
     errors?: {
         taskId?: string[];
-        taskName?: string[];
+        taskTitle?: string[];
         mindset?: string[];
         status?: string[];
     };
@@ -31,7 +30,7 @@ export type State = {
 export async function createTask(prevState: State, formData: FormData) {
     const validatedFields = CreateTask.safeParse({
         taskId: formData.get('taskId'),
-        taskName: formData.get('taskName'),
+        taskTitle: formData.get('taskTitle'),
         mindset: formData.get('mindset'),
         status: formData.get('status'),
     });
@@ -45,18 +44,18 @@ export async function createTask(prevState: State, formData: FormData) {
         };
     }
 
-    const { taskId, taskName, mindset, status } = validatedFields.data;
+    const { taskId, taskTitle, mindset, status } = validatedFields.data;
 
-    // try {
-    //     await sql`
-    //       INSERT INTO invoices (customer_id, amount, status, date)
-    //       VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
-    //     `;
-    //   } catch (error) {
-    //     return {
-    //       message: 'Database Error: Failed to create invoice.',
-    //     };
-    //   }
+    try {
+        await sql`
+          INSERT INTO invoices (customer_id, amount, status, date)
+          VALUES (${taskId}, ${taskTitle}, ${status}, ${mindset})
+        `;
+      } catch (error) {
+        return {
+          message: 'Database Error: Failed to create invoice.',
+        };
+      }
       
       revalidatePath('/dashboard/invoices');
       redirect('/dashboard/invoices');
