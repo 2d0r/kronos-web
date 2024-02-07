@@ -21,14 +21,3 @@ export type StatusField = {
     id: string;
     name: string;
 }
-
-export const MINDSETS = [
-    'solve',
-    'create',
-    'learn',
-    'play',
-    'socialise',
-    'self-care',
-    'relax',
-    'maintain/survive',
-]
