@@ -7,20 +7,17 @@ import { redirect } from 'next/navigation';
 
 const FormSchema = z.object({
     id: z.string(),
-    taskId: z.string({
-        invalid_type_error: 'Please select a task.',
-    }),
-    taskTitle: z.string(),
+    name: z.string(),
     mindset: z.enum(['solve', 'create', 'maintain', 'survive', 'learn', 'play', 'socialise', 'self-care', 'relax'], { invalid_type_error: 'Please select a mindset.' }),
     status: z.enum(['to do', 'in progress', 'done'], { invalid_type_error: 'Please select a task status.' }),
+    date: z.string(),
   });
 
-const CreateTask = FormSchema.omit({ id: true });
+const CreateTask = FormSchema.omit({ id: true, date: true });
 
 export type State = {
     errors?: {
-        taskId?: string[];
-        taskTitle?: string[];
+        name?: string[];
         mindset?: string[];
         status?: string[];
     };
@@ -29,8 +26,7 @@ export type State = {
 
 export async function createTask(prevState: State, formData: FormData) {
     const validatedFields = CreateTask.safeParse({
-        taskId: formData.get('taskId'),
-        taskTitle: formData.get('taskTitle'),
+        name: formData.get('name'),
         mindset: formData.get('mindset'),
         status: formData.get('status'),
     });
@@ -44,12 +40,13 @@ export async function createTask(prevState: State, formData: FormData) {
         };
     }
 
-    const { taskId, taskTitle, mindset, status } = validatedFields.data;
+    const { name, mindset, status } = validatedFields.data;
+    const date = new Date().toISOString().split('T')[0];
 
     try {
         await sql`
-          INSERT INTO invoices (customer_id, amount, status, date)
-          VALUES (${taskId}, ${taskTitle}, ${status}, ${mindset})
+          INSERT INTO tasks (name, status, mindset, date
+          VALUES (${name}, ${status}, ${mindset}, ${date})
         `;
       } catch (error) {
         return {
@@ -57,6 +54,18 @@ export async function createTask(prevState: State, formData: FormData) {
         };
       }
       
-      revalidatePath('/dashboard/invoices');
-      redirect('/dashboard/invoices');
+      revalidatePath('/');
+      redirect('/');
 };
+
+export async function deleteTask(id: string, formData: FormData) {
+  try {
+    await sql`DELETE FROM tasks WHERE id = ${id}`;
+  } catch (error) {
+    return {
+      message: 'Database Error: Failed to delete task.',
+    };
+  }
+  
+  revalidatePath('/');
+}

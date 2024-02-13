@@ -3,6 +3,20 @@ export type Frequency = {
     timeRange: string, 
 }
 
+export type Task = {
+    id: string;
+    name: string;
+    mindset: string;
+    status: string;
+}
+
+export type User = {
+    id: string;
+    name: string;
+    email: string;
+    password: string;
+  };
+
 export type TaskChain = {
     prevTask: string[],
     nextTask: string[],
