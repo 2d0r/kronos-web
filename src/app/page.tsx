@@ -33,7 +33,7 @@ export default async function Home() {
       </div>
       <div className="container space-x-6 w-full flex p-4 flex-col text-center">
         {tasks.map((task) => (
-            <div key={task.id}>{task.title} {task.mindset}</div>
+            <div key={task.id}>{task.title}</div>
         ))}
       </div>
     </main>

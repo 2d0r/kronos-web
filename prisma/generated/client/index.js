@@ -91,20 +91,8 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.TaskScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  mindsetId: 'mindsetId',
-  statusId: 'statusId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
-};
-
-exports.Prisma.MindsetScalarFieldEnum = {
-  id: 'id',
-  name: 'name'
-};
-
-exports.Prisma.StatusScalarFieldEnum = {
-  id: 'id',
-  name: 'name'
 };
 
 exports.Prisma.SortOrder = {
@@ -119,9 +107,7 @@ exports.Prisma.QueryMode = {
 
 
 exports.Prisma.ModelName = {
-  Task: 'Task',
-  Mindset: 'Mindset',
-  Status: 'Status'
+  Task: 'Task'
 };
 /**
  * Create the Client
@@ -164,13 +150,13 @@ const config = {
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": "POSTGRES_URL",
+        "fromEnvVar": "POSTGRES_PRISMA_URL",
         "value": null
       }
     }
   },
-  "inlineSchema": "Ly8gVGhpcyBpcyB5b3VyIFByaXNtYSBzY2hlbWEgZmlsZSwKLy8gbGVhcm4gbW9yZSBhYm91dCBpdCBpbiB0aGUgZG9jczogaHR0cHM6Ly9wcmlzLmx5L2QvcHJpc21hLXNjaGVtYQoKZ2VuZXJhdG9yIGNsaWVudCB7CiAgcHJvdmlkZXIgPSAicHJpc21hLWNsaWVudC1qcyIKICBvdXRwdXQgICA9ICIuL2dlbmVyYXRlZC9jbGllbnQiCn0KCmRhdGFzb3VyY2UgZGIgewogIHByb3ZpZGVyID0gInBvc3RncmVzcWwiCiAgdXJsICAgICAgPSBlbnYoIlBPU1RHUkVTX1VSTCIpCiAgZGlyZWN0VXJsID0gZW52KCJQT1NUR1JFU19VUkxfTk9OX1BPT0xJTkciKQogIHNoYWRvd0RhdGFiYXNlVXJsID0gZW52KCJQT1NUR1JFU19VUkxfTk9OX1BPT0xJTkciKQp9Cgptb2RlbCBUYXNrIHsKICBpZCAgICAgICAgICBTdHJpbmcgICAgICAgIEBpZCBAZGVmYXVsdChjdWlkKCkpCiAgdGl0bGUgICAgICAgU3RyaW5nCiAgbWluZHNldCAgICAgTWluZHNldCAgICAgICBAcmVsYXRpb24oZmllbGRzOiBbbWluZHNldElkXSwgcmVmZXJlbmNlczogW2lkXSkKICBtaW5kc2V0SWQgICBTdHJpbmcKICBzdGF0dXMgICAgICBTdGF0dXMgICAgICAgIEByZWxhdGlvbihmaWVsZHM6IFtzdGF0dXNJZF0sIHJlZmVyZW5jZXM6IFtpZF0pCiAgc3RhdHVzSWQgICAgU3RyaW5nCiAgY3JlYXRlZEF0ICAgRGF0ZVRpbWUgICAgICBAZGVmYXVsdChub3coKSkKICB1cGRhdGVkQXQgICBEYXRlVGltZSAgICAgIEB1cGRhdGVkQXQKCiAgQEBpbmRleChbdGl0bGVdKQogIEBAbWFwKCJ0YXNrcyIpCn0KCm1vZGVsIE1pbmRzZXQgewogIGlkICAgICAgICAgIFN0cmluZyAgICAgICAgQGlkIEBkZWZhdWx0KGN1aWQoKSkKICBuYW1lICAgICAgICBTdHJpbmcgICAgICAgIEB1bmlxdWUKICB0YXNrcyAgICAgICBUYXNrW10KCiAgQEBpbmRleChbbmFtZV0pCiAgQEBtYXAoIm1pbmRzZXRzIikKfQoKbW9kZWwgU3RhdHVzIHsKICBpZCAgICAgICAgICBTdHJpbmcgICAgICAgIEBpZCBAZGVmYXVsdChjdWlkKCkpCiAgbmFtZSAgICAgICAgU3RyaW5nICAgICAgICBAdW5pcXVlCiAgdGFza3MgICAgICAgVGFza1tdCgogIEBAaW5kZXgoW25hbWVdKQogIEBAbWFwKCJzdGF0dXNlcyIpCn0KCi8vIGVudW0gTWluZHNldCB7Ci8vICAgc29sdmUKLy8gICBjcmVhdGUKLy8gICBsZWFybgovLyAgIG1haW50YWluCi8vICAgc2VsZkNhcmUKLy8gICByZWxheAovLyAgIHN1cnZpdmUKLy8gICBzb2NpYWxpc2UKLy8gfQoKLy8gZW51bSBTdGF0dXMgewovLyAgIHRvRG8KLy8gICBpblByb2dyZXNzCi8vICAgZG9uZQovLyB9",
-  "inlineSchemaHash": "f4f8d22dc4579d6d53f713d13d37c12963f606602ea1a6820cf2da642a76466d",
+  "inlineSchema": "Ly8gVGhpcyBpcyB5b3VyIFByaXNtYSBzY2hlbWEgZmlsZSwKLy8gbGVhcm4gbW9yZSBhYm91dCBpdCBpbiB0aGUgZG9jczogaHR0cHM6Ly9wcmlzLmx5L2QvcHJpc21hLXNjaGVtYQoKZ2VuZXJhdG9yIGNsaWVudCB7CiAgcHJvdmlkZXIgPSAicHJpc21hLWNsaWVudC1qcyIKICBvdXRwdXQgICA9ICIuL2dlbmVyYXRlZC9jbGllbnQiCn0KCmRhdGFzb3VyY2UgZGIgewogIHByb3ZpZGVyID0gInBvc3RncmVzcWwiCiAgdXJsICAgICAgPSBlbnYoIlBPU1RHUkVTX1BSSVNNQV9VUkwiKQogIGRpcmVjdFVybCA9IGVudigiUE9TVEdSRVNfVVJMX05PTl9QT09MSU5HIikKICBzaGFkb3dEYXRhYmFzZVVybCA9IGVudigiUE9TVEdSRVNfVVJMX05PTl9QT09MSU5HIikKfQoKbW9kZWwgVGFzayB7CiAgaWQgICAgICAgICAgU3RyaW5nICAgICAgICBAaWQgQGRlZmF1bHQoY3VpZCgpKQogIHRpdGxlICAgICAgIFN0cmluZwogIC8vIG1pbmRzZXQgICAgIE1pbmRzZXQgICAgICAgQHJlbGF0aW9uKGZpZWxkczogW21pbmRzZXRJZF0sIHJlZmVyZW5jZXM6IFtpZF0pCiAgLy8gbWluZHNldElkICAgU3RyaW5nCiAgLy8gc3RhdHVzICAgICAgU3RhdHVzICAgICAgICBAcmVsYXRpb24oZmllbGRzOiBbc3RhdHVzSWRdLCByZWZlcmVuY2VzOiBbaWRdKQogIC8vIHN0YXR1c0lkICAgIFN0cmluZwogIGNyZWF0ZWRBdCAgIERhdGVUaW1lICAgICAgQGRlZmF1bHQobm93KCkpCiAgdXBkYXRlZEF0ICAgRGF0ZVRpbWUgICAgICBAdXBkYXRlZEF0CgogIEBAaW5kZXgoW3RpdGxlXSkKICBAQG1hcCgidGFza3MiKQp9CgovLyBtb2RlbCBNaW5kc2V0IHsKLy8gICBpZCAgICAgICAgICBTdHJpbmcgICAgICAgIEBpZCBAZGVmYXVsdChjdWlkKCkpCi8vICAgbmFtZSAgICAgICAgU3RyaW5nICAgICAgICBAdW5pcXVlCi8vICAgdGFza3MgICAgICAgVGFza1tdCgovLyAgIEBAaW5kZXgoW25hbWVdKQovLyAgIEBAbWFwKCJtaW5kc2V0cyIpCi8vIH0KCi8vIG1vZGVsIFN0YXR1cyB7Ci8vICAgaWQgICAgICAgICAgU3RyaW5nICAgICAgICBAaWQgQGRlZmF1bHQoY3VpZCgpKQovLyAgIG5hbWUgICAgICAgIFN0cmluZyAgICAgICAgQHVuaXF1ZQovLyAgIHRhc2tzICAgICAgIFRhc2tbXQoKLy8gICBAQGluZGV4KFtuYW1lXSkKLy8gICBAQG1hcCgic3RhdHVzZXMiKQovLyB9CgovLyBlbnVtIE1pbmRzZXQgewovLyAgIHNvbHZlCi8vICAgY3JlYXRlCi8vICAgbGVhcm4KLy8gICBtYWludGFpbgovLyAgIHNlbGZDYXJlCi8vICAgcmVsYXgKLy8gICBzdXJ2aXZlCi8vICAgc29jaWFsaXNlCi8vIH0KCi8vIGVudW0gU3RhdHVzIHsKLy8gICB0b0RvCi8vICAgaW5Qcm9ncmVzcwovLyAgIGRvbmUKLy8gfQ==",
+  "inlineSchemaHash": "d55a6e094865f60e2a1a92614e083cec79ce369532bc1ef4d4c423e24517f3dc",
   "noEngine": false
 }
 
@@ -191,7 +177,7 @@ if (!fs.existsSync(path.join(__dirname, 'schema.prisma'))) {
   config.isBundled = true
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Task\":{\"dbName\":\"tasks\",\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":true,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"String\",\"default\":{\"name\":\"cuid\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"title\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"mindset\",\"kind\":\"object\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"Mindset\",\"relationName\":\"MindsetToTask\",\"relationFromFields\":[\"mindsetId\"],\"relationToFields\":[\"id\"],\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"mindsetId\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":true,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"status\",\"kind\":\"object\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"Status\",\"relationName\":\"StatusToTask\",\"relationFromFields\":[\"statusId\"],\"relationToFields\":[\"id\"],\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"statusId\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":true,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"DateTime\",\"default\":{\"name\":\"now\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"DateTime\",\"isGenerated\":false,\"isUpdatedAt\":true}],\"primaryKey\":null,\"uniqueFields\":[],\"uniqueIndexes\":[],\"isGenerated\":false},\"Mindset\":{\"dbName\":\"mindsets\",\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":true,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"String\",\"default\":{\"name\":\"cuid\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"name\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":true,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"tasks\",\"kind\":\"object\",\"isList\":true,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"Task\",\"relationName\":\"MindsetToTask\",\"relationFromFields\":[],\"relationToFields\":[],\"isGenerated\":false,\"isUpdatedAt\":false}],\"primaryKey\":null,\"uniqueFields\":[],\"uniqueIndexes\":[],\"isGenerated\":false},\"Status\":{\"dbName\":\"statuses\",\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":true,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"String\",\"default\":{\"name\":\"cuid\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"name\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":true,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"tasks\",\"kind\":\"object\",\"isList\":true,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"Task\",\"relationName\":\"StatusToTask\",\"relationFromFields\":[],\"relationToFields\":[],\"isGenerated\":false,\"isUpdatedAt\":false}],\"primaryKey\":null,\"uniqueFields\":[],\"uniqueIndexes\":[],\"isGenerated\":false}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Task\":{\"dbName\":\"tasks\",\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":true,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"String\",\"default\":{\"name\":\"cuid\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"title\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"String\",\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":true,\"type\":\"DateTime\",\"default\":{\"name\":\"now\",\"args\":[]},\"isGenerated\":false,\"isUpdatedAt\":false},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"isList\":false,\"isRequired\":true,\"isUnique\":false,\"isId\":false,\"isReadOnly\":false,\"hasDefaultValue\":false,\"type\":\"DateTime\",\"isGenerated\":false,\"isUpdatedAt\":true}],\"primaryKey\":null,\"uniqueFields\":[],\"uniqueIndexes\":[],\"isGenerated\":false}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.getQueryEngineWasmModule = undefined
 

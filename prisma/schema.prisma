@@ -16,10 +16,10 @@ datasource db {
 model Task {
   id          String        @id @default(cuid())
   title       String
-  mindset     Mindset       @relation(fields: [mindsetId], references: [id])
-  mindsetId   String
-  status      Status        @relation(fields: [statusId], references: [id])
-  statusId    String
+  // mindset     Mindset       @relation(fields: [mindsetId], references: [id])
+  // mindsetId   String
+  // status      Status        @relation(fields: [statusId], references: [id])
+  // statusId    String
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
@@ -27,23 +27,23 @@ model Task {
   @@map("tasks")
 }
 
-model Mindset {
-  id          String        @id @default(cuid())
-  name        String        @unique
-  tasks       Task[]
+// model Mindset {
+//   id          String        @id @default(cuid())
+//   name        String        @unique
+//   tasks       Task[]
 
-  @@index([name])
-  @@map("mindsets")
-}
+//   @@index([name])
+//   @@map("mindsets")
+// }
 
-model Status {
-  id          String        @id @default(cuid())
-  name        String        @unique
-  tasks       Task[]
+// model Status {
+//   id          String        @id @default(cuid())
+//   name        String        @unique
+//   tasks       Task[]
 
-  @@index([name])
-  @@map("statuses")
-}
+//   @@index([name])
+//   @@map("statuses")
+// }
 
 // enum Mindset {
 //   solve
