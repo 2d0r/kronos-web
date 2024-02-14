@@ -9,7 +9,7 @@ export async function fetchTasks() {
     noStore();
     try {
         const data = await sql<Task>`
-        SELECT tasks.name, tasks.status, tasks.mindset
+        SELECT tasks.id, tasks.name, tasks.status, tasks.mindset
         FROM tasks
         ORDER BY tasks.name ASC
         LIMIT 10`;

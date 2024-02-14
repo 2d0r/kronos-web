@@ -19,16 +19,16 @@ export default function CreateForm() {
             <div className='rounded-md bg-gray-50 p-4 md:p-6'>
                 {/* Task Title */}
                 <div className='mb-4'>
-                    <label htmlFor='customer' className='mb-2 block text-sm font-medium'>
-                        Title
+                    <label htmlFor='name' className='mb-2 block text-sm font-medium'>
+                        Name
                     </label>
                     <div className='relative'>
                     <input
-                        id='title'
-                        name='title'
+                        id='name'
+                        name='name'
                         type='string'
                         className='peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500'
-                        placeholder='Enter task title'
+                        placeholder='Enter task name'
                         aria-describedby='task-error'
                     />
                     </div>
@@ -44,7 +44,7 @@ export default function CreateForm() {
                 
                 {/* Mindset */}
                 <div className='mb-4'>
-                    <label htmlFor='customer' className='mb-2 block text-sm font-medium'>
+                    <label htmlFor='mindset' className='mb-2 block text-sm font-medium'>
                         Mindset
                     </label>
                     <div className='relative'>
@@ -59,9 +59,9 @@ export default function CreateForm() {
                         Select a mindset
                         </option>
                         {mindsets.map((mindset, idx) => (
-                        <option key={idx} value={idx}>
-                            {mindset}
-                        </option>
+                            <option key={idx} value={mindset}>
+                                {mindset}
+                            </option>
                         ))}
                     </select>
                     </div>
@@ -77,7 +77,7 @@ export default function CreateForm() {
 
                 {/* Status */}
                 <div className='mb-4'>
-                    <label htmlFor='customer' className='mb-2 block text-sm font-medium'>
+                    <label htmlFor='status' className='mb-2 block text-sm font-medium'>
                         Status
                     </label>
                     <div className='relative'>
@@ -92,9 +92,9 @@ export default function CreateForm() {
                         Select a status
                         </option>
                         {statuses.map((status, idx) => (
-                        <option key={idx} value={idx}>
-                            {status}
-                        </option>
+                            <option key={idx} value={status}>
+                                {status}
+                            </option>
                         ))}
                     </select>
                     </div>
