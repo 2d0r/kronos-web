@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id    String @id @default(uuid())
+  name  String
+  email String @unique
+
+  @@index([name])
+  @@map("users")
+}
+
+model Task {
+  id                 String      @id @default(uuid())
+  name               String
+  priority           Priority
+  startTime          DateTime?
+  endTime            DateTime?
+  duration           DateTime?
+  mindset            Mindset     @relation(fields: [mindsetId], references: [id])
+  mindsetId          String
+  prevTaskChain      Task[]      @relation("TaskChain")
+  nextTaskChain      Task[]      @relation("TaskChain")
+  prevTaskCausal     Task[]      @relation("TaskCausality")
+  nextTaskCausal     Task[]      @relation("TaskCausality")
+  status             Status      @default(toDo)
+  repeat             Boolean     @default(false)
+  frequency          Int?
+  repeatRange        TimeSpan?
+  totalDuration      DateTime?
+  preferredTimeOfDay TimeOfDay[]
+  preferredDayOfWeek DayOfWeek[]
+  notes              String?
+  createdAt          DateTime    @default(now())
+
+  @@index([name])
+  @@map("tasks")
+}
+
+model Mindset {
+  id            String @id @default(cuid())
+  name          String @unique
+  task          Task[]
+  survive       Int
+  maintain      Int
+  socialise     Int
+  play          Int
+  learn         Int
+  selfCare      Int
+  create        Int
+  selfChallenge Int
+  restReward    Int
+
+  @@index([name])
+  @@map("mindsets")
+}
+
+enum Status {
+  toDo
+  inProgress
+  done
+}
+
+enum Priority {
+  veryHigh
+  high
+  medium
+  low
+}
+
+enum TimeSpan {
+  day
+  week
+  month
+  year
+}
+
+enum TimeOfDay {
+  morning
+  noon
+  afternoon
+  evening
+  night
+}
+
+enum DayOfWeek {
+  monday
+  tuesday
+  wednesday
+  thursday
+  friday
+  saturday
+  sunday
+}
+
+enum TaskType {
+  step
+  task
+  project
+  goal
+}

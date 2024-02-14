@@ -66,7 +66,7 @@ async function seedTasks(client) {
     console.log(`Created "tasks" table`);
 
     // Insert data into the "invoices" table
-    const insertedTasks = await Promise.all(
+    const seededTasks = await Promise.all(
       tasks.map(
         (task) => client.sql`
         INSERT INTO tasks (id, name, mindset, status, date)
@@ -76,12 +76,27 @@ async function seedTasks(client) {
       ),
     );
 
-    console.log(`Seeded ${insertedTasks.length} tasks`);
+    console.log(`Seeded ${seededTasks.length} tasks`);
+
+    // const updateTableFullTask = await client.sql`
+    //   ALTER TABLE tasks
+    //   ADD duration TIME,
+    //   ADD start_time DATE,
+    //   ADD end_time DATE,
+    //   ADD repeat BOOL DEFAULT 0,
+    //   ADD frequency INT,
+    //   ADD repeatRange ENUM('', 'day', 'week', 'month', 'year') DEFAULT '',
+    //   ADD totalDuration TIME,
+    //   ADD preferredTimeOfDay SET('morning', 'noon', 'afternoon', 'evening', 'night'),
+    //   ADD preferredDayOfWeek SET('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
+    //   ADD type ENUM('task', 'project', 'step', 'goal'),
+    //   ADD priority ENUM('urgent', 'high', 'medium', 'low') DEFAULT 'medium';
+    // `;
 
     return {
-      deleteTable,
+      // deleteTable,
       createTable,
-      tasks: insertedTasks,
+      // tasks: seededTasks,
     };
   } catch (error) {
     console.error('Error seeding tasks:', error);
