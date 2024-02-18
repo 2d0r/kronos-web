@@ -4,6 +4,37 @@ import {
     Task,
     User,
 } from './definitions';
+import prisma from './db';
+
+
+
+export async function fetchTasksPrisma() {
+
+    try {
+        const allTasks = await prisma.task.findMany();
+        await prisma.$disconnect();
+        return allTasks;
+    } catch (error) {
+        console.error('Database Error:', error);
+        // throw new Error('Failed to fetch the latest tasks.');
+        await prisma.$disconnect();
+        process.exit(1);
+    }
+}
+
+export async function fetchMindsets() {
+
+    try {
+        const allMindsets = await prisma.mindset.findMany();
+        await prisma.$disconnect();
+        return allMindsets;
+    } catch (error) {
+        console.error('Database Error:', error);
+        // throw new Error('Failed to fetch the latest tasks.');
+        await prisma.$disconnect();
+        process.exit(1);
+    }
+}
 
 export async function fetchTasks() {
     noStore();

@@ -1,15 +1,18 @@
 import Button from "@/components/Button";
 import { revalidatePath } from "next/cache";
-import { fetchTasks } from "./lib/data";
-import { deleteTask } from "./lib/actions";
+import { fetchTasks, fetchTasksPrisma, fetchMindsets } from "./lib/data";
+import { deleteTask, deleteTaskPrisma } from "./lib/actions";
 import CreateForm from "./ui/tasks/create-form";
 import Breadcrumbs from "./ui/tasks/breadcrumbs";
+import prisma from "./lib/db";
 
 export default async function Home() {
-  const tasks = await fetchTasks();
+  const tasks = await fetchTasksPrisma();
+  const mindsets = await fetchMindsets();
+
 
   function DeleteTask({ id }: { id: string }) {
-    const deleteTaskWithId = deleteTask.bind(null, id);
+    const deleteTaskWithId = deleteTaskPrisma.bind(null, id);
 
     return (
         <form action={deleteTaskWithId} className="flex align-middle">
@@ -20,7 +23,25 @@ export default async function Home() {
     );
   }
 
-  return (
+  async function getMindsetById (id : string) {
+    const mindsetByID = await prisma.mindset.findUnique({
+      where: {
+        id: id
+      },
+      select: {
+        name: true
+      }
+    });
+
+    if (mindsetByID) {
+      return mindsetByID.name;
+    } else {
+      console.log('Mindset not found.');
+      return 'Not found';
+    }
+  }
+
+  return (<>
     <main>
       <Breadcrumbs
             breadcrumbs={[
@@ -39,11 +60,11 @@ export default async function Home() {
         {tasks.map((task, idx) => {
           return (
             <div className='w-full h-full flex align-middle gap-6 text-left' key={idx}>
-              <span className="inline-block align-middle">{task.name} - {task.status} - {task.mindset}</span>
+              <span className="inline-block align-middle">{task.name} - {task.status} - {task.priority} - {getMindsetById(task.mindsetId)}</span>
               <DeleteTask id={task.id} />
             </div>
         )})}
       </div>
     </main>
-  );
+  </>);
 }

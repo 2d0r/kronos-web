@@ -6,13 +6,15 @@ import { useFormState } from 'react-dom';
 import { createTask } from '@/app/lib/actions';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
+import { Mindset, Status } from '@prisma/client';
+import prisma from '@/app/lib/db';
 
 export default function CreateForm() {
     const initialState = { message: null, errors: {} };
     const createTaskHere : any = createTask;
     const [state, dispatch] = useFormState(createTaskHere, initialState);
-    const mindsets = ['solve', 'create'];
-    const statuses = ['to do', 'in progress', 'done'];
+    const mindsets = ['solve', 'create', 'survive', 'maintain', 'learn', 'selfCare', 'selfChallenge', 'socialise', 'restReward'];
+    const statuses = ['toDo', 'inProgress', 'done'];
 
     return (<>
         <form action={dispatch}>
