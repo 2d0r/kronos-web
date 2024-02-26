@@ -8,7 +8,6 @@ import prisma from "./lib/db";
 
 export default async function Home() {
   const tasks = await fetchTasksPrisma();
-  const mindsets = await fetchMindsets();
 
 
   function DeleteTask({ id }: { id: string }) {
@@ -60,7 +59,7 @@ export default async function Home() {
         {tasks.map((task, idx) => {
           return (
             <div className='w-full h-full flex align-middle gap-6 text-left' key={idx}>
-              <span className="inline-block align-middle">{task.name} - {task.status} - {task.priority} - {getMindsetById(task.mindsetId)}</span>
+              <span>{JSON.stringify(task)}</span>
               <DeleteTask id={task.id} />
             </div>
         )})}

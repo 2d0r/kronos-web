@@ -6,12 +6,30 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { fromZodError } from 'zod-validation-error';
 import prisma from './db';
+import { prismaEnums } from './definitions';
 
 const FormSchema = z.object({
     id: z.string(),
     name: z.string(),
-    mindset: z.enum(['create', 'maintain', 'survive', 'learn', 'play', 'socialise', 'selfCare', 'relaxReward', 'selfChallenge'], { invalid_type_error: 'Please select a mindset.' }),
-    status: z.enum(['toDo', 'inProgress', 'done'], { invalid_type_error: 'Please select a task status.' }),
+    mindset: z.enum(['survive', 'maintain', 'socialise', 'play', 'learn', 'create', 'selfCare', 'selfChallenge'], { invalid_type_error: 'Please select a valid mindset.' }),
+    status: z.enum(['toDo', 'inProgress', 'done'], { invalid_type_error: 'Please select a valid status.' }),
+    priority: z.enum(['veryHigh', 'high', 'medium', 'low'], { invalid_type_error: 'Please select a valid priority.' }),
+    startTime: z.string().nullable(),
+    startDate: z.string().nullable(),
+    endTime: z.string().nullable(),
+    endDate: z.string().nullable(),
+    duration: z.number().nullable(),
+    repeat: z.coerce.boolean(),
+    repeatFrequency: z.number().nullable(),
+    repeatTimespan: z.enum(['day', 'week', 'month', 'year'], {invalid_type_error: 'Please select a valid Repeat Timespan.'}).nullable(),
+    repeatDuration: z.number().nullable(),
+    preferredTimeOfDay: z.array(z.enum(['morning', 'noon', 'afternoon', 'evening', 'night'], {invalid_type_error: 'Please select a valid time of day.'})).nullish(),
+    preferredDayOfWeek: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], {invalid_type_error: 'Please select a valid day of the week.'})).nullish(),
+    endRepeat: z.coerce.boolean(),
+    totalDuration: z.number().nullable(),
+    repetitions: z.number().nullable(),
+    endRepeatDate: z.string().nullable()
+
   });
 
 const CreateTask = FormSchema.omit({ id: true, date: true });
@@ -21,6 +39,23 @@ export type State = {
         name?: string[];
         mindset?: string[];
         status?: string[];
+        priority?: string[];
+        startTime?: string[];
+        startDate?: string[];
+        endTime?: string[];
+        endDate?: string[];
+        duration?: number[];
+        repeat?: boolean[];
+        repeatFrequency?: number[];
+        repeatTimespan?: string[];
+        repeatDuration?: number[];
+        preferredTimeOfDay?: string[];
+        preferredDayOfWeek?: string[];
+        endRepeat?: string[];
+        totalDuration?: number[];
+        repetitions?: number[];
+        endRepeatDate?: number[];
+
     };
     message?: string | null;
 };
@@ -30,58 +65,66 @@ export async function createTask(prevState: State, formData: FormData) {
       name: formData.get('name'),
       mindset: formData.get('mindset'),
       status: formData.get('status'),
+      priority: formData.get('priority'),
+      startTime: formData.get('startTime'),
+      startDate: formData.get('startDate'),
+      endTime: formData.get('endTime'),
+      endDate: formData.get('endDate'),
+      duration: formData.get('duration'),
+      repeat: formData.get('repeat'),
+      repeatFrequency: formData.get('repeatFrequency'),
+      repeatTimespan: formData.get('repeatTimespan'),
+      repeatDuration: formData.get('repeatDuration'),
+      preferredTimeOfDay: formData.get('preferredTimeOfDay'),
+      preferredDayOfWeek: formData.get('preferredDayOfWeek'),
+      endRepeat: formData.get('endRepeat'),
+      totalDuration: formData.get('totalDuration'),
+      repetitions: formData.get('repetitions'),
+      endRepeatDate: formData.get('endRepeatDate')
     });
 
     // If form validation fails, return errors early. Otherwise, continue.
     if (!validatedFields.success) {
-      console.log('validatedFields', validatedFields);
+      console.log('validatedFields', validatedFields, validatedFields.error.flatten().fieldErrors);
       return {
         errors: validatedFields.error.flatten().fieldErrors,
         message: 'Missing Fields. Failed to Create Task.',
       };
     }
 
-    const { name, mindset, status } = validatedFields.data;
-    const mindsetEntry = await prisma.mindset.findUnique({
-      where: {
-        name: mindset
-      },
-      select: {
-        id: true
-      }
-    });
+    const { name, mindset, status, priority, startDate, startTime, endDate, endTime, duration, 
+      repeat, repeatDuration, repeatFrequency, repeatTimespan, preferredTimeOfDay, preferredDayOfWeek, 
+      endRepeat, totalDuration, repetitions, endRepeatDate
+    } = validatedFields.data;
+    // Merge start date and time; Also end date and time
+    const sqlStartTime = new Date(`${startDate || '2024-01-01'}T${startTime || '00:00'}:00`);
+    const sqlEndTime = new Date(`${endDate || '2024-01-01'}T${endTime || '00:00'}:00`);
 
-    if (mindsetEntry) {
-      const mindsetId = mindsetEntry.id;
+
+    try {
       await prisma.task.create({
         data: {
           name: name,
           status: status,
-          mindsetId: mindsetId,
-          priority: 'high'
+          mindset: mindset,
+          priority: priority,
+          startTime: sqlStartTime,
+          endTime: sqlEndTime,
+          duration: duration,
+          repeat: repeat,
+          repeatDuration: repeatDuration,
+          repeatFrequency: repeatFrequency,
+          repeatTimespan: repeatTimespan,
+          preferredTimeOfDay: preferredTimeOfDay || [],
+          preferredDayOfWeek: preferredDayOfWeek || [],
+          endRepeat: endRepeat,
+          totalDuration: totalDuration,
+          repetitions: repetitions,
+          endRepeatDate: endRepeatDate
         },
       });
-    } else {
-      console.log('Mindset not found.');
-    }
-
-    // const validationError = fromZodError(err);
-    // // the error is now readable by the user
-    // // you may print it to console
-    // console.log(validationError.toString());
-    // // or return it as an actual error
-    // return validationError;
-
-    
-
-    try {
-      
-      // await sql`
-      //   UPDATE tasks
-      //   INSERT INTO tasks (name, status, mindset, date)
-      //   VALUES (${name}, ${status}, ${mindset}, ${date})
-      // `;  
     } catch (error) {
+      console.log('Failed to create task', error);
       return {
         message: 'Database Error: Failed to create task.',
       };
@@ -122,4 +165,26 @@ export async function deleteTaskPrisma(id: string, fromData: FormData) {
 
   revalidatePath('/');
   redirect('/');
+}
+
+export async function getMindsetNames() {
+  try {
+    // Use Prisma to query all 'name' values from the 'mindset' table
+    const mindsetNames = await prisma.mindset.findMany({
+      select: {
+        name: true,
+      },
+    });
+
+    // Extract the 'name' values from the result
+    const namesArray = mindsetNames.map((mindset) => mindset.name);
+
+    console.log(namesArray);
+    return namesArray;
+  } catch (error) {
+    console.error('Error fetching mindsets:', error);
+    throw error;
+  } finally {
+    await prisma.$disconnect(); // Disconnect the Prisma client when done
+  }
 }

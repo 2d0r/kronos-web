@@ -1,114 +1,176 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
-import { createTask } from '@/app/lib/actions';
+import { createTask} from '@/app/lib/actions';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { Mindset, Status } from '@prisma/client';
 import prisma from '@/app/lib/db';
+import { Dropdown, InputField, SelectionField } from './form-fields';
+import { getMindsetNames } from '@/app/lib/actions';
+import { mindsetList, priorityList, preferredDayOfWeekList, preferredTimeOfDayList, timeSpanList, statusList } from '@/app/lib/definitions';
+
 
 export default function CreateForm() {
     const initialState = { message: null, errors: {} };
     const createTaskHere : any = createTask;
     const [state, dispatch] = useFormState(createTaskHere, initialState);
-    const mindsets = ['solve', 'create', 'survive', 'maintain', 'learn', 'selfCare', 'selfChallenge', 'socialise', 'restReward'];
-    const statuses = ['toDo', 'inProgress', 'done'];
+
+    const getEnumValues = (enumType: Record<string, string>) => {
+        return Object.values(enumType);
+    }
+
+    const [isScheduled, setIsScheduled] = useState<string | null>(null);
+    const handleScheduledToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
+        setIsScheduled(event.target.value);
+    }
+
+    const [isRepeating, setIsRepeating] = useState<string | null>(null);
+    const handleRepeatToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
+        setIsRepeating(event.target.value);
+    }
+
+    const [endRepeat, setEndRepeat] = useState<string | null>(null);
+    const handleEndRepeatToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
+        setEndRepeat(event.target.value);
+    }
 
     return (<>
         <form action={dispatch}>
             <div className='rounded-md bg-gray-50 p-4 md:p-6'>
-                {/* Task Title */}
-                <div className='mb-4'>
-                    <label htmlFor='name' className='mb-2 block text-sm font-medium'>
-                        Name
-                    </label>
-                    <div className='relative'>
-                    <input
-                        id='name'
-                        name='name'
-                        type='string'
-                        className='peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500'
-                        placeholder='Enter task name'
-                        aria-describedby='task-error'
+                <InputField 
+                    fieldName='name'
+                    placeholder='Enter task name'
+                    inputType='string'
+                />
+                <Dropdown 
+                    fieldName='mindset'
+                    prompt='Select a mindset'
+                    list={mindsetList}
+                    defaultValue=''
+                />
+                <SelectionField 
+                    fieldName='status'
+                    prompt='Status'
+                    list={statusList}
+                    type='radio'
+                    defaultSelected={[statusList[0]]}
+                />
+                <SelectionField 
+                    fieldName='priority'
+                    prompt='Priority'
+                    list={priorityList}
+                    type='radio'
+                />
+                <SelectionField 
+                    fieldName='isScheduled'
+                    prompt=''
+                    list={['Scheduled', 'Planned by me']}
+                    type='radio'
+                    onChange={handleScheduledToggle}
+                />
+                {isScheduled === 'Scheduled' && (<>
+                    <InputField 
+                        fieldName='startTime'
+                        placeholder='Enter start time'
+                        inputType='time'
                     />
-                    </div>
-                    <div id='task-error' aria-live='polite' aria-atomic='true'>
-                    {/* {state.errors?.customerId &&
-                        state.errors.customerId.map((error: string) => (
-                        <p className='mt-2 text-sm text-red-500' key={error}>
-                            {error}
-                        </p>
-                    ))} */}
-                    </div>
-                </div>
-                
-                {/* Mindset */}
-                <div className='mb-4'>
-                    <label htmlFor='mindset' className='mb-2 block text-sm font-medium'>
-                        Mindset
-                    </label>
-                    <div className='relative'>
-                    <select
-                        id='mindset'
-                        name='mindset'
-                        className='peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500'
-                        defaultValue=''
-                        aria-describedby='task-error'
-                    >
-                        <option value='' disabled>
-                        Select a mindset
-                        </option>
-                        {mindsets.map((mindset, idx) => (
-                            <option key={idx} value={mindset}>
-                                {mindset}
-                            </option>
-                        ))}
-                    </select>
-                    </div>
-                    <div id='task-error' aria-live='polite' aria-atomic='true'>
-                    {/* {state.errors?.customerId &&
-                        state.errors.customerId.map((error: string) => (
-                        <p className='mt-2 text-sm text-red-500' key={error}>
-                            {error}
-                        </p>
-                    ))} */}
-                    </div>
-                </div>
+                    <InputField 
+                        fieldName='startDate'
+                        placeholder='Enter start date'
+                        inputType='date'
+                    />
+                    <InputField 
+                        fieldName='endTime'
+                        placeholder='Enter end time'
+                        inputType='time'
+                    />
+                    <InputField 
+                        fieldName='endDate'
+                        placeholder='Enter end date'
+                        inputType='date'
+                    />
+                </>)}
 
-                {/* Status */}
-                <div className='mb-4'>
-                    <label htmlFor='status' className='mb-2 block text-sm font-medium'>
-                        Status
-                    </label>
-                    <div className='relative'>
-                    <select
-                        id='status'
-                        name='status'
-                        className='peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-10 text-sm outline-2 placeholder:text-gray-500'
-                        defaultValue=''
-                        aria-describedby='task-error'
-                    >
-                        <option value='' disabled>
-                        Select a status
-                        </option>
-                        {statuses.map((status, idx) => (
-                            <option key={idx} value={status}>
-                                {status}
-                            </option>
-                        ))}
-                    </select>
-                    </div>
-                    <div id='task-error' aria-live='polite' aria-atomic='true'>
-                    {/* {state.errors?.customerId &&
-                        state.errors.customerId.map((error: string) => (
-                        <p className='mt-2 text-sm text-red-500' key={error}>
-                            {error}
-                        </p>
-                    ))} */}
-                    </div>
-                </div>
+                {isScheduled === 'Planned by me' && (<>
+                    <InputField 
+                        fieldName='deadline'
+                        placeholder='Enter deadline'
+                        inputType='date'
+                    />
+                    <InputField 
+                        fieldName='duration'
+                        placeholder='Enter duration'
+                        inputType='number'
+                    />
+                    <SelectionField 
+                        fieldName='preferredTimeOfDay'
+                        prompt='Preferred time of day'
+                        list={preferredTimeOfDayList}
+                        type='checkbox'
+                    />
+                    <SelectionField 
+                        fieldName='preferredDayOfWeek'
+                        prompt='Preferred days of the week'
+                        list={preferredDayOfWeekList}
+                        type='checkbox'
+                    />
+                </>)}
+                
+                
+                <SelectionField 
+                    fieldName='repeat'
+                    prompt=''
+                    list={['One time', 'Repeat']}
+                    type='radio'
+                    onChange={handleRepeatToggle}
+                    defaultSelected={['One time']}
+                />
+                {isRepeating === 'Repeat' && (<>
+                    <InputField 
+                        fieldName='repeatFrequency'
+                        placeholder='How often'
+                        inputType='number'
+                    />
+                    <InputField 
+                        fieldName='repeatDuration'
+                        placeholder='How much'
+                        inputType='number'
+                    />
+                    <SelectionField 
+                        fieldName='repeatTimespan'
+                        prompt='every'
+                        list={timeSpanList}
+                        type='radio'
+                    />
+                    <SelectionField 
+                        fieldName='endRepeat'
+                        prompt='End Repeat?'
+                        list={['No', 'Yes']}
+                        type='radio'
+                        onChange={handleEndRepeatToggle}
+                        defaultSelected={['No']}
+                    />
+                    {endRepeat === 'Yes' && (<>
+                        <InputField 
+                            fieldName='totalDuration'
+                            placeholder='Total duration'
+                            inputType='number'
+                        />
+                        <InputField 
+                            fieldName='repetitions'
+                            placeholder='Number of repetitions'
+                            inputType='number'
+                        />
+                        <InputField 
+                            fieldName='endRepeatDate'
+                            placeholder='End repeat on date'
+                            inputType='date'
+                        />
+                    </>)}
+                </>)}
+                
             </div>
             <div className='mt-6 flex justify-end gap-4'>
                 {/* <Link

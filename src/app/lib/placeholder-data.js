@@ -13,8 +13,8 @@ const tasks = [
         // type: 'to-do',
         // duration: '',
         // deadline: '',
-        // preferredTimesOfDay: ['morning', 'evening'],
-        // preferredDaysOfWeek: [],
+        // preferredTimeOfDay: ['morning', 'evening'],
+        // preferredDayOfWeek: [],
         // frequency: [2, 'day'],
         // taskChains: {
         //     prevTask: [],
