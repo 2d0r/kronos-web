@@ -3,45 +3,54 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
   // directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
-  id    String @id @default(uuid())
-  name  String
-  email String @unique
+  id           String @id @default(uuid())
+  name         String
+  email        String @unique
+  averageSleep Int?
 
   @@index([name])
   @@map("users")
 }
 
 model Task {
-  id                    String      @id @default(uuid())
-  name                  String
-  priority              Priority    @default(medium)
-  mindset               MindsetEnum
-  status                Status      @default(toDo)
-  startTime             DateTime?
-  endTime               DateTime?
-  duration              Int?
-  preferredTimeOfDay    TimeOfDay[]
-  preferredDayOfWeek    DayOfWeek[]
-  repeat                Boolean     @default(false)
-  repeatDuration        Int?
-  repeatFrequency       Int?
-  repeatTimespan        TimeSpan?
-  endRepeat             Boolean     @default(false)
-  totalDuration         Int?
-  repetitions           Int?
-  endRepeatDate         DateTime?
-  notes                 String?
-  tasks_TaskCausality_A Task[]      @relation("TaskCausality")
-  tasks_TaskCausality_B Task[]      @relation("TaskCausality")
-  tasks_TaskChain_A     Task[]      @relation("TaskChain")
-  tasks_TaskChain_B     Task[]      @relation("TaskChain")
-  createdAt             DateTime    @default(now())
+  id                     String      @id @default(uuid())
+  name                   String
+  priorityScore          Int         @default(0)
+  priority               Priority    @default(medium)
+  mindset                MindsetEnum
+  status                 Status      @default(toDo)
+  scheduled              Boolean     @default(false)
+  startTime              DateTime?
+  endTime                DateTime?
+  duration               Int?
+  deadline               DateTime?
+  timeSpent              Int         @default(0)
+  repetitionsDone        Int         @default(0)
+  completion             Int?        @default(0)
+  preferredTimeOfDay     TimeOfDay[]
+  preferredDayOfWeek     DayOfWeek[]
+  repeat                 Boolean     @default(false)
+  repeatTimespanMultiplier         Int?
+  repeatFrequency        Int?
+  repeatTimespan         TimeSpan?
+  firstSessionStartTime  DateTime?
+  latestSessionStartTime DateTime?
+  endRepeat              Boolean     @default(false)
+  totalDuration          Int?
+  totalRepetitions       Int?
+  endRepeatDate          DateTime?
+  notes                  String?
+  tasks_TaskCausality_A  Task[]      @relation("TaskCausality")
+  tasks_TaskCausality_B  Task[]      @relation("TaskCausality")
+  tasks_TaskChain_A      Task[]      @relation("TaskChain")
+  tasks_TaskChain_B      Task[]      @relation("TaskChain")
+  createdAt              DateTime    @default(now())
 
   @@index([name])
   @@map("tasks")
@@ -90,6 +99,7 @@ enum Priority {
 }
 
 enum TimeSpan {
+  hour
   day
   week
   month

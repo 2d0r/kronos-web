@@ -1,14 +1,10 @@
 'use client';
-
-import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
 import { createTask} from '@/app/lib/actions';
-import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import prisma from '@/app/lib/db';
 import { Dropdown, InputField, SelectionField } from './form-fields';
-import { getMindsetNames } from '@/app/lib/actions';
 import { mindsetList, priorityList, preferredDayOfWeekList, preferredTimeOfDayList, timeSpanList, statusList } from '@/app/lib/definitions';
 
 
@@ -134,7 +130,7 @@ export default function CreateForm() {
                         inputType='number'
                     />
                     <InputField 
-                        fieldName='repeatDuration'
+                        fieldName='repeatTimespanMultiplier'
                         placeholder='How much'
                         inputType='number'
                     />
@@ -159,8 +155,8 @@ export default function CreateForm() {
                             inputType='number'
                         />
                         <InputField 
-                            fieldName='repetitions'
-                            placeholder='Number of repetitions'
+                            fieldName='totalRepetitions'
+                            placeholder='Number of totalRepetitions'
                             inputType='number'
                         />
                         <InputField 

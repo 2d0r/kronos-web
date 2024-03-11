@@ -6,7 +6,6 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { fromZodError } from 'zod-validation-error';
 import prisma from './db';
-import { prismaEnums } from './definitions';
 
 const FormSchema = z.object({
     id: z.string(),
@@ -22,12 +21,12 @@ const FormSchema = z.object({
     repeat: z.coerce.boolean(),
     repeatFrequency: z.number().nullable(),
     repeatTimespan: z.enum(['day', 'week', 'month', 'year'], {invalid_type_error: 'Please select a valid Repeat Timespan.'}).nullable(),
-    repeatDuration: z.number().nullable(),
+    repeatTimespanMultiplier: z.number().nullable(),
     preferredTimeOfDay: z.array(z.enum(['morning', 'noon', 'afternoon', 'evening', 'night'], {invalid_type_error: 'Please select a valid time of day.'})).nullish(),
     preferredDayOfWeek: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], {invalid_type_error: 'Please select a valid day of the week.'})).nullish(),
     endRepeat: z.coerce.boolean(),
     totalDuration: z.number().nullable(),
-    repetitions: z.number().nullable(),
+    totalRepetitions: z.number().nullable(),
     endRepeatDate: z.string().nullable()
 
   });
@@ -48,12 +47,12 @@ export type State = {
         repeat?: boolean[];
         repeatFrequency?: number[];
         repeatTimespan?: string[];
-        repeatDuration?: number[];
+        repeatTimespanMultiplier?: number[];
         preferredTimeOfDay?: string[];
         preferredDayOfWeek?: string[];
         endRepeat?: string[];
         totalDuration?: number[];
-        repetitions?: number[];
+        totalRepetitions?: number[];
         endRepeatDate?: number[];
 
     };
@@ -74,12 +73,12 @@ export async function createTask(prevState: State, formData: FormData) {
       repeat: formData.get('repeat'),
       repeatFrequency: formData.get('repeatFrequency'),
       repeatTimespan: formData.get('repeatTimespan'),
-      repeatDuration: formData.get('repeatDuration'),
+      repeatTimespanMultiplier: formData.get('repeatTimespanMultiplier'),
       preferredTimeOfDay: formData.get('preferredTimeOfDay'),
       preferredDayOfWeek: formData.get('preferredDayOfWeek'),
       endRepeat: formData.get('endRepeat'),
       totalDuration: formData.get('totalDuration'),
-      repetitions: formData.get('repetitions'),
+      totalRepetitions: formData.get('totalRepetitions'),
       endRepeatDate: formData.get('endRepeatDate')
     });
 
@@ -93,8 +92,8 @@ export async function createTask(prevState: State, formData: FormData) {
     }
 
     const { name, mindset, status, priority, startDate, startTime, endDate, endTime, duration, 
-      repeat, repeatDuration, repeatFrequency, repeatTimespan, preferredTimeOfDay, preferredDayOfWeek, 
-      endRepeat, totalDuration, repetitions, endRepeatDate
+      repeat, repeatTimespanMultiplier, repeatFrequency, repeatTimespan, preferredTimeOfDay, preferredDayOfWeek, 
+      endRepeat, totalDuration, totalRepetitions, endRepeatDate
     } = validatedFields.data;
     // Merge start date and time; Also end date and time
     const sqlStartTime = new Date(`${startDate || '2024-01-01'}T${startTime || '00:00'}:00`);
@@ -112,14 +111,14 @@ export async function createTask(prevState: State, formData: FormData) {
           endTime: sqlEndTime,
           duration: duration,
           repeat: repeat,
-          repeatDuration: repeatDuration,
+          repeatTimespanMultiplier: repeatTimespanMultiplier,
           repeatFrequency: repeatFrequency,
           repeatTimespan: repeatTimespan,
           preferredTimeOfDay: preferredTimeOfDay || [],
           preferredDayOfWeek: preferredDayOfWeek || [],
           endRepeat: endRepeat,
           totalDuration: totalDuration,
-          repetitions: repetitions,
+          totalRepetitions: totalRepetitions,
           endRepeatDate: endRepeatDate
         },
       });
@@ -134,7 +133,7 @@ export async function createTask(prevState: State, formData: FormData) {
     redirect('/');
 }
 
-export async function deleteTask(id: string, formData: FormData) {
+export async function deleteTask(id: string) {
   try {
     await sql`DELETE FROM tasks WHERE id = ${id}`;
   } catch (error) {
@@ -147,7 +146,7 @@ export async function deleteTask(id: string, formData: FormData) {
   redirect('/');
 }
 
-export async function deleteTaskPrisma(id: string, fromData: FormData) {
+export async function deleteTaskPrisma(id: string) {
 
   try {
       await prisma.task.delete({
@@ -165,26 +164,4 @@ export async function deleteTaskPrisma(id: string, fromData: FormData) {
 
   revalidatePath('/');
   redirect('/');
-}
-
-export async function getMindsetNames() {
-  try {
-    // Use Prisma to query all 'name' values from the 'mindset' table
-    const mindsetNames = await prisma.mindset.findMany({
-      select: {
-        name: true,
-      },
-    });
-
-    // Extract the 'name' values from the result
-    const namesArray = mindsetNames.map((mindset) => mindset.name);
-
-    console.log(namesArray);
-    return namesArray;
-  } catch (error) {
-    console.error('Error fetching mindsets:', error);
-    throw error;
-  } finally {
-    await prisma.$disconnect(); // Disconnect the Prisma client when done
-  }
 }

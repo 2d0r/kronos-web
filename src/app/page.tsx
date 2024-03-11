@@ -1,44 +1,15 @@
 import Button from "@/components/Button";
-import { revalidatePath } from "next/cache";
-import { fetchTasks, fetchTasksPrisma, fetchMindsets } from "./lib/data";
-import { deleteTask, deleteTaskPrisma } from "./lib/actions";
+import { fetchTasksPrisma } from "./lib/data";
 import CreateForm from "./ui/tasks/create-form";
 import Breadcrumbs from "./ui/tasks/breadcrumbs";
-import prisma from "./lib/db";
+import TaskCard from "./ui/tasks/task-card";
+import calculatePriorityScores from "./lib/priorityScore";
 
 export default async function Home() {
   const tasks = await fetchTasksPrisma();
 
-
-  function DeleteTask({ id }: { id: string }) {
-    const deleteTaskWithId = deleteTaskPrisma.bind(null, id);
-
-    return (
-        <form action={deleteTaskWithId} className="flex align-middle">
-            <button className="rounded-md border p-2 hover:bg-gray-100">
-              Delete
-            </button>
-        </form>
-    );
-  }
-
-  async function getMindsetById (id : string) {
-    const mindsetByID = await prisma.mindset.findUnique({
-      where: {
-        id: id
-      },
-      select: {
-        name: true
-      }
-    });
-
-    if (mindsetByID) {
-      return mindsetByID.name;
-    } else {
-      console.log('Mindset not found.');
-      return 'Not found';
-    }
-  }
+  const minutes = 5, interval = minutes * 60 * 1000;
+  setInterval(calculatePriorityScores, interval);
 
   return (<>
     <main>
@@ -53,15 +24,13 @@ export default async function Home() {
             ]}
         />
       <CreateForm />
-      <div className="container mx-auto space-x-6 w-full justify-center flex p-4">
+      <div className="container mx-auto w-full justify-center flex p-4">
       </div>
-      <div className="container space-x-6 w-full flex p-4 flex-col text-center">
-        {tasks.map((task, idx) => {
+      <div className="container w-full p-4 flex flex-col gap-2 text-center">
+        <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={calculatePriorityScores}>Rescore</Button>
+        {tasks.sort((a, b) => b.priorityScore - a.priorityScore).map((task, idx) => {
           return (
-            <div className='w-full h-full flex align-middle gap-6 text-left' key={idx}>
-              <span>{JSON.stringify(task)}</span>
-              <DeleteTask id={task.id} />
-            </div>
+            <TaskCard task={task} key={idx}/>
         )})}
       </div>
     </main>
