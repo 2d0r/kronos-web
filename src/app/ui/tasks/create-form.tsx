@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
-import { createTask} from '@/app/lib/actions';
+import { createTaskPrisma} from '@/app/lib/actions';
 import { Button } from '@/app/ui/button';
 import prisma from '@/app/lib/db';
 import { Dropdown, InputField, SelectionField } from './form-fields';
@@ -10,7 +10,7 @@ import { mindsetList, priorityList, preferredDayOfWeekList, preferredTimeOfDayLi
 
 export default function CreateForm() {
     const initialState = { message: null, errors: {} };
-    const createTaskHere : any = createTask;
+    const createTaskHere : any = createTaskPrisma;
     const [state, dispatch] = useFormState(createTaskHere, initialState);
 
     const getEnumValues = (enumType: Record<string, string>) => {

@@ -3,13 +3,14 @@ import { fetchTasksPrisma } from "./lib/data";
 import CreateForm from "./ui/tasks/create-form";
 import Breadcrumbs from "./ui/tasks/breadcrumbs";
 import TaskCard from "./ui/tasks/task-card";
-import calculatePriorityScores from "./lib/priorityScore";
+import { updatePriorityScores } from './lib/data';
+import { organiseWeek } from "./lib/organiser";
 
 export default async function Home() {
   const tasks = await fetchTasksPrisma();
 
-  const minutes = 5, interval = minutes * 60 * 1000;
-  setInterval(calculatePriorityScores, interval);
+  // const minutes = 5, interval = minutes * 60 * 1000;
+  // setInterval(updatePriorityScores, interval);
 
   return (<>
     <main>
@@ -27,7 +28,8 @@ export default async function Home() {
       <div className="container mx-auto w-full justify-center flex p-4">
       </div>
       <div className="container w-full p-4 flex flex-col gap-2 text-center">
-        <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={calculatePriorityScores}>Rescore</Button>
+        {/* <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={updatePriorityScores}>Rescore</Button> */}
+        <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={organiseWeek}>Organise</Button>
         {tasks.sort((a, b) => b.priorityScore - a.priorityScore).map((task, idx) => {
           return (
             <TaskCard task={task} key={idx}/>

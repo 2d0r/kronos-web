@@ -1,27 +1,27 @@
-'use server';
-
-import { revalidatePath } from "next/cache";
+import { revalidatePath } from 'next/cache';
 import {
     fetchTasksPrisma,
     fetchMindsets,
     updateTaskField
-} from "./data";
+} from './data';
 import {
-    getCurrentTimeOfDay,
     dayOfWeekToNumber,
     DEFAULT_AVERAGE_SLEEP, DEFAULT_AVERAGE_MEALS, DEFAULT_MINDSET,
     FURTHEST_MINDSET, CLOSEST_MINDSET,
-} from "./definitions";
+} from './constants';
+import {
+    getCurrentTimeOfDay
+} from '../utils/dateUtils';
+import { Task, Mindset } from '@prisma/client';
 
-export default async function calculatePriorityScores() {
-    const tasks = await fetchTasksPrisma();
-    const mindsets = await fetchMindsets();
+export function calculatePriorityScores(tasks : Task[], mindsets: Mindset[], targetTime?: Date) : Task[] {
 
-    const currentTime = new Date();
+    // current time is the time for which the priority score is calculated
+    const currentTime = targetTime || new Date();
     const currentHour = currentTime.getHours();
 
     // All durations should be in minutes, unless specified
-
+    const tasksWithNewScore: Task[] = [];
     tasks
         .filter((task) => (
             ['toDo', 'inProgress'].includes(String(task.status)) &&
@@ -157,11 +157,15 @@ export default async function calculatePriorityScores() {
                 score.preferredTimeScore +
                 score.preferredDayScore
             ) / (Object.values(score).filter(value => value !== -1).length);
-
-            updateTaskField(task.id, 'priorityScore', score.overall);
-            console.log(score);
+            score.overall = Math.round((score.overall + Number.EPSILON) * 10) / 10;
+            
+            tasksWithNewScore.push({
+                ...task,
+                priorityScore: score.overall
+            })
         });
 
     console.log('Calculated priority scores!');
-    revalidatePath('/');
+
+    return tasksWithNewScore;
 }

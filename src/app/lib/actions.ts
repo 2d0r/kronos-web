@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { fromZodError } from 'zod-validation-error';
 import prisma from './db';
+import { Event } from '@prisma/client';
 
 const FormSchema = z.object({
     id: z.string(),
@@ -17,7 +18,7 @@ const FormSchema = z.object({
     startDate: z.string().nullable(),
     endTime: z.string().nullable(),
     endDate: z.string().nullable(),
-    duration: z.number().nullable(),
+    duration: z.number(),
     repeat: z.coerce.boolean(),
     repeatFrequency: z.number().nullable(),
     repeatTimespan: z.enum(['day', 'week', 'month', 'year'], {invalid_type_error: 'Please select a valid Repeat Timespan.'}).nullable(),
@@ -59,7 +60,7 @@ export type State = {
     message?: string | null;
 };
 
-export async function createTask(prevState: State, formData: FormData) {
+export async function createTaskPrisma(prevState: State, formData: FormData) {
   const validatedFields = CreateTask.safeParse({
       name: formData.get('name'),
       mindset: formData.get('mindset'),
@@ -96,8 +97,10 @@ export async function createTask(prevState: State, formData: FormData) {
       endRepeat, totalDuration, totalRepetitions, endRepeatDate
     } = validatedFields.data;
     // Merge start date and time; Also end date and time
-    const sqlStartTime = new Date(`${startDate || '2024-01-01'}T${startTime || '00:00'}:00`);
-    const sqlEndTime = new Date(`${endDate || '2024-01-01'}T${endTime || '00:00'}:00`);
+    const sqlStartTime = startDate && startTime ? new Date(`${startDate}T${startTime}:00`): null;
+    const sqlEndTime = endDate && endTime ? new Date(`${endDate}T${endTime}:00`): null;
+    const durationFromStartEnd = (sqlStartTime && sqlEndTime) ? sqlEndTime.getTime() - sqlStartTime.getTime() : null;
+
 
 
     try {
@@ -109,7 +112,7 @@ export async function createTask(prevState: State, formData: FormData) {
           priority: priority,
           startTime: sqlStartTime,
           endTime: sqlEndTime,
-          duration: duration,
+          duration: duration || durationFromStartEnd || 10,
           repeat: repeat,
           repeatTimespanMultiplier: repeatTimespanMultiplier,
           repeatFrequency: repeatFrequency,
@@ -164,4 +167,20 @@ export async function deleteTaskPrisma(id: string) {
 
   revalidatePath('/');
   redirect('/');
+}
+
+export async function createEventPrisma(event: Event) {
+  try {
+    await prisma.event.create({
+      data: {
+        ...event
+      },
+    });
+  } catch (error) {
+    console.log('Failed to create event', error);
+    return {
+      message: 'Database Error: Failed to create event.',
+    };
+  }
+
 }

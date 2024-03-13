@@ -29,7 +29,7 @@ model Task {
   scheduled                Boolean     @default(false)
   startTime                DateTime?
   endTime                  DateTime?
-  duration                 Int?
+  duration                 Int
   deadline                 DateTime?
   timeSpent                Int         @default(0)
   repetitionsDone          Int         @default(0)
