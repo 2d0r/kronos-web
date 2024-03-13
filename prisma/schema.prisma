@@ -19,38 +19,39 @@ model User {
 }
 
 model Task {
-  id                     String      @id @default(uuid())
-  name                   String
-  priorityScore          Int         @default(0)
-  priority               Priority    @default(medium)
-  mindset                MindsetEnum
-  status                 Status      @default(toDo)
-  scheduled              Boolean     @default(false)
-  startTime              DateTime?
-  endTime                DateTime?
-  duration               Int?
-  deadline               DateTime?
-  timeSpent              Int         @default(0)
-  repetitionsDone        Int         @default(0)
-  completion             Int?        @default(0)
-  preferredTimeOfDay     TimeOfDay[]
-  preferredDayOfWeek     DayOfWeek[]
-  repeat                 Boolean     @default(false)
-  repeatTimespanMultiplier         Int?
-  repeatFrequency        Int?
-  repeatTimespan         TimeSpan?
-  firstSessionStartTime  DateTime?
-  latestSessionStartTime DateTime?
-  endRepeat              Boolean     @default(false)
-  totalDuration          Int?
-  totalRepetitions       Int?
-  endRepeatDate          DateTime?
-  notes                  String?
-  tasks_TaskCausality_A  Task[]      @relation("TaskCausality")
-  tasks_TaskCausality_B  Task[]      @relation("TaskCausality")
-  tasks_TaskChain_A      Task[]      @relation("TaskChain")
-  tasks_TaskChain_B      Task[]      @relation("TaskChain")
-  createdAt              DateTime    @default(now())
+  id                       String      @id @default(uuid())
+  name                     String
+  events                   Event[]
+  priorityScore            Int         @default(0)
+  priority                 Priority    @default(medium)
+  mindset                  MindsetEnum
+  status                   Status      @default(toDo)
+  scheduled                Boolean     @default(false)
+  startTime                DateTime?
+  endTime                  DateTime?
+  duration                 Int?
+  deadline                 DateTime?
+  timeSpent                Int         @default(0)
+  repetitionsDone          Int         @default(0)
+  completion               Int?        @default(0)
+  preferredTimeOfDay       TimeOfDay[]
+  preferredDayOfWeek       DayOfWeek[]
+  repeat                   Boolean     @default(false)
+  repeatTimespanMultiplier Int?
+  repeatFrequency          Int?
+  repeatTimespan           TimeSpan?
+  firstSessionStartTime    DateTime?
+  latestSessionStartTime   DateTime?
+  endRepeat                Boolean     @default(false)
+  totalDuration            Int?
+  totalRepetitions         Int?
+  endRepeatDate            DateTime?
+  notes                    String?
+  tasks_TaskCausality_A    Task[]      @relation("TaskCausality")
+  tasks_TaskCausality_B    Task[]      @relation("TaskCausality")
+  tasks_TaskChain_A        Task[]      @relation("TaskChain")
+  tasks_TaskChain_B        Task[]      @relation("TaskChain")
+  createdAt                DateTime    @default(now())
 
   @@index([name])
   @@map("tasks")
@@ -129,4 +130,36 @@ enum TaskType {
   task
   project
   goal
+}
+
+model Event {
+  id            String      @id @default(uuid())
+  name          String
+  task          Task        @relation(fields: [taskId], references: [id])
+  taskId        String
+  mindset       MindsetEnum
+  status        Status      @default(toDo)
+  startTime     DateTime
+  endTime       DateTime
+  userStartTime DateTime?
+  userEndTime   DateTime?
+  breaks        Break[]
+  notes         String?
+  createdAt     DateTime    @default(now())
+
+  @@index([name])
+  @@map("events")
+}
+
+model Break {
+  id        String   @id @default(uuid())
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
+  startTime DateTime
+  endTime   DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([id])
+  @@map("breaks")
 }
