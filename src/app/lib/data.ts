@@ -22,6 +22,37 @@ export async function fetchTasksPrisma() {
     }
 }
 
+export async function getCurrentTask() {
+  const now = new Date();
+  try {
+    const currentEvents = await prisma.event.findMany({
+      where: {
+        startTime: {
+          lt: now, // Start time is less than (before) now
+        }, 
+        endTime: {
+          gt: now, // End time is greater than (after) now 
+        },
+      }, 
+      select: {
+        taskId: true
+      }
+    });
+    if (currentEvents.length > 0) {
+      const currentEventsTaskIds = currentEvents.map(el => el.taskId);
+      const tasks = await fetchTasksPrisma();
+      const currentTasks = tasks.filter(el => currentEventsTaskIds.includes(el.id))
+        .sort((a,b) => (a.priorityScore - b.priorityScore));
+      return currentTasks;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.log('Failed to fetch mindset list', error);
+    throw error;
+  }
+}
+
 export async function fetchMindsets() {
 
     try {
@@ -33,23 +64,6 @@ export async function fetchMindsets() {
         // throw new Error('Failed to fetch the latest tasks.');
         await prisma.$disconnect();
         process.exit(1);
-    }
-}
-
-export async function fetchTasks() {
-    noStore();
-    try {
-        const data = await sql<Task>`
-        SELECT tasks.id, tasks.name, tasks.status, tasks.mindset
-        FROM tasks
-        ORDER BY tasks.name ASC
-        LIMIT 10`;
-
-        const latestTasks = data.rows;
-        return latestTasks;
-    } catch (error) {
-        console.error('Database Error:', error);
-        throw new Error('Failed to fetch the latest tasks.');
     }
 }
 
@@ -84,8 +98,6 @@ export async function getMindsetNames() {
 
     // Extract the 'name' values from the result
     const namesArray = mindsetNames.map((mindset) => mindset.name);
-
-    console.log(namesArray);
     return namesArray;
   } catch (error) {
     console.error('Error fetching mindsets:', error);
@@ -115,17 +127,6 @@ export async function getMindsetById (id : string) {
   }
 }
 
-export async function updatePriorityScores(taskList: Task[]) {
-  const tasks = taskList || await fetchTasksPrisma();
-  const mindsets = await fetchMindsets();
-  const updatedTasks = calculatePriorityScores(tasks, mindsets);
-  tasks.forEach((task) => {
-      updateTaskField(task.id, 'priorityScore', task.priorityScore);
-  })
-
-  revalidatePath('/'); 
-}
-
 export async function allTasksHaveActiveEvents() {
   const tasksWithoutActiveEvents = await prisma.task.findMany({
     where: {
@@ -138,5 +139,23 @@ export async function allTasksHaveActiveEvents() {
     return true;
   } else {
     return false;
+  }
+}
+
+export async function getTaskMindsets(task: Task) {
+  try {
+    const taskMindsets = await prisma.mindset.findMany({
+      where: {
+        tasks: {
+          some: {
+            id: task.id
+          } 
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error getting mindset of task:', task.name);
+    await prisma.$disconnect();
+    process.exit(1);
   }
 }

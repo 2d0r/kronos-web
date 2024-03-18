@@ -24,7 +24,8 @@ model Task {
   events                   Event[]
   priorityScore            Int         @default(0)
   priority                 Priority    @default(medium)
-  mindset                  MindsetEnum
+  mindset                  Mindset     @relation(fields: [mindsetId], references: [id])
+  mindsetId                String
   status                   Status      @default(toDo)
   scheduled                Boolean     @default(false)
   startTime                DateTime?
@@ -58,17 +59,10 @@ model Task {
 }
 
 model Mindset {
-  id            String @id @default(cuid())
-  name          String @unique
-  create        Int
-  learn         Int
-  maintain      Int
-  play          Int
-  restReward    Int
-  selfCare      Int
-  selfChallenge Int
-  socialise     Int
-  survive       Int
+  id           String       @id @default(cuid())
+  name         String       @unique
+  maslowLevel  Int          @default(1)
+  tasks        Task[]
 
   @@index([name])
   @@map("mindsets")
@@ -137,7 +131,6 @@ model Event {
   name          String
   task          Task        @relation(fields: [taskId], references: [id])
   taskId        String
-  mindset       MindsetEnum
   status        Status      @default(toDo)
   startTime     DateTime
   endTime       DateTime

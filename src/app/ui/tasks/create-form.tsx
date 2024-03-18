@@ -5,10 +5,11 @@ import { createTaskPrisma} from '@/app/lib/actions';
 import { Button } from '@/app/ui/button';
 import prisma from '@/app/lib/db';
 import { Dropdown, InputField, SelectionField } from './form-fields';
-import { mindsetList, priorityList, preferredDayOfWeekList, preferredTimeOfDayList, timeSpanList, statusList } from '@/app/lib/definitions';
+import { priorityList, preferredDayOfWeekList, preferredTimeOfDayList, timeSpanList, statusList } from '@/app/lib/definitions';
+import { getMindsetNames } from '@/app/lib/data';
 
 
-export default function CreateForm() {
+export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
     const initialState = { message: null, errors: {} };
     const createTaskHere : any = createTaskPrisma;
     const [state, dispatch] = useFormState(createTaskHere, initialState);

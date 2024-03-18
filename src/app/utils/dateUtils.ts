@@ -1,4 +1,4 @@
-import { DEFAULT_TIMES_OF_DAY } from "../lib/constants";
+import { DEFAULT_TIMES_OF_DAY } from "../lib/definitions";
 
 export const dateDifferenceInMinutes = (dateA : Date, dateB : Date) => {
     return (

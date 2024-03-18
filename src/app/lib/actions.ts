@@ -7,11 +7,14 @@ import { redirect } from 'next/navigation';
 import { fromZodError } from 'zod-validation-error';
 import prisma from './db';
 import { Event } from '@prisma/client';
+import { MIN_TASK_DURATION, statusList } from './definitions';
+import { fetchTasksPrisma, updateTaskField } from './data';
+import { calculatePriorityScores } from './priorityScore';
 
 const FormSchema = z.object({
     id: z.string(),
     name: z.string(),
-    mindset: z.enum(['survive', 'maintain', 'socialise', 'play', 'learn', 'create', 'selfCare', 'selfChallenge'], { invalid_type_error: 'Please select a valid mindset.' }),
+    mindset: z.enum(['survive', 'maintain'], { invalid_type_error: 'Please select a valid mindset.' }),
     status: z.enum(['toDo', 'inProgress', 'done'], { invalid_type_error: 'Please select a valid status.' }),
     priority: z.enum(['veryHigh', 'high', 'medium', 'low'], { invalid_type_error: 'Please select a valid priority.' }),
     startTime: z.string().nullable(),
@@ -63,7 +66,7 @@ export type State = {
 export async function createTaskPrisma(prevState: State, formData: FormData) {
   const validatedFields = CreateTask.safeParse({
       name: formData.get('name'),
-      mindset: formData.get('mindset'),
+      mindset: formData.get('mindsetId'),
       status: formData.get('status'),
       priority: formData.get('priority'),
       startTime: formData.get('startTime'),
@@ -101,18 +104,21 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     const sqlEndTime = endDate && endTime ? new Date(`${endDate}T${endTime}:00`): null;
     const durationFromStartEnd = (sqlStartTime && sqlEndTime) ? sqlEndTime.getTime() - sqlStartTime.getTime() : null;
 
-
+    let mindsetId = '';
+    fetchMindsets().then(mindsets => {
+      mindsetId = mindsets.filter(el => el.name === mindset)[0].id;
+    });
 
     try {
       await prisma.task.create({
         data: {
           name: name,
           status: status,
-          mindset: mindset,
+          mindsetId: mindsetId,
           priority: priority,
           startTime: sqlStartTime,
           endTime: sqlEndTime,
-          duration: duration || durationFromStartEnd || 10,
+          duration: duration || durationFromStartEnd || MIN_TASK_DURATION,
           repeat: repeat,
           repeatTimespanMultiplier: repeatTimespanMultiplier,
           repeatFrequency: repeatFrequency,
@@ -183,4 +189,42 @@ export async function createEventPrisma(event: Event) {
     };
   }
 
+}
+
+export async function fetchMindsets() {
+  try {
+    const mindsets = await prisma.mindset.findMany();
+    return mindsets;
+  } catch (error) {
+    console.log('Failed to fetch mindset list', error);
+    return [];
+  }
+}
+
+export async function fetchMindsetList() {
+  try {
+    const mindsetNames = await prisma.mindset.findMany({
+      select: {
+        name: true
+      }
+    });
+    const mindsetList = mindsetNames.map(el => {
+      return el.name;
+    });
+    return mindsetList;
+  } catch (error) {
+    console.log('Failed to fetch mindset list', error);
+    return [];
+  }
+}
+
+export async function updatePriorityScores() {
+  const tasks = await fetchTasksPrisma();
+  const mindsets = await fetchMindsets();
+  const updatedTasks = calculatePriorityScores(tasks, mindsets);
+  updatedTasks.forEach((task) => {
+      updateTaskField(task.id, 'priorityScore', task.priorityScore);
+  })
+
+  revalidatePath('/'); 
 }

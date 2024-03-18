@@ -2,13 +2,14 @@ import { revalidatePath } from 'next/cache';
 import {
     fetchTasksPrisma,
     fetchMindsets,
-    updateTaskField
+    updateTaskField,
+    getCurrentTask
 } from './data';
 import {
     dayOfWeekToNumber,
     DEFAULT_AVERAGE_SLEEP, DEFAULT_AVERAGE_MEALS, DEFAULT_MINDSET,
     FURTHEST_MINDSET, CLOSEST_MINDSET,
-} from './constants';
+} from './definitions';
 import {
     getCurrentTimeOfDay
 } from '../utils/dateUtils';
@@ -109,15 +110,22 @@ export function calculatePriorityScores(tasks : Task[], mindsets: Mindset[], tar
             }
 
             // mindset score
-            const currentMindset = DEFAULT_MINDSET; // prevTaskMindset || DEFAULT_MINDSET;
+            let currentMindset = DEFAULT_MINDSET;
+            getCurrentTask().then(currentTasks => {
+                if (currentTasks.length) {
+                    const currentMindsetId = currentTasks[0].mindsetId;
+                    currentMindset = mindsets.filter(el => el.id === currentMindsetId)[0].name;
+                }
+            });
             // get the number in the matrix between the currentMindset and task.mindset
             // filter array of objects by object with name task.Mindset
-            const proximityToCurrMindset = mindsets.filter(mindset => mindset.name === task.mindset)[0][currentMindset];
+            const currentMindsetMaslowLevel = mindsets.filter(el => el.name === currentMindset)[0].maslowLevel;
+            const taskMindsetMaslowLevel = mindsets.filter(el => el.id === task.mindsetId)[0].maslowLevel;
+            const proximityToCurrMindset = currentMindset === 'restReward' ? 1 :
+                Math.abs(currentMindsetMaslowLevel - taskMindsetMaslowLevel);
             score.mindsetScore = 100 / (FURTHEST_MINDSET - CLOSEST_MINDSET) * (FURTHEST_MINDSET - proximityToCurrMindset);
             /**
-             * 4 … 0%
-             * 3 … 33%
-             * 2 … 66%
+             * 6 … 0%
              * 1 … 100%
             */
 

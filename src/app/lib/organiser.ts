@@ -3,7 +3,7 @@
 import React from "react";
 import prisma from "./db";
 import { addMinutesToDate, dateDifferenceInMinutes } from "../utils/dateUtils";
-import { MINIMUM_TRANSITION, MIN_TASK_DURATION } from "./constants";
+import { MINIMUM_TRANSITION, MIN_TASK_DURATION } from "./definitions";
 import { allTasksHaveActiveEvents, fetchMindsets, fetchTasksPrisma } from './data';
 import { calculatePriorityScores } from './priorityScore';
 import { Task, Event } from '@prisma/client';
@@ -91,19 +91,16 @@ export async function organiseWeek() {
                 task.duration && (task.duration <= dateDifferenceInMinutes(gap.endTime, gap.startTime)) &&
                 // filter out tasks that are already scheduled
                 !scheduledTaskIdsList.includes(task.id)
-            ))
-            console.log('fitting tasks:', fittingTasks);
+            ));
             if(fittingTasks.length === 0) break;
             // calculate priority scores for this moment
             const tasksWithCurrentScores = calculatePriorityScores(fittingTasks, mindsets, currentTime);
             const chosenTask = tasksWithCurrentScores.sort((taskA, taskB) => taskA.priorityScore - taskB.priorityScore)[0];
-            console.log('chosenTask', chosenTask);
 
             if (chosenTask) {
                 const eventToSchedule: Event = {
                     id: uuidv4(),
                     name: chosenTask.name,
-                    mindset: chosenTask.mindset,
                     status: chosenTask.status,
                     taskId: chosenTask.id,
                     startTime: endTimeOfLastTaskAdded,
