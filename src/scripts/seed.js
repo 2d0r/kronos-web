@@ -7,8 +7,8 @@ const bcrypt = require('bcrypt');
 
 async function seedUsers(client) {
   try {
-    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
-    // Create the "users" table if it doesn't exist
+    await client.sql`CREATE EXTENSION IF NOT EXISTS 'uuid-ossp'`;
+    // Create the 'users' table if it doesn't exist
     const createTable = await client.sql`
       CREATE TABLE IF NOT EXISTS users (
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -18,9 +18,9 @@ async function seedUsers(client) {
       );
     `;
 
-    console.log(`Created "users" table`);
+    console.log(`Created 'users' table`);
 
-    // Insert data into the "users" table
+    // Insert data into the 'users' table
     const insertedUsers = await Promise.all(
       users.map(async (user) => {
         const hashedPassword = await bcrypt.hash(user.password, 10);
@@ -46,13 +46,13 @@ async function seedUsers(client) {
 
 async function seedTasks(client) {
   try {
-    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+    await client.sql`CREATE EXTENSION IF NOT EXISTS 'uuid-ossp'`;
 
     const deleteTable = await client.sql`
       DROP TABLE IF EXISTS tasks;
     `;
 
-    // Create the "invoices" table if it doesn't exist
+    // Create the 'invoices' table if it doesn't exist
     const createTable = await client.sql`
       CREATE TABLE IF NOT EXISTS tasks (
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
@@ -63,9 +63,9 @@ async function seedTasks(client) {
       );
     `;
 
-    console.log(`Created "tasks" table`);
+    console.log(`Created 'tasks' table`);
 
-    // Insert data into the "invoices" table
+    // Insert data into the 'invoices' table
     const seededTasks = await Promise.all(
       tasks.map(
         (task) => client.sql`

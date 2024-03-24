@@ -1,9 +1,9 @@
 'use server';
 
-import React from "react";
-import prisma from "./db";
-import { addMinutesToDate, dateDifferenceInMinutes } from "../utils/dateUtils";
-import { MINIMUM_TRANSITION, MIN_TASK_DURATION } from "./definitions";
+import React from 'react';
+import prisma from './db';
+import { addMinutesToDate, dateDifferenceInMinutes } from '../utils/dateUtils';
+import { MINIMUM_TRANSITION, MIN_TASK_DURATION } from './definitions';
 import { allTasksHaveActiveEvents, fetchMindsets, fetchTasksPrisma } from './data';
 import { calculatePriorityScores } from './priorityScore';
 import { Task, Event } from '@prisma/client';

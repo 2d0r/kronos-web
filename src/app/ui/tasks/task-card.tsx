@@ -1,5 +1,5 @@
-import React from "react";
-import { DeleteTask } from "./delete-task";
+import React from 'react';
+import { DeleteTask } from './delete-task';
 import { getTaskMindset } from '@/app/lib/data';
 
 export default async function TaskCard(props : any) {
