@@ -24,7 +24,7 @@ model Task {
   events                   Event[]
   priorityScore            Int         @default(0)
   priority                 Priority    @default(medium)
-  mindset                  Mindset     @relation(fields: [mindsetId], references: [id])
+  mindset                  Mindset?    @relation(fields: [mindsetId], references: [id])
   mindsetId                String
   status                   Status      @default(toDo)
   scheduled                Boolean     @default(false)

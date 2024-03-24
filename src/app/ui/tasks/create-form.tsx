@@ -4,8 +4,8 @@ import { useFormState } from 'react-dom';
 import { createTaskPrisma} from '@/app/lib/actions';
 import { Button } from '@/app/ui/button';
 import prisma from '@/app/lib/db';
-import { Dropdown, InputField, SelectionField } from './form-fields';
-import { priorityList, preferredDayOfWeekList, preferredTimeOfDayList, timeSpanList, statusList } from '@/app/lib/definitions';
+import { Dropdown, InputField, MultiField, MultiSelectionField, SelectionField } from './form-fields';
+import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, statusList, DEFAULT_MINDSET_LIST } from '@/app/lib/definitions';
 import { getMindsetNames } from '@/app/lib/data';
 
 
@@ -13,10 +13,6 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
     const initialState = { message: null, errors: {} };
     const createTaskHere : any = createTaskPrisma;
     const [state, dispatch] = useFormState(createTaskHere, initialState);
-
-    const getEnumValues = (enumType: Record<string, string>) => {
-        return Object.values(enumType);
-    }
 
     const [isScheduled, setIsScheduled] = useState<string | null>(null);
     const handleScheduledToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
@@ -34,8 +30,15 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
     }
 
     return (<>
-        <form action={dispatch}>
-            <div className='rounded-md bg-gray-50 p-4 md:p-6'>
+        <form action={dispatch} 
+            // onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+            //     event.preventDefault(); // Prevent default form submission
+            //     const formData = new FormData(event.target as HTMLFormElement); // Access the form element
+            //     console.log('Duration:', formData.getAll('duration'));  
+            //     // console.log('Preferred Day of Week:', formData.get('startTime')); 
+            // }}
+        >
+            <div className='rounded-md bg-gray-50 p-4 md:p-6 w-1/3 min-w-80'>
                 <InputField 
                     fieldName='name'
                     placeholder='Enter task name'
@@ -44,7 +47,7 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
                 <Dropdown 
                     fieldName='mindset'
                     prompt='Select a mindset'
-                    list={mindsetList}
+                    list={DEFAULT_MINDSET_LIST}
                     defaultValue=''
                 />
                 <SelectionField 
@@ -63,7 +66,7 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
                 <SelectionField 
                     fieldName='isScheduled'
                     prompt=''
-                    list={['Scheduled', 'Planned by me']}
+                    list={['Scheduled', 'Flexible']}
                     type='radio'
                     onChange={handleScheduledToggle}
                 />
@@ -90,28 +93,33 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
                     />
                 </>)}
 
-                {isScheduled === 'Planned by me' && (<>
+                {isScheduled === 'Flexible' && (<>
+                    <InputField 
+                        fieldName='duration'
+                        placeholder=''
+                        inputType='duration'
+                    />
+                    <InputField 
+                        fieldName='idealStartTime'
+                        placeholder='Enter start time'
+                        inputType='time'
+                    />
+                    <MultiSelectionField
+                        fieldName='preferredTimeOfDay'
+                        prompt='Preferred time of day'
+                        list={timeOfDayList}
+                        type='checkbox'
+                    />
+                    <MultiSelectionField 
+                        fieldName='preferredDayOfWeek'
+                        prompt='Preferred days of the week'
+                        list={dayOfWeekList}
+                        type='checkbox'
+                    />
                     <InputField 
                         fieldName='deadline'
                         placeholder='Enter deadline'
                         inputType='date'
-                    />
-                    <InputField 
-                        fieldName='duration'
-                        placeholder='Enter duration'
-                        inputType='number'
-                    />
-                    <SelectionField 
-                        fieldName='preferredTimeOfDay'
-                        prompt='Preferred time of day'
-                        list={preferredTimeOfDayList}
-                        type='checkbox'
-                    />
-                    <SelectionField 
-                        fieldName='preferredDayOfWeek'
-                        prompt='Preferred days of the week'
-                        list={preferredDayOfWeekList}
-                        type='checkbox'
                     />
                 </>)}
                 
@@ -132,12 +140,12 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
                     />
                     <InputField 
                         fieldName='repeatTimespanMultiplier'
-                        placeholder='How much'
+                        placeholder='every'
                         inputType='number'
                     />
                     <SelectionField 
                         fieldName='repeatTimespan'
-                        prompt='every'
+                        prompt=''
                         list={timeSpanList}
                         type='radio'
                     />

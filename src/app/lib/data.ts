@@ -5,7 +5,7 @@ import {
 } from './definitions';
 import prisma from './db';
 import { calculatePriorityScores } from './priorityScore';
-import { Task } from '@prisma/client';
+import { Mindset, Task } from '@prisma/client';
 
 
 export async function fetchTasksPrisma() {
@@ -142,17 +142,21 @@ export async function allTasksHaveActiveEvents() {
   }
 }
 
-export async function getTaskMindsets(task: Task) {
+export async function getTaskMindset(task: Task) {
   try {
-    const taskMindsets = await prisma.mindset.findMany({
+    const taskMindset = await prisma.mindset.findMany({
       where: {
         tasks: {
           some: {
             id: task.id
           } 
         }
+      },
+      select: {
+        name: true
       }
     });
+    return taskMindset[0].name;
   } catch (error) {
     console.error('Error getting mindset of task:', task.name);
     await prisma.$disconnect();

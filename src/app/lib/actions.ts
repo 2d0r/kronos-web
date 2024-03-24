@@ -4,29 +4,31 @@ import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { fromZodError } from 'zod-validation-error';
 import prisma from './db';
 import { Event } from '@prisma/client';
-import { MIN_TASK_DURATION, statusList } from './definitions';
+import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION } from './definitions';
 import { fetchTasksPrisma, updateTaskField } from './data';
 import { calculatePriorityScores } from './priorityScore';
 
 const FormSchema = z.object({
     id: z.string(),
     name: z.string(),
-    mindset: z.enum(['survive', 'maintain'], { invalid_type_error: 'Please select a valid mindset.' }),
+    mindset: z.enum(DEFAULT_MINDSET_LIST, { invalid_type_error: 'Please select a valid mindset.' }),
     status: z.enum(['toDo', 'inProgress', 'done'], { invalid_type_error: 'Please select a valid status.' }),
     priority: z.enum(['veryHigh', 'high', 'medium', 'low'], { invalid_type_error: 'Please select a valid priority.' }),
     startTime: z.string().nullable(),
     startDate: z.string().nullable(),
     endTime: z.string().nullable(),
     endDate: z.string().nullable(),
-    duration: z.number(),
+    idealStartTime: z.string().nullable(),
+    // duration: z.array(z.number()).nullish(),
+    durationHours: z.string().nullable(),
+    durationMinutes: z.string().nullable(),
     repeat: z.coerce.boolean(),
-    repeatFrequency: z.number().nullable(),
+    repeatFrequency: z.string().nullable(),
     repeatTimespan: z.enum(['day', 'week', 'month', 'year'], {invalid_type_error: 'Please select a valid Repeat Timespan.'}).nullable(),
-    repeatTimespanMultiplier: z.number().nullable(),
-    preferredTimeOfDay: z.array(z.enum(['morning', 'noon', 'afternoon', 'evening', 'night'], {invalid_type_error: 'Please select a valid time of day.'})).nullish(),
+    repeatTimespanMultiplier: z.string().nullable(),
+    preferredTimeOfDay: z.array(z.enum(['morning', 'noon', 'afternoon', 'evening', 'night'], {invalid_type_error: 'Please select a valid time of day.'})).nullish(), // z.array(z.string().refine(value => timeOfDayList.includes(value))), // 
     preferredDayOfWeek: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], {invalid_type_error: 'Please select a valid day of the week.'})).nullish(),
     endRepeat: z.coerce.boolean(),
     totalDuration: z.number().nullable(),
@@ -47,13 +49,15 @@ export type State = {
         startDate?: string[];
         endTime?: string[];
         endDate?: string[];
-        duration?: number[];
+        idealStartTime?: string[];
+        durationHours?: number[];
+        durationMinutes?: number[];
         repeat?: boolean[];
         repeatFrequency?: number[];
         repeatTimespan?: string[];
         repeatTimespanMultiplier?: number[];
-        preferredTimeOfDay?: string[];
-        preferredDayOfWeek?: string[];
+        preferredTimeOfDay?: string[][];
+        preferredDayOfWeek?: string[][];
         endRepeat?: string[];
         totalDuration?: number[];
         totalRepetitions?: number[];
@@ -64,22 +68,25 @@ export type State = {
 };
 
 export async function createTaskPrisma(prevState: State, formData: FormData) {
+
   const validatedFields = CreateTask.safeParse({
       name: formData.get('name'),
-      mindset: formData.get('mindsetId'),
+      mindset: formData.get('mindset'),
       status: formData.get('status'),
       priority: formData.get('priority'),
       startTime: formData.get('startTime'),
       startDate: formData.get('startDate'),
       endTime: formData.get('endTime'),
       endDate: formData.get('endDate'),
-      duration: formData.get('duration'),
+      idealStartTime: formData.get('idealStartTime'),
+      durationHours: formData.get('durationHours'),
+      durationMinutes: formData.get('durationMinutes'),
       repeat: formData.get('repeat'),
       repeatFrequency: formData.get('repeatFrequency'),
       repeatTimespan: formData.get('repeatTimespan'),
       repeatTimespanMultiplier: formData.get('repeatTimespanMultiplier'),
-      preferredTimeOfDay: formData.get('preferredTimeOfDay'),
-      preferredDayOfWeek: formData.get('preferredDayOfWeek'),
+      preferredTimeOfDay: formData.getAll('preferredTimeOfDay'),
+      preferredDayOfWeek: formData.getAll('preferredDayOfWeek'),
       endRepeat: formData.get('endRepeat'),
       totalDuration: formData.get('totalDuration'),
       totalRepetitions: formData.get('totalRepetitions'),
@@ -95,33 +102,43 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
       };
     }
 
-    const { name, mindset, status, priority, startDate, startTime, endDate, endTime, duration, 
+    const { name, mindset, status, priority, startDate, startTime, endDate, endTime, 
+      durationHours, durationMinutes, idealStartTime,
       repeat, repeatTimespanMultiplier, repeatFrequency, repeatTimespan, preferredTimeOfDay, preferredDayOfWeek, 
       endRepeat, totalDuration, totalRepetitions, endRepeatDate
     } = validatedFields.data;
     // Merge start date and time; Also end date and time
-    const sqlStartTime = startDate && startTime ? new Date(`${startDate}T${startTime}:00`): null;
-    const sqlEndTime = endDate && endTime ? new Date(`${endDate}T${endTime}:00`): null;
-    const durationFromStartEnd = (sqlStartTime && sqlEndTime) ? sqlEndTime.getTime() - sqlStartTime.getTime() : null;
+    const startDateTime = (startDate && startTime) ? new Date(`${startDate}T${startTime}:00`): 
+      (startTime && !startDate) ? new Date(`00/00/00T${startTime}:00`): null;
+    const endDateTime = (endDate && endTime) ? new Date(`${endDate}T${endTime}:00`): null;
+    const durationInMinutes = (durationHours || durationMinutes) ? (Number(durationMinutes) || 0) + (Number(durationHours) || 0) * 60 : 
+      (startDateTime && endDateTime) ? endDateTime.getTime() - startDateTime.getTime() : null;
 
-    let mindsetId = '';
-    fetchMindsets().then(mindsets => {
-      mindsetId = mindsets.filter(el => el.name === mindset)[0].id;
-    });
+    const matchingMindset = await fetchMindsets().then(mindsets => 
+      mindsets.find(el => el.name === mindset)
+    );
+    if (!matchingMindset) {
+        //  Handle error - invalid mindset
+        return { message: 'Invalid mindset selected.' };
+    }
+    // let mindsetId = '';
+    // fetchMindsets().then(mindsets => {
+    //   mindsetId = mindsets.filter(el => el.name === mindset)[0].id;
+    // });
 
     try {
       await prisma.task.create({
         data: {
           name: name,
           status: status,
-          mindsetId: mindsetId,
+          mindsetId: matchingMindset.id,
           priority: priority,
-          startTime: sqlStartTime,
-          endTime: sqlEndTime,
-          duration: duration || durationFromStartEnd || MIN_TASK_DURATION,
+          startTime: startDateTime,
+          endTime: endDateTime,
+          duration: durationInMinutes || MIN_TASK_DURATION,
           repeat: repeat,
-          repeatTimespanMultiplier: repeatTimespanMultiplier,
-          repeatFrequency: repeatFrequency,
+          repeatTimespanMultiplier: Number(repeatTimespanMultiplier),
+          repeatFrequency: Number(repeatFrequency),
           repeatTimespan: repeatTimespan,
           preferredTimeOfDay: preferredTimeOfDay || [],
           preferredDayOfWeek: preferredDayOfWeek || [],
@@ -227,4 +244,22 @@ export async function updatePriorityScores() {
   })
 
   revalidatePath('/'); 
+}
+
+export async function getMindsetProximity(mindset1: string, mindset2: string) {
+  try {
+    const mindsets = await prisma.mindset.findMany();
+    const mindsetMaslowLevels = [mindset1, mindset2].map((mindset) => {
+      return mindsets.filter(el => el.name === mindset)[0].maslowLevel;
+    });
+    return (
+      mindsetMaslowLevels.includes(0) ? 0 :
+      Math.abs(mindsetMaslowLevels[0] - mindsetMaslowLevels[1])
+    );
+  } catch (error) {
+    console.error('Error getting mindset proximity. Check mindset names');
+    return {
+      message: 'Error getting mindset proximity. Check mindset names',
+    };
+  }
 }
