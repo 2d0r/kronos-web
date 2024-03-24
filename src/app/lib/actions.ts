@@ -174,18 +174,29 @@ export async function deleteTask(id: string) {
 
 export async function deleteTaskPrisma(id: string) {
 
+  // Delete related events first
+  try {
+    await prisma.event.deleteMany({
+        where: {
+          taskId: id
+        },
+    });
+} catch (error) {
+  return {
+    message: 'Database Error: Failed to delete events related to task.'
+  }
+}
+
   try {
       await prisma.task.delete({
           where: {
               id: id,
           },
       });
-      await prisma.$disconnect();
   } catch (error) {
-      console.error('Database Error:', error);
-      // throw new Error('Failed to fetch the latest tasks.');
-      await prisma.$disconnect();
-      process.exit(1);
+    return {
+      message: 'Database Error: Failed to delete task.'
+    }
   }
 
   revalidatePath('/');
