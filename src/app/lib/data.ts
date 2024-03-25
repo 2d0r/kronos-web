@@ -9,17 +9,24 @@ import { Mindset, Task } from '@prisma/client';
 
 
 export async function fetchTasksPrisma() {
+  try {
+      const allTasks = await prisma.task.findMany();
+      return allTasks;
+  } catch (error) {
+      console.error('Database Error:', error);
+      // throw new Error('Failed to fetch the latest tasks.');
+      process.exit(1);
+  }
+}
 
-    try {
-        const allTasks = await prisma.task.findMany();
-        await prisma.$disconnect();
-        return allTasks;
-    } catch (error) {
-        console.error('Database Error:', error);
-        // throw new Error('Failed to fetch the latest tasks.');
-        await prisma.$disconnect();
-        process.exit(1);
-    }
+export async function fetchEvents() {
+  try {
+    const allEvents = await prisma.event.findMany();
+    return allEvents;
+} catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch the latest events.');
+}
 }
 
 export async function getCurrentTask() {

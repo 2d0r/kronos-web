@@ -9,6 +9,7 @@ import { Event } from '@prisma/client';
 import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION } from './definitions';
 import { fetchTasksPrisma, updateTaskField } from './data';
 import { calculatePriorityScores } from './priorityScore';
+import { calculateTimeScore } from './time-score';
 
 const FormSchema = z.object({
     id: z.string(),
@@ -30,7 +31,7 @@ const FormSchema = z.object({
     repeatTimespanMultiplier: z.string().nullable(),
     preferredTimeOfDay: z.array(z.enum(['morning', 'noon', 'afternoon', 'evening', 'night'], {invalid_type_error: 'Please select a valid time of day.'})).nullish(), // z.array(z.string().refine(value => timeOfDayList.includes(value))), // 
     preferredDayOfWeek: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], {invalid_type_error: 'Please select a valid day of the week.'})).nullish(),
-    endRepeat: z.coerce.boolean(),
+    endRepeat: z.string(),
     totalDuration: z.number().nullable(),
     totalRepetitions: z.number().nullable(),
     endRepeatDate: z.string().nullable()
@@ -137,12 +138,12 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
           endTime: endDateTime,
           duration: durationInMinutes || MIN_TASK_DURATION,
           repeat: repeat,
-          repeatTimespanMultiplier: Number(repeatTimespanMultiplier),
+          repeatTimespanMultiplier: Number(repeatTimespanMultiplier) || 1,
           repeatFrequency: Number(repeatFrequency),
           repeatTimespan: repeatTimespan,
           preferredTimeOfDay: preferredTimeOfDay || [],
           preferredDayOfWeek: preferredDayOfWeek || [],
-          endRepeat: endRepeat,
+          endRepeat: Boolean(endRepeat),
           totalDuration: totalDuration,
           totalRepetitions: totalRepetitions,
           endRepeatDate: endRepeatDate
@@ -252,6 +253,16 @@ export async function updatePriorityScores() {
   const updatedTasks = calculatePriorityScores(tasks, mindsets);
   updatedTasks.forEach((task) => {
       updateTaskField(task.id, 'priorityScore', task.priorityScore);
+  })
+
+  revalidatePath('/'); 
+}
+
+export async function updateTimeScores() {
+  const tasks = await fetchTasksPrisma();
+  tasks.forEach((task) => {
+    const timeScore = calculateTimeScore(task);
+    updateTaskField(task.id, 'timeScore', timeScore);
   })
 
   revalidatePath('/'); 

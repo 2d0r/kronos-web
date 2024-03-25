@@ -3,8 +3,10 @@ import { fetchTasksPrisma, getMindsetNames } from './lib/data';
 import CreateForm from './ui/tasks/create-form';
 import Breadcrumbs from './ui/tasks/breadcrumbs';
 import TaskCard from './ui/tasks/task-card';
-import { updatePriorityScores } from './lib/actions';
-import { organiseWeek } from './lib/organiser';
+import { updatePriorityScores, updateTimeScores } from './lib/actions';
+import { handleOrganise, organiseWeek } from './lib/organiser';
+import { organiseTimespan } from './lib/organiser-snake';
+import { addDaysToDate } from './utils/dateUtils';
 
 export default async function Home() {
   const tasks = await fetchTasksPrisma();
@@ -29,8 +31,8 @@ export default async function Home() {
       <div className='container mx-auto w-full justify-center flex p-4'>
       </div>
       <div className='container w-full p-4 flex flex-col gap-2 text-center'>
-        <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={updatePriorityScores}>Rescore</Button>
-        <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={organiseWeek}>Organise</Button>
+        <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={updateTimeScores}>Rescore</Button>
+        <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={handleOrganise}>Organise</Button>
         {tasks.sort((a, b) => b.priorityScore - a.priorityScore).map((task, idx) => {
           return (
             <TaskCard task={task} key={idx}/>

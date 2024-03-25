@@ -7,6 +7,7 @@ export const CLOSEST_MINDSET = 1;
 export const FURTHEST_MINDSET = 6;
 export const MINIMUM_TRANSITION = 0;
 export const MIN_TASK_DURATION = 10;
+export const HOURS_IN_A_WEEK = 168;
 
 export const DEFAULT_MINDSET_LIST = [
     'restReward', 'survive', 'maintain', 'play', 'socialise', 'learn', 'create', 'selfChallenge', 'selfCare', 'achieve'

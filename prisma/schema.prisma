@@ -23,11 +23,12 @@ model Task {
   name                     String
   events                   Event[]
   priorityScore            Int         @default(0)
+  timeScore                Int         @default(0)
   priority                 Priority    @default(medium)
   mindset                  Mindset?    @relation(fields: [mindsetId], references: [id])
   mindsetId                String
   status                   Status      @default(toDo)
-  scheduled                Boolean     @default(false)
+  fixed                    Boolean     @default(false)
   startTime                DateTime?
   endTime                  DateTime?
   duration                 Int
@@ -131,6 +132,7 @@ model Event {
   name          String
   task          Task        @relation(fields: [taskId], references: [id])
   taskId        String
+  fixed         Boolean     @default(false)
   status        Status      @default(toDo)
   startTime     DateTime
   endTime       DateTime

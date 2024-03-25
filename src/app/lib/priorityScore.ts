@@ -23,14 +23,20 @@ export function calculatePriorityScores(tasks : Task[], mindsets: Mindset[], tar
 
     // All durations should be in minutes, unless specified
     const tasksWithNewScore: Task[] = [];
+    console.log('filtered tasks', tasks
+        .filter((task) => (
+            ['toDo', 'inProgress'].includes(String(task.status))
+                // && ((task.endRepeat && task.endRepeatDate && task.endRepeatDate > currentTime) || !task.endRepeat)
+                // && (task.fixed === false)
+        )));
     tasks
         .filter((task) => (
             ['toDo', 'inProgress'].includes(String(task.status)) &&
                 ((task.endRepeat && task.endRepeatDate && task.endRepeatDate > currentTime) || !task.endRepeat) &&
-                (task.scheduled === false)
+                (task.fixed === false)
         ))
         .forEach((task) => {
-
+            console.log('entering forEach');
             let score = {
                 'overall': 0,
                 'statusScore': -1,
@@ -45,7 +51,7 @@ export function calculatePriorityScores(tasks : Task[], mindsets: Mindset[], tar
 
             // Time Score
             // const BUFFER_TIME_MINUTES = 15;
-            if (!task.scheduled && task.startTime) {
+            if (!task.fixed && task.startTime) {
                 const minutesToTask = Math.abs(task.startTime.getMinutes() - currentTime.getMinutes())
                 switch (true) {
                     case minutesToTask <= 15:
@@ -66,7 +72,7 @@ export function calculatePriorityScores(tasks : Task[], mindsets: Mindset[], tar
                 }
             }
 
-            (!task.scheduled && task.startTime) &&
+            (!task.fixed && task.startTime) &&
                 score.timeScore
 
             // Status Score
@@ -155,6 +161,8 @@ export function calculatePriorityScores(tasks : Task[], mindsets: Mindset[], tar
                     }
                 });
             }
+
+            console.log('score', score);
 
             score.overall = (
                 score.timeScore +

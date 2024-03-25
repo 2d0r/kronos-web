@@ -2,13 +2,14 @@
 
 import React from 'react';
 import prisma from './db';
-import { addMinutesToDate, dateDifferenceInMinutes } from '../utils/dateUtils';
+import { addDaysToDate, addMinutesToDate, minutesBetweenDates } from '../utils/dateUtils';
 import { MINIMUM_TRANSITION, MIN_TASK_DURATION } from './definitions';
 import { allTasksHaveActiveEvents, fetchMindsets, fetchTasksPrisma } from './data';
 import { calculatePriorityScores } from './priorityScore';
 import { Task, Event } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
 import { createEventPrisma } from './actions';
+import { organiseTimespan } from './organiser-snake';
 
 export async function organiseWeek() {
 
@@ -44,7 +45,7 @@ export async function organiseWeek() {
             })
         // Edge case: between first event and now
         } else if (idx === -1) {
-            if (dateDifferenceInMinutes(eventsNextSevenDays[0].startTime, currentTime) > MINIMUM_TRANSITION) {
+            if (minutesBetweenDates(currentTime, eventsNextSevenDays[0].startTime) > MINIMUM_TRANSITION) {
                 timeGaps.push({
                     startTime: currentTime,
                     endTime: eventsNextSevenDays[0].startTime
@@ -52,7 +53,7 @@ export async function organiseWeek() {
             }
         // Edge case: between last event's end time and seveDaysFromNow
         } else if (idx === eventsNextSevenDays.length - 1) {
-            if (dateDifferenceInMinutes(sevenDaysFromNow, event.endTime) > MINIMUM_TRANSITION) {
+            if (minutesBetweenDates(event.endTime, sevenDaysFromNow) > MINIMUM_TRANSITION) {
                 timeGaps.push({
                     startTime: event.endTime,
                     endTime: sevenDaysFromNow
@@ -60,7 +61,7 @@ export async function organiseWeek() {
             }
         // Between events
         } else {
-            if (dateDifferenceInMinutes(eventsNextSevenDays[idx + 1].startTime, event.endTime) > MINIMUM_TRANSITION) {
+            if (minutesBetweenDates(event.endTime, eventsNextSevenDays[idx + 1].startTime) > MINIMUM_TRANSITION) {
                 timeGaps.push({
                     startTime: event.endTime,
                     endTime: eventsNextSevenDays[idx + 1].startTime
@@ -88,7 +89,7 @@ export async function organiseWeek() {
             const fittingTasks = tasks
             // filter tasks that fit this gap
             .filter(task => (
-                task.duration && (task.duration <= dateDifferenceInMinutes(gap.endTime, gap.startTime)) &&
+                task.duration && (task.duration <= minutesBetweenDates(gap.startTime, gap.endTime)) &&
                 // filter out tasks that are already scheduled
                 !scheduledTaskIdsList.includes(task.id)
             ));
@@ -102,6 +103,7 @@ export async function organiseWeek() {
                     id: uuidv4(),
                     name: chosenTask.name,
                     status: chosenTask.status,
+                    fixed: chosenTask.fixed,
                     taskId: chosenTask.id,
                     startTime: endTimeOfLastTaskAdded,
                     endTime: addMinutesToDate(endTimeOfLastTaskAdded, chosenTask.duration || MIN_TASK_DURATION),
@@ -137,3 +139,9 @@ export async function organiseWeek() {
         // Expand filter?
     // Run calculatePriorityScore() for the time at the beginning of the gap, on the filtered tasks ✅
     // Schedule the top task there
+
+export async function handleOrganise () {
+    const currentTime = new Date();
+    const sevenDaysFromNow = addDaysToDate(currentTime, 7);
+    organiseTimespan([currentTime, sevenDaysFromNow]);
+}
