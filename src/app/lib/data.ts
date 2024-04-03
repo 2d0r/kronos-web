@@ -6,6 +6,8 @@ import {
 import prisma from './db';
 import { calculatePriorityScores } from './priorityScore';
 import { Mindset, Task } from '@prisma/client';
+import { Emilys_Candy } from 'next/font/google';
+import { createEventPrisma } from './actions';
 
 
 export async function fetchTasksPrisma() {
@@ -170,3 +172,5 @@ export async function getTaskMindset(task: Task) {
     process.exit(1);
   }
 }
+
+

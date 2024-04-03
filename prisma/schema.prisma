@@ -39,7 +39,7 @@ model Task {
   preferredTimeOfDay       TimeOfDay[]
   preferredDayOfWeek       DayOfWeek[]
   repeat                   Boolean     @default(false)
-  repeatTimespanMultiplier Int?
+  repeatTimespanMultiplier Int         @default(1)
   repeatFrequency          Int?
   repeatTimespan           TimeSpan?
   firstSessionStartTime    DateTime?

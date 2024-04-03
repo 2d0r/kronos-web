@@ -5,11 +5,12 @@ import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import prisma from './db';
-import { Event } from '@prisma/client';
+import { Event, Task } from '@prisma/client';
 import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION } from './definitions';
 import { fetchTasksPrisma, updateTaskField } from './data';
 import { calculatePriorityScores } from './priorityScore';
 import { calculateTimeScore } from './time-score';
+import { v4 as uuidv4 } from 'uuid';
 
 const FormSchema = z.object({
     id: z.string(),
@@ -284,4 +285,27 @@ export async function getMindsetProximity(mindset1: string, mindset2: string) {
       message: 'Error getting mindset proximity. Check mindset names',
     };
   }
+}
+
+export async function scheduleEventForTask (task: Task, startTime: Date, duration?: number) {
+
+  const endTime = new Date(startTime.getTime() + (duration || task.duration) * 60 * 1000);
+
+  const eventToSchedule: Event = {
+    id: uuidv4(),
+    name: task.name,
+    status: task.status,
+    fixed: task.fixed,
+    taskId: task.id,
+    startTime: startTime,
+    endTime: endTime,
+    userStartTime: null,
+    userEndTime: null,
+    notes: null,
+    createdAt: new Date()
+  }
+
+  createEventPrisma(eventToSchedule);
+
+  return eventToSchedule as Event;
 }

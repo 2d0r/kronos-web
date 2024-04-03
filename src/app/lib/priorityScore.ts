@@ -6,7 +6,7 @@ import {
     getCurrentTask
 } from './data';
 import {
-    dayOfWeekToNumber,
+    DAYS_OF_WEEK_DICT,
     DEFAULT_AVERAGE_SLEEP, DEFAULT_AVERAGE_MEALS, DEFAULT_MINDSET,
     FURTHEST_MINDSET, CLOSEST_MINDSET,
 } from './definitions';
@@ -150,12 +150,12 @@ export function calculatePriorityScores(tasks : Task[], mindsets: Mindset[], tar
                 score.preferredDayScore = 0;
                 task.preferredDayOfWeek.forEach((preferredDay) => {
                     // 100% if it's a day match
-                    if (dayOfWeekToNumber[preferredDay] === currentDayOfWeek) {
+                    if (DAYS_OF_WEEK_DICT[preferredDay] === currentDayOfWeek) {
                         score.preferredDayScore = 100;
                         // 50% if both are weekdays / weekend days
                     } else if (
-                        ([0, 6].includes(currentDayOfWeek) && [0, 6].includes(dayOfWeekToNumber[preferredDay])) ||
-                        (![0, 6].includes(currentDayOfWeek) && ![0, 6].includes(dayOfWeekToNumber[preferredDay]))
+                        ([0, 6].includes(currentDayOfWeek) && [0, 6].includes(DAYS_OF_WEEK_DICT[preferredDay])) ||
+                        (![0, 6].includes(currentDayOfWeek) && ![0, 6].includes(DAYS_OF_WEEK_DICT[preferredDay]))
                     ) {
                         score.preferredDayScore = 50;
                     }

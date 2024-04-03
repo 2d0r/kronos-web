@@ -8,33 +8,36 @@ export const FURTHEST_MINDSET = 6;
 export const MINIMUM_TRANSITION = 0;
 export const MIN_TASK_DURATION = 10;
 export const HOURS_IN_A_WEEK = 168;
+export const MAX_REP_OFFSET = 1/4;
+export const MAX_OFFSET = 120;
 
 export const DEFAULT_MINDSET_LIST = [
     'restReward', 'survive', 'maintain', 'play', 'socialise', 'learn', 'create', 'selfChallenge', 'selfCare', 'achieve'
 ] as [string, ...string[]];
 
-export const DEFAULT_TIMES_OF_DAY = {
-    'Morning': [6, 12],
-    'Afternoon': [12, 18],
-    'Evening': [18, 22],
-    'Night': [22, 6]
-    // add late night and noon ?
+export const DEFAULT_TIMES_OF_DAY : { [key: string]: [number, number]} = {
+    'morning': [6, 12],
+    'afternoon': [12, 18],
+    'evening': [18, 22],
+    'noon': [12, 12],
+    'night': [22, 6]
+    // TO DO: add late night and noon ?
 };
 export const TIME_DAY_LIST = Object.keys(DEFAULT_TIMES_OF_DAY) as [string, ...string[]];
 
-export const dayOfWeekToNumber = {
-    'Sunday' : 0,
-    'Monday' : 1,
-    'Tuesday' : 2,
-    'Wednesday' : 3,
-    'Thursday' : 4,
-    'Friday' : 5,
-    'Saturday' : 6
+export const DAYS_OF_WEEK_DICT : { [key: string]: number } = {
+    'Sunday': 0,
+    'Monday': 1,
+    'Tuesday': 2,
+    'Wednesday': 3,
+    'Thursday': 4,
+    'Friday': 5,
+    'Saturday': 6
 }
 
 export type Frequency = {
     times: number,
-    timeRange: string, 
+    timeRange: string,
 }
 
 export type Task = {
@@ -49,7 +52,7 @@ export type User = {
     name: string;
     email: string;
     password: string;
-  };
+};
 
 export type TaskChain = {
     prevTask: string[],
