@@ -5,7 +5,7 @@ import { createTaskPrisma} from '@/app/lib/actions';
 import { Button } from '@/app/ui/button';
 import prisma from '@/app/lib/db';
 import { Dropdown, InputField, MultiField, MultiSelectionField, SelectionField } from './form-fields';
-import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, statusList, DEFAULT_MINDSET_LIST } from '@/app/lib/definitions';
+import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, statusList, repeatUnitList, DEFAULT_MINDSET_LIST } from '@/app/lib/definitions';
 import { getMindsetNames } from '@/app/lib/data';
 
 
@@ -13,20 +13,33 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
     const initialState = { message: null, errors: {} };
     const createTaskHere : any = createTaskPrisma;
     const [state, dispatch] = useFormState(createTaskHere, initialState);
-
     const [isScheduled, setIsScheduled] = useState<string | null>(null);
+    const [timespanList, setTimespanList] = useState<string[]>(timeSpanList);
+    const [repeatTimespan, setRepeatTimespan] = useState<string>('');
+    const [isRepeating, setIsRepeating] = useState<string | null>(null);
+    const [endRepeat, setEndRepeat] = useState<string | null>(null);
+    const [repeatUnit, setRepeatUnit] = useState<string | null>('sessions');
+
     const handleScheduledToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
         setIsScheduled(event.target.value);
     }
-
-    const [isRepeating, setIsRepeating] = useState<string | null>(null);
     const handleRepeatToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
         setIsRepeating(event.target.value);
+        if (isRepeating !== 'Repeat') {
+            setRepeatTimespan('');
+        }
     }
-
-    const [endRepeat, setEndRepeat] = useState<string | null>(null);
     const handleEndRepeatToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
         setEndRepeat(event.target.value);
+    }
+    const handleRepeatTimespanToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
+        setRepeatTimespan(event.target.value);
+    }
+    const handleTimespanMultiplierInput = (event : React.ChangeEvent<HTMLInputElement>) => {
+        setTimespanList(event.target.value !== '1' ? timeSpanList.map(item => `${item}s`) : timeSpanList);
+    }
+    const handleRepeatUnitSelect = (event : React.ChangeEvent<HTMLSelectElement>) => {
+        setRepeatUnit(event.target.value);
     }
 
     return (<>
@@ -104,26 +117,7 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
                         placeholder='Enter start time'
                         inputType='time'
                     />
-                    <MultiSelectionField
-                        fieldName='preferredTimeOfDay'
-                        prompt='Preferred time of day'
-                        list={timeOfDayList}
-                        type='checkbox'
-                    />
-                    <MultiSelectionField 
-                        fieldName='preferredDayOfWeek'
-                        prompt='Preferred days of the week'
-                        list={dayOfWeekList}
-                        type='checkbox'
-                    />
-                    <InputField 
-                        fieldName='deadline'
-                        placeholder='Enter deadline'
-                        inputType='date'
-                    />
                 </>)}
-                
-                
                 <SelectionField 
                     fieldName='repeat'
                     prompt=''
@@ -133,22 +127,60 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
                     defaultSelected={['One time']}
                 />
                 {isRepeating === 'Repeat' && (<>
-                    <InputField 
-                        fieldName='repeatFrequency'
-                        placeholder='How often'
-                        inputType='number'
+                    {repeatUnit === 'sessions' ? (<>
+                        <InputField 
+                            fieldName='repeatFrequency'
+                            placeholder='How often'
+                            inputType='number'
+                        />
+                    </>) : (<>
+                        <InputField 
+                            fieldName='repeatDuration'
+                            placeholder=''
+                            inputType='duration'
+                        />
+                    </>)}
+                    <Dropdown 
+                        fieldName='repeatUnit'
+                        prompt=''
+                        list={repeatUnitList as [string, ...string[]]}
+                        defaultValue='Sessions'
+                        onChange={handleRepeatUnitSelect}
                     />
                     <InputField 
                         fieldName='repeatTimespanMultiplier'
-                        placeholder='every'
+                        label = 'Every'
+                        placeholder='1'
                         inputType='number'
+                        onChange={handleTimespanMultiplierInput}
                     />
                     <SelectionField 
                         fieldName='repeatTimespan'
                         prompt=''
-                        list={timeSpanList}
+                        list={timespanList}
                         type='radio'
+                        onChange={handleRepeatTimespanToggle}
                     />
+                </>)}
+                {(isScheduled !== 'Scheduled' && (repeatTimespan !== '' || isRepeating !== 'Repeat')) && (<>
+                    {(isRepeating !== 'Repeat' || !['hour'].includes(repeatTimespan)) && (<>
+                        <MultiSelectionField
+                            fieldName='preferredTimeOfDay'
+                            prompt='Preferred time of day'
+                            list={timeOfDayList}
+                            type='checkbox'
+                        />
+                    </>)}
+                    {(isRepeating !== 'Repeat' || !['hour', 'day'].includes(repeatTimespan)) && (<>
+                        <MultiSelectionField 
+                            fieldName='preferredDayOfWeek'
+                            prompt='Preferred days of the week'
+                            list={dayOfWeekList}
+                            type='checkbox'
+                        />
+                    </>)}
+                </>)}
+                {isRepeating === 'Repeat' && (<>
                     <SelectionField 
                         fieldName='endRepeat'
                         prompt='End Repeat?'
@@ -157,7 +189,8 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
                         onChange={handleEndRepeatToggle}
                         defaultSelected={['No']}
                     />
-                    {endRepeat === 'Yes' && (<>
+                </>)}
+                {(isRepeating === 'Repeat' && endRepeat === 'Yes') && (<>
                         <InputField 
                             fieldName='totalDuration'
                             placeholder='Total duration'
@@ -173,7 +206,13 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
                             placeholder='End repeat on date'
                             inputType='date'
                         />
-                    </>)}
+                </>)}
+                {(isRepeating !== 'Repeat') && (<>
+                    <InputField 
+                        fieldName='deadline'
+                        placeholder='Enter deadline'
+                        inputType='date'
+                    />
                 </>)}
                 
             </div>

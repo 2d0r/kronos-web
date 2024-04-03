@@ -27,9 +27,12 @@ const FormSchema = z.object({
     durationHours: z.string().nullable(),
     durationMinutes: z.string().nullable(),
     repeat: z.coerce.boolean(),
+    repeatUnit: z.enum(['sessions', 'minutes'], {invalid_type_error: 'Please select a valid Repeat Unit.'}),
     repeatFrequency: z.string().nullable(),
     repeatTimespan: z.enum(['day', 'week', 'month', 'year'], {invalid_type_error: 'Please select a valid Repeat Timespan.'}).nullable(),
     repeatTimespanMultiplier: z.string().nullable(),
+    repeatDurationHours: z.string().nullable(),
+    repeatDurationMinutes: z.string().nullable(),
     preferredTimeOfDay: z.array(z.enum(['morning', 'noon', 'afternoon', 'evening', 'night'], {invalid_type_error: 'Please select a valid time of day.'})).nullish(), // z.array(z.string().refine(value => timeOfDayList.includes(value))), // 
     preferredDayOfWeek: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], {invalid_type_error: 'Please select a valid day of the week.'})).nullish(),
     endRepeat: z.string(),
@@ -55,7 +58,10 @@ export type State = {
         durationHours?: number[];
         durationMinutes?: number[];
         repeat?: boolean[];
+        repeatUnit?: string[];
         repeatFrequency?: number[];
+        repeatDurationHours?: number[];
+        repeatDurationMinutes?: number[];
         repeatTimespan?: string[];
         repeatTimespanMultiplier?: number[];
         preferredTimeOfDay?: string[][];
@@ -87,6 +93,8 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
       repeatFrequency: formData.get('repeatFrequency'),
       repeatTimespan: formData.get('repeatTimespan'),
       repeatTimespanMultiplier: formData.get('repeatTimespanMultiplier'),
+      repeatDurationHours: formData.get('repeatDurationHours'),
+      repeatDurationMinutes: formData.get('repeatDurationMinutes'),
       preferredTimeOfDay: formData.getAll('preferredTimeOfDay'),
       preferredDayOfWeek: formData.getAll('preferredDayOfWeek'),
       endRepeat: formData.get('endRepeat'),
@@ -106,7 +114,9 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
 
     const { name, mindset, status, priority, startDate, startTime, endDate, endTime, 
       durationHours, durationMinutes, idealStartTime,
-      repeat, repeatTimespanMultiplier, repeatFrequency, repeatTimespan, preferredTimeOfDay, preferredDayOfWeek, 
+      repeat, repeatTimespanMultiplier, repeatFrequency, repeatTimespan,
+      repeatUnit, repeatDurationHours, repeatDurationMinutes,
+      preferredTimeOfDay, preferredDayOfWeek, 
       endRepeat, totalDuration, totalRepetitions, endRepeatDate
     } = validatedFields.data;
     // Merge start date and time; Also end date and time
@@ -115,6 +125,8 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     const endDateTime = (endDate && endTime) ? new Date(`${endDate}T${endTime}:00`): null;
     const durationInMinutes = (durationHours || durationMinutes) ? (Number(durationMinutes) || 0) + (Number(durationHours) || 0) * 60 : 
       (startDateTime && endDateTime) ? endDateTime.getTime() - startDateTime.getTime() : null;
+    const repeatDurationInMinutes = (repeatDurationHours || repeatDurationMinutes) ? 
+      (Number(repeatDurationMinutes) || 0) + (Number(repeatDurationHours) || 0) * 60 : null;
 
     const matchingMindset = await fetchMindsets().then(mindsets => 
       mindsets.find(el => el.name === mindset)
@@ -139,8 +151,9 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
           endTime: endDateTime,
           duration: durationInMinutes || MIN_TASK_DURATION,
           repeat: repeat,
+          repeatUnit: repeatUnit,
           repeatTimespanMultiplier: Number(repeatTimespanMultiplier) || 1,
-          repeatFrequency: Number(repeatFrequency),
+          repeatFrequency: Number(repeatFrequency) || repeatDurationInMinutes,
           repeatTimespan: repeatTimespan,
           preferredTimeOfDay: preferredTimeOfDay || [],
           preferredDayOfWeek: preferredDayOfWeek || [],

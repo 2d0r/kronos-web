@@ -4,9 +4,7 @@ import React from 'react';
 import prisma from './db';
 import { addDaysToDate, addMinutesToDate, calcRepeatIntervalInMinutes, hourRangeXDate, findNearestDate, hourRangesXDates, minutesBetweenDates, updateTimeGaps, startOfDay } from '../utils/dateUtils';
 import { fetchEvents, fetchMindsets } from './data';
-import { calculatePriorityScores } from './priorityScore';
 import { Task, Event, TimeOfDay, $Enums } from '@prisma/client';
-import { v4 as uuidv4 } from 'uuid';
 import { createEventPrisma, scheduleEventForTask } from './actions';
 import { DAYS_OF_WEEK_DICT, DEFAULT_TIMES_OF_DAY, MAX_OFFSET, MAX_REP_OFFSET, dayOfWeekList, priorityList } from './definitions';
 import { sortByCustomOrder } from '../utils/taskUtils';
@@ -17,7 +15,7 @@ import { sortByCustomOrder } from '../utils/taskUtils';
 // Can only calculate for tasks that had their first session already scheduled
 const getIdealReps = (task: Task, timespan: [Date, Date], idealFirstRepTime?: Date): Date[] => {
     let idealReps = [];
-    if (task.repeat && task.repeatFrequency && task.repeatTimespanMultiplier && task.repeatTimespan) {
+    if (task.repeat && task.repeatUnit === 'sessions' && task.repeatFrequency && task.repeatTimespanMultiplier && task.repeatTimespan) {
         const repInterval = calcRepeatIntervalInMinutes(task);
         if (task.firstSessionStartTime && task.repetitionsDone) {
             let idealRep = new Date(task.firstSessionStartTime.getTime() + (task.repetitionsDone + 1) * repInterval * 60 * 1000);
@@ -148,7 +146,7 @@ export async function organiseIdealFirst(timespan: [Date, Date]) {
     });
     // For repeating tasks, estimate number of sessions that fit in the given timespan
     tasksToSchedule.filter(task => task.repeat === true).forEach((task, idx) => {
-        if ( task.repeatFrequency && task.repeatTimespanMultiplier && task.repeatTimespan ) {
+        if ( task.repeatUnit === 'sessions' && task.repeatFrequency && task.repeatTimespanMultiplier && task.repeatTimespan ) {
             const taskRepeatIntervalInMinutes = calcRepeatIntervalInMinutes(task);
             
             // Find where we are between the task's sessions, by dividing the time before its first event by its repeatTimespan

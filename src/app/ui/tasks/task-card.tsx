@@ -26,7 +26,7 @@ export default async function TaskCard(props : any) {
                 { task.endTime && task.scheduled &&
                     <div><div className='font-bold'>End</div><div>{task.endTime.getHours()}</div></div> 
                 }
-                { (task.repeat && task.repeatFrequency && task.repeatTimespan) && 
+                { (task.repeat && task.repeatUnit === 'sessions' && task.repeatFrequency && task.repeatTimespan) && 
                     <div><div className='font-bold'>Frequency</div><div>x {task.repeatFrequency} / {task.repeatTimespan}</div></div> 
                 }
                 { task.preferredTimeOfDay.length > 0 && 

@@ -81,7 +81,7 @@ export function calculatePriorityScores(tasks : Task[], mindsets: Mindset[], tar
                     0;
 
             // Frequency Score
-            if (task.repeat && task.repeatFrequency && task.repeatTimespan) {
+            if (task.repeat && task.repeatUnit === 'sessions' && task.repeatFrequency && task.repeatTimespan) {
                 if (!task.firstSessionStartTime) {
                     score.frequencyScore = 100;
                 } else {

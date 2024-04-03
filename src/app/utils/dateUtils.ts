@@ -39,7 +39,7 @@ export function addDaysToDate(date: Date, days: number) {
 }
 
 export function calcRepeatIntervalInMinutes(task: Task) {
-    if (task.repeat && task.repeatFrequency && task.repeatTimespan && task.repeatTimespanMultiplier) {
+    if (task.repeat && task.repeatUnit === 'sessions' && task.repeatFrequency && task.repeatTimespan && task.repeatTimespanMultiplier) {
         const repeatTimespanInMinutes =
         task.repeatTimespan === 'hour' ? 60 :
         task.repeatTimespan === 'day' ? 60 * 24 :

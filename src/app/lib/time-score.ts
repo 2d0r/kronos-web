@@ -16,7 +16,7 @@ export const calculateTimeScore = (task: Task) => {
             return duration * HOURS_IN_A_WEEK / hoursBetweenDates(now, task.deadline);
         }
         return duration;
-    } else if (task.repeatFrequency && task.repeatTimespanMultiplier && task.repeatTimespan) {
+    } else if (task.repeatUnit === 'sessions' && task.repeatFrequency && task.repeatTimespanMultiplier && task.repeatTimespan) {
         const repeatInterval = calcRepeatIntervalInMinutes(task) / 60; // in hours
         if ( task.deadline ) {
             if ( task.completion ) {

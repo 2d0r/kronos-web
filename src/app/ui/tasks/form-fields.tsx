@@ -11,14 +11,20 @@ function camelcaseToTitlecase(text: string) {
 }
 
 export function InputField(
-    { fieldName, placeholder, inputType, prompt, label } : { 
+    { fieldName, placeholder, inputType, label, onChange = () => {} } : { 
         fieldName: string, 
         placeholder: string, 
         inputType: string,
-        prompt?: string,
         label?: string,
+        onChange?: any
     }
 ) {
+
+    const [ input, setInput ] = useState<string>(placeholder);
+    const handleInput = (event : React.ChangeEvent<HTMLInputElement>) => {
+        setInput(event.target.value);
+        onChange(event);
+    }
 
     return (<>
         <div className='mb-4'>
@@ -29,22 +35,22 @@ export function InputField(
                 {inputType === 'duration' ? 
                     <div className='flex gap-3 text-black'>
                         <input
-                            id='durationHours'
-                            name='durationHours'
+                            id={`${fieldName}Hours`}
+                            name={`${fieldName}Hours`}
                             type='number'
                             className='peer block w-16 cursor-pointer rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 dark:text-neutral-700'
                             placeholder=''
                             aria-describedby='task-error'
-                        /> <label htmlFor='durationHours' className='flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600'>
+                        /> <label htmlFor={`${fieldName}Hours`} className='flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600'>
                         Hours</label>
                         <input
-                            id='durationMinutes'
-                            name='durationMinutes'
+                            id={`${fieldName}Minutes`}
+                            name={`${fieldName}Minutes`}
                             type='number'
                             className='peer block w-16 cursor-pointer rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 dark:text-neutral-700'
                             placeholder=''
                             aria-describedby='task-error'
-                        /> <label htmlFor='durationMinutes' className='flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600'>
+                        /> <label htmlFor={`${fieldName}Minutes`} className='flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600'>
                         Minutes</label>
                     </div> :
                     <input
@@ -53,6 +59,7 @@ export function InputField(
                         type={inputType}
                         className='peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 dark:text-neutral-700'
                         placeholder={placeholder}
+                        onChange={handleInput}
                         aria-describedby='task-error'
                     />
                 }
@@ -70,13 +77,19 @@ export function InputField(
 }
 
 export function Dropdown ( 
-    { fieldName, list, defaultValue, prompt } : {
+    { fieldName, list, defaultValue, prompt, onChange = () => {} } : {
         fieldName: string,
         list: string[],
         defaultValue: string,
         prompt: string,
+        onChange?: any
     }
 ) {
+    const [ selection, setSelection ] = useState<string>(defaultValue);
+    const handleSelect = (event : React.ChangeEvent<HTMLSelectElement>) => {
+        setSelection(event.target.value);
+        onChange(event);
+    }
 
     return (
         <div className='mb-4'>
@@ -89,12 +102,13 @@ export function Dropdown (
                 name={fieldName}
                 className='peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 dark:text-neutral-700'
                 defaultValue={defaultValue}
+                onChange={handleSelect}
                 aria-describedby='task-error'
             >
                 <option value='' disabled>{prompt}</option>
                 {list.map((item, idx) => (
                     <option key={idx} value={item}>
-                        {item}
+                        {camelcaseToTitlecase(item)}
                     </option>
                 ))}
             </select>

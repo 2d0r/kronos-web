@@ -39,8 +39,9 @@ model Task {
   preferredTimeOfDay       TimeOfDay[]
   preferredDayOfWeek       DayOfWeek[]
   repeat                   Boolean     @default(false)
-  repeatTimespanMultiplier Int         @default(1)
+  repeatUnit               RepeatUnit  @default(sessions)
   repeatFrequency          Int?
+  repeatTimespanMultiplier Int         @default(1)
   repeatTimespan           TimeSpan?
   firstSessionStartTime    DateTime?
   latestSessionStartTime   DateTime?
@@ -125,6 +126,11 @@ enum TaskType {
   task
   project
   goal
+}
+
+enum RepeatUnit {
+  sessions
+  minutes
 }
 
 model Event {

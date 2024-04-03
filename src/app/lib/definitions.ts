@@ -1,4 +1,4 @@
-import { Status, TimeSpan, Priority, TimeOfDay, DayOfWeek } from '@prisma/client';
+import { Status, TimeSpan, Priority, TimeOfDay, DayOfWeek, RepeatUnit } from '@prisma/client';
 
 export const DEFAULT_AVERAGE_SLEEP = 8 * 60; // 8 hours, expressed in minutes
 export const DEFAULT_AVERAGE_MEALS = 3 * 60; // 3 hours, expressed in minutes
@@ -81,6 +81,7 @@ export const priorityList = getEnumValues(Priority);
 export const timeSpanList = getEnumValues(TimeSpan);
 export const timeOfDayList = getEnumValues(TimeOfDay);
 export const dayOfWeekList = getEnumValues(DayOfWeek);
+export const repeatUnitList = getEnumValues(RepeatUnit);
 
 export let prismaEnums = {
     status: getEnumValues(Status),
