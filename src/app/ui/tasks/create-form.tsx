@@ -39,7 +39,8 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
         setTimespanList(event.target.value !== '1' ? timeSpanList.map(item => `${item}s`) : timeSpanList);
     }
     const handleRepeatUnitSelect = (event : React.ChangeEvent<HTMLSelectElement>) => {
-        setRepeatUnit(event.target.value);
+        setRepeatUnit(event.target.value ? event.target.value : 'sessions');
+        console.log(event.target.value);
     }
 
     return (<>
@@ -144,7 +145,7 @@ export default function CreateForm({mindsetList} : {mindsetList: string[]}) {
                         fieldName='repeatUnit'
                         prompt=''
                         list={repeatUnitList as [string, ...string[]]}
-                        defaultValue='Sessions'
+                        defaultValue='sessions'
                         onChange={handleRepeatUnitSelect}
                     />
                     <InputField 

@@ -87,7 +87,7 @@ export function Dropdown (
 ) {
     const [ selection, setSelection ] = useState<string>(defaultValue);
     const handleSelect = (event : React.ChangeEvent<HTMLSelectElement>) => {
-        setSelection(event.target.value);
+        setSelection(event.target.value !== undefined ? event.target.value : defaultValue);
         onChange(event);
     }
 
