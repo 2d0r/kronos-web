@@ -160,17 +160,12 @@ export async function getTaskMindset(task: Task) {
             id: task.id
           } 
         }
-      },
-      select: {
-        name: true
       }
     });
-    return taskMindset[0].name;
+    return taskMindset[0];
   } catch (error) {
     console.error('Error getting mindset of task:', task.name);
     await prisma.$disconnect();
     process.exit(1);
   }
 }
-
-

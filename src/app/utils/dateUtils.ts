@@ -119,3 +119,7 @@ export const updateTimeGaps = (event: [Date, Date], timeGaps: [Date, Date][]): [
 export function startOfDay(date: Date): Date {
     return new Date(date.setUTCHours(0, 0, 0, 0));
 }
+
+export function dateToDDMMYYYY (date: Date) {
+    return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+}

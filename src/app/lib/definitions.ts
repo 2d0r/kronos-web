@@ -15,6 +15,13 @@ export const DEFAULT_MINDSET_LIST = [
     'restReward', 'survive', 'maintain', 'play', 'socialise', 'learn', 'create', 'selfChallenge', 'selfCare', 'achieve'
 ] as [string, ...string[]];
 
+export const CARD_SCALES = {
+    small: 1,
+    medium: 1.5,
+    large: 2
+}
+export const SMALL_CARD_HEIGHT = 200;
+
 export const DEFAULT_TIMES_OF_DAY : { [key: string]: [number, number]} = {
     'morning': [6, 12],
     'afternoon': [12, 18],

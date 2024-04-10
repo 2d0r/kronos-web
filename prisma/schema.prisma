@@ -65,6 +65,7 @@ model Mindset {
   name         String       @unique
   maslowLevel  Int          @default(1)
   tasks        Task[]
+  colour       String       @default("grey")
 
   @@index([name])
   @@map("mindsets")
