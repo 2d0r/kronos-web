@@ -12,7 +12,7 @@ export default async function TaskCard({ task } : TaskCardProps) {
     const mindset = await getTaskMindset(task);
     
     return (<>
-        <div className='rounded-md bg-violet-400 dark:bg-violet-700 flex flex-row justify-between align-middle p-6 w-auto'>
+        <div className='rounded-md bg-violet-400 flex flex-row justify-between align-middle p-6 w-auto'>
             <div className='text-2xl'>{task.name}</div>
             <div className='overflow-scroll flex flex-row justify-start align-middle gap-8 w-2/3'>
                 <div><div className='font-bold'>Score</div><div>{task.timeScore}</div></div>

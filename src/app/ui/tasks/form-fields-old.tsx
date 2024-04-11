@@ -28,28 +28,50 @@ export function InputField(
 
     return (<>
         <div className='mb-4'>
-            {/* <label htmlFor={fieldName} className='mb-2 block text-sm font-medium'>
+            <label htmlFor={fieldName} className='mb-2 block text-sm font-medium'>
                 {label || camelcaseToTitlecase(fieldName)}
-            </label> */}
+            </label>
             <div className='relative'>
-                <input
-                    id={fieldName}
-                    name={fieldName}
-                    type={inputType}
-                    className='peer block w-auto cursor-pointer rounded-lg border-[1px] border-violet-600 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500'
-                    placeholder={placeholder}
-                    onChange={handleInput}
-                    aria-describedby='task-error'
-                />
+                {inputType === 'duration' ? 
+                    <div className='flex gap-3 text-black'>
+                        <input
+                            id={`${fieldName}Hours`}
+                            name={`${fieldName}Hours`}
+                            type='number'
+                            className='peer block w-16 cursor-pointer rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500'
+                            placeholder=''
+                            aria-describedby='task-error'
+                        /> <label htmlFor={`${fieldName}Hours`} className='flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600'>
+                        Hours</label>
+                        <input
+                            id={`${fieldName}Minutes`}
+                            name={`${fieldName}Minutes`}
+                            type='number'
+                            className='peer block w-16 cursor-pointer rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500'
+                            placeholder=''
+                            aria-describedby='task-error'
+                        /> <label htmlFor={`${fieldName}Minutes`} className='flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600'>
+                        Minutes</label>
+                    </div> :
+                    <input
+                        id={fieldName}
+                        name={fieldName}
+                        type={inputType}
+                        className='peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500'
+                        placeholder={placeholder}
+                        onChange={handleInput}
+                        aria-describedby='task-error'
+                    />
+                }
             </div>
-            {/* <div id='task-error' aria-live='polite' aria-atomic='true'>
-            {state.errors?.customerId &&
+            <div id='task-error' aria-live='polite' aria-atomic='true'>
+            {/* {state.errors?.customerId &&
                 state.errors.customerId.map((error: string) => (
                 <p className='mt-2 text-sm text-red-500' key={error}>
                     {error}
                 </p>
-            ))}
-            </div> */}
+            ))} */}
+            </div>
         </div>
     </>);
 }
@@ -71,14 +93,14 @@ export function Dropdown (
 
     return (
         <div className='mb-4'>
-            <label htmlFor={fieldName} className='mb-2 block text-sm font-medium'>
+            <label htmlFor={fieldName} className='mb-2 block text-sm font-medium '>
                 {camelcaseToTitlecase(fieldName)}
             </label>
             <div className='relative'>
             <select
                 id={fieldName}
                 name={fieldName}
-                className='peer block cursor-pointer rounded-lg border border-violet-600 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500'
+                className='peer block w-full cursor-pointer rounded-md border border-gray-200 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500'
                 defaultValue={defaultValue}
                 onChange={handleSelect}
                 aria-describedby='task-error'
@@ -119,14 +141,13 @@ export function SelectionField(
         onChange(event);
     }
     const selectionList = list.map((item, idx) => {
-        return (<div className='flex items-center 
-            border-y-none border-l-none border-r-[1px] border-r-violet-600 last:border-r-0' key={idx}>
+        return (<div className='flex items-center' key={idx}>
             <input
                 id={item}
                 name={fieldName}
                 type={type}
                 value={item}
-                className='hidden'
+                className='h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
                 aria-describedby='task-error'
                 onChange={handleSelect}
                 checked={
@@ -136,33 +157,30 @@ export function SelectionField(
             />
             <label
                 htmlFor={item}
-                className='flex cursor-pointer items-center gap-1.5 p-3
-                    text-sm font-medium text-violet-600 focus:text-white 
-                    focus:bg-violet-600 active:bg-violet-600
-                    hover:bg-violet-600 hover:text-white
-                    focus-within:text-white'
+                className='ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600'
             >
-                {capitalise(item)}
+            {capitalise(item)}
             </label>
       </div>)
     })
 
-    return (<fieldset className='mb-4 inline-block'>
+    return (<fieldset className='mb-4'>
         <legend className='mb-2 block text-sm font-medium'>
-            {prompt}
+          {prompt}
         </legend>
-        
-        <div className='relative flex rounded-lg overflow-hidden border-[1px] border-violet-600'>
+        <div className='rounded-md border border-gray-200 bg-white px-[14px] py-3'>
+          <div className='flex gap-4 flex-wrap'>
             {selectionList}
+          </div>
         </div>
-        {/* <div id='customer-error' aria-live='polite' aria-atomic='true'>
-          {state.errors?.status &&
+        <div id='customer-error' aria-live='polite' aria-atomic='true'>
+          {/* {state.errors?.status &&
             state.errors.status.map((error: string) => (
               <p className='mt-2 text-sm text-red-500' key={error}>
                 {error}
               </p>
-            ))}
-        </div> */}
+            ))} */}
+        </div>
     </fieldset>);
 }
 
@@ -189,14 +207,13 @@ export function MultiSelectionField(
         onChange(event);
     }
     const selectionList = list.map((item, idx) => {
-        return (<div className='flex items-center
-            border-y-none border-l-none border-r-[1px] border-r-violet-600 last:border-r-0' key={idx}>
+        return (<div className='flex items-center' key={idx}>
             <input
                 id={item}
                 name={fieldName}
                 type={type}
                 value={item}
-                className='hidden h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
+                className='h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
                 aria-describedby='task-error'
                 onChange={handleSelect}
                 // checked={
@@ -206,13 +223,9 @@ export function MultiSelectionField(
             />
             <label
                 htmlFor={item}
-                className='flex cursor-pointer items-center gap-1.5 p-3
-                    text-sm font-medium text-violet-600 focus:text-white 
-                    focus:bg-violet-600 active:bg-violet-600
-                    hover:bg-violet-600 hover:text-white
-                    focus-within:bg-violet-600 focus-within:text-white'
+                className='ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600'
             >
-                {capitalise(item)}
+            {capitalise(item)}
             </label>
       </div>)
     })
@@ -221,8 +234,8 @@ export function MultiSelectionField(
         <legend className='mb-2 block text-sm font-medium'>
           {prompt}
         </legend>
-        <div className='rounded-lg border border-violet-600 bg-white'>
-          <div className='flex'>
+        <div className='rounded-md border border-gray-200 bg-white px-[14px] py-3'>
+          <div className='flex gap-4 flex-wrap'>
             {selectionList}
           </div>
         </div>
@@ -264,7 +277,7 @@ export function MultiField(
         <legend className='mb-2 block text-sm font-medium'>
           {prompt}
         </legend>
-        <div className='rounded-lg border border-gray-200 bg-white px-[14px] py-3'>
+        <div className='rounded-md border border-gray-200 bg-white px-[14px] py-3'>
             <div className='flex gap-4 flex-wrap'>
                 {list.map((item, idx) => {
                     return (<div className='flex items-center' key={idx}>

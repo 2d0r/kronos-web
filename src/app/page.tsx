@@ -1,6 +1,6 @@
 import Button from '@/components/Button';
 import { fetchTasksPrisma, getMindsetNames } from './lib/data';
-import CreateForm from './ui/tasks/create-form';
+import CreateTask from './ui/tasks/create-task';
 import Breadcrumbs from './ui/tasks/breadcrumbs';
 import { updateTimeScores } from './lib/actions';
 import { handleOrganise } from './lib/organiser-idealFirst';
@@ -26,7 +26,7 @@ export default async function Home() {
             },
             ]}
         />
-      <CreateForm mindsetList={mindsetList} />
+      <CreateTask />
       <div className='container w-full justify-start flex flex-row gap-8 p-4'>
         <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={updateTimeScores}>Rescore</Button>
         <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={handleOrganise}>Organise</Button>

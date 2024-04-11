@@ -98,3 +98,6 @@ export let prismaEnums = {
     preferredDayOfWeek: getEnumValues(DayOfWeek),
 };
 
+export type SearchParamProps = {
+    searchParams: Record<string, string> | null | undefined;
+};
