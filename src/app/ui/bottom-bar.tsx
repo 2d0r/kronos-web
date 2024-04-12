@@ -1,5 +1,5 @@
 import React from 'react';
-import AddTaskButton from './add-task-button';
+import AddTaskButton from './buttons/add-task-button';
 import { SearchParamProps } from '../lib/definitions';
 
 export default function BottomBar({ searchParams }: SearchParamProps) {

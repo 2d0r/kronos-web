@@ -19,16 +19,16 @@ export default async function Page({ searchParams }: SearchParamProps) {
     const showAddTask = searchParams?.showAddTask;
     const showMenu = searchParams?.showMenu;
 
-    return (<div className='w-screen h-screen bg-violet-200'>
-        <TopBar/>
+    return (<div className='w-screen h-screen bg-gradient-to-br from-violet-200 to-violet-400'>
+        <TopBar searchParams={searchParams}/>
         { showAddTask && <CreateTask />}
         <div className='w-full h-full flex flex-col items-center justify-center'>
             {showMenu && <Menu />}
-            <div className='w-1/3 align-middle justify-center flex flex-col gap-4'>
+            <div className='w-1/3 max-w-[400px] items-center justify-center flex flex-col gap-4'>
                 <EventCard task={currTask} key={currTask.id}/>
                 <TransportControls />
             </div>
-            <div className='w-1/3 fixed z-40' style={{
+            <div className='w-1/3 max-w-[400px] fixed z-40' style={{
                 bottom: -1 * CARD_SCALES['small'] / 2,
             }}>
                 <EventCard task={nextTask} key={nextTask.id} className='mb-[-45px]'/>

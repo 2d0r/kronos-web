@@ -101,3 +101,10 @@ export let prismaEnums = {
 export type SearchParamProps = {
     searchParams: Record<string, string> | null | undefined;
 };
+
+export interface CardProps {
+    className?: string,
+    title: string,
+    subtitle?: string,
+    icon: string
+}
