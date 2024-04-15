@@ -6,8 +6,11 @@ import { updateTimeScores } from './lib/actions';
 import { handleOrganise } from './lib/organiser-idealFirst';
 import TaskCard from './ui/tasks/task-card';
 import Link from 'next/link';
+import TopBar from './ui/top-bar';
+import { SearchParamProps } from './lib/definitions';
+import BottomBar from './ui/bottom-bar';
 
-export default async function Home() {
+export default async function Page({ searchParams }: SearchParamProps) {
   const tasks = await fetchTasksPrisma();
   const mindsetList = await getMindsetNames();
 
@@ -15,8 +18,9 @@ export default async function Home() {
   // setInterval(updatePriorityScores, interval);
 
   return (<>
+    <TopBar searchParams={searchParams}/>
     <main>
-      <Breadcrumbs
+      {/* <Breadcrumbs
             breadcrumbs={[
             { label: 'Tasks', href: '/' },
             {
@@ -25,8 +29,7 @@ export default async function Home() {
                 active: true,
             },
             ]}
-        />
-      <CreateTask />
+        /> */}
       <div className='container w-full justify-start flex flex-row gap-8 p-4'>
         <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={updateTimeScores}>Rescore</Button>
         <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={handleOrganise}>Organise</Button>
@@ -43,6 +46,8 @@ export default async function Home() {
             <TaskCard task={task} key={idx}/>
         )})}
       </div>
+      
     </main>
+    <BottomBar searchParams={searchParams}/>
   </>);
 }

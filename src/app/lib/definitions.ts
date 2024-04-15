@@ -1,4 +1,5 @@
 import { Status, TimeSpan, Priority, TimeOfDay, DayOfWeek, RepeatUnit } from '@prisma/client';
+import { Url } from 'next/dist/shared/lib/router/router';
 
 export const DEFAULT_AVERAGE_SLEEP = 8 * 60; // 8 hours, expressed in minutes
 export const DEFAULT_AVERAGE_MEALS = 3 * 60; // 3 hours, expressed in minutes
@@ -106,5 +107,6 @@ export interface CardProps {
     className?: string,
     title: string,
     subtitle?: string,
-    icon: string
+    icon: string,
+    href?: Url,
 }

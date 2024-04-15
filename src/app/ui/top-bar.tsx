@@ -6,7 +6,9 @@ import { useEffect, useState } from 'react';
 import { SearchParamProps } from '../lib/definitions';
 import { useRouter } from 'next/navigation';
 
-export function TopBar({ searchParams } : SearchParamProps) {
+export default function TopBar({ searchParams, back = false } : {
+    searchParams: Record<string, string> | null | undefined, back?: boolean
+}) {
     const pathname = usePathname();
     const [showMenu, setShowMenu] = useState(false);
     const router = useRouter();
@@ -21,11 +23,10 @@ export function TopBar({ searchParams } : SearchParamProps) {
 
 
     return (<div className='fixed z-50 w-full flex justify-between p-4'>
+        {back === true ?
         <button onClick={() => router.back()}>
-            {/* <div className='w-8 h-8 bg-white rounded-full'></div> */}
-
             <img src='../icons/back.svg' className='w-8 h-8'/>
-        </button>
+        </button> : <div></div>}
         <Link href={showMenu ? pathname.slice(-1 * '?showMenu=true'.length) : `${pathname}?showMenu=true`} onClick={handleMenuClick}>
             {/* <div className='w-8 h-8 bg-white rounded-full'></div> */}
 

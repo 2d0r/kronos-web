@@ -50,8 +50,8 @@ export default function CreateTask() {
     }
     
 
-    return (<div className='fixed z-40 w-full h-full flex items-center justify-center overflow-x-scroll'>
-    <div className='top-1/3 rounded-2xl bg-white p-4 md:p-6 w-1/3 min-w-80 overflow-x-hidden shadow-2xl shadow-slate-500'>
+    return (<div className='fixed z-50 w-full h-full flex items-center justify-center overflow-x-scroll backdrop-blur-sm'>
+    <div className='top-1/3 rounded-2xl bg-white p-4 md:p-6 w-1/3 min-w-80 overflow-x-hidden shadow-2xl shadow-slate-500 text-black'>
         <div className='w-full flex justify-between items-center pb-4'>
             <div className='w-8 h-8'></div>
             <div className='text-lg'>Add task</div>

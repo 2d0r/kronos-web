@@ -13,12 +13,13 @@ export default function AddTaskButton({ searchParams }: SearchParamProps) {
         setShowAddTask(searchParams?.showAddTask ? true : false);
     }, [searchParams?.showAddTask]);
 
-    return (<div className='w-10 h-10 text-white bg-violet-600 rounded-full flex items-center justify-center'>
+    return (
         <Link
             href={showAddTask ? pathname.slice(-1 * '?showAddTask=true'.length) : `${pathname}?showAddTask=true`}
+            className='w-10 h-10 text-white bg-violet-600 rounded-full flex items-center justify-center'
         >
             <img src={showAddTask ? '../icons/close.svg' : '../icons/add.svg'} 
                 className='w-8 h-8'/>
         </Link>
-    </div>)
+    )
 }

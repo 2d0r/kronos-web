@@ -1,9 +1,23 @@
+import Link from 'next/link';
 import React from 'react';
 
-export default function TransportControls () {
-    return (<div className='w-3/4 flex justify-between items-center p-4'>
-        <img src='../icons/shuffle.svg' className='h-8 w-8' />
-        <img src='../icons/play-pause.svg' className='h-8 w-8' />
-        <img src='../icons/add-purple.svg' className='h-8 w-8' />
-    </div>)
+export default function TransportControls ({ taskId, context, className }: { 
+    taskId: string | undefined, context?: string, className?: string 
+}) {
+    return (<div className='w-5/6 max-w-[400px] flex justify-between items-center'>
+        { context === 'taskPage' && <>
+            <Link href='/timeline'>
+                <img src='../icons/close.svg' className='h-8 w-8' />
+            </Link>
+            <img src='../icons/pause.svg' className='h-12 w-12' />
+            <img src='../icons/adjust.svg' className='h-8 w-8' />
+        </>} { context === 'timeline' && <>
+            <img src='../icons/shuffle.svg' className='h-8 w-8' />
+            <Link href={`/timeline/task/?taskId=${taskId || '-1'}`}>
+                <img src='../icons/play-pause.svg' className='h-12 w-12' />
+            </Link>
+            <img src='../icons/add-purple.svg' className='h-8 w-8' />
+        </>}
+        
+    </div>);
 }

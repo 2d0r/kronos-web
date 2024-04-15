@@ -18,9 +18,9 @@ export default async function EventCard({ task, className } : EventCardProps) {
     const durationDisplay = `${hours > 0 ? String(hours) + 'h' : ''}${minutes > 0 ? String(minutes) + 'min' : ''}`;
     
     return (<>
-        <div className={`bg-violet-600 text-white rounded-2xl flex flex-col justify-center align-middle p-6 w-full text-center ${className}`}
+        <div className={`${className} w-1/3 max-w-[400px] bg-violet-600 text-white rounded-2xl flex flex-col justify-center align-middle p-6 text-center`}
             style = {{
-                backgroundColor: mindset.colour
+                // backgroundColor: mindset.colour
             }}
         >
             <div className='text-2xl'>{task.name}</div>
