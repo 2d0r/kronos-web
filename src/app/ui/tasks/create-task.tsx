@@ -9,6 +9,7 @@ import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, statusList, r
 import { getMindsetNames } from '@/app/lib/data';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { setPriority } from 'os';
 
 
 export default function CreateTask() {
@@ -16,25 +17,38 @@ export default function CreateTask() {
     const initialState = { message: null, errors: {} };
     const createTaskHere : any = createTaskPrisma;
     const [state, dispatch] = useFormState(createTaskHere, initialState);
+    const [taskName, setTaskName] = useState<string | null>(null);
+    const [priority, setPriority] = useState<string | null>(null);
     const [isScheduled, setIsScheduled] = useState<string | null>(null);
+    const [repeatFrequency, setRepeatFrequency] = useState<number | null>(null);
     const [timespanList, setTimespanList] = useState<string[]>(timeSpanList);
     const [repeatTimespan, setRepeatTimespan] = useState<string>('');
-    const [isRepeating, setIsRepeating] = useState<string | null>(null);
+    const [chosenRepeat, setChosenRepeat] = useState<string | null>(null);
     const [endRepeat, setEndRepeat] = useState<string | null>(null);
     const [repeatUnit, setRepeatUnit] = useState<string | null>('sessions');
     const [selectedMindset, setSelectedMindset] = useState<string | null>(null);
+    const [ inFocus, setInFocus ] = useState<string>('');
 
+    const handleTaskNameInput = (event : React.ChangeEvent<HTMLSelectElement>) => {
+        setTaskName(event.target.value ? event.target.value : null);
+    }
     const handleMindsetSelect = (event : React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedMindset(event.target.value ? event.target.value : null);
+    }
+    const handleSetPriority = (event : React.ChangeEvent<HTMLSelectElement>) => {
+        setPriority(event.target.value ? event.target.value : null);
     }
     const handleScheduledToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
         setIsScheduled(event.target.value);
     }
     const handleRepeatToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
-        setIsRepeating(event.target.value);
-        if (isRepeating !== 'Repeat') {
+        setChosenRepeat(event.target.value);
+        if (chosenRepeat !== 'Repeat') {
             setRepeatTimespan('');
         }
+    }
+    const handleRepeatFrequency = (event : React.ChangeEvent<HTMLInputElement>) => {
+        setRepeatFrequency(Number(event.target.value));
     }
     const handleEndRepeatToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
         setEndRepeat(event.target.value);
@@ -50,7 +64,7 @@ export default function CreateTask() {
     }
     
 
-    return (<div className='fixed z-50 w-full h-full flex items-center justify-center overflow-x-scroll backdrop-blur-sm'>
+    return (<div className='fixed z-50 w-full h-full flex items-start justify-center overflow-y-scroll backdrop-blur-sm py-4'>
     <div className='top-1/3 rounded-2xl bg-white p-4 md:p-6 w-1/3 min-w-80 overflow-x-hidden shadow-2xl shadow-slate-500 text-black'>
         <div className='w-full flex justify-between items-center pb-4'>
             <div className='w-8 h-8'></div>
@@ -67,19 +81,23 @@ export default function CreateTask() {
             //     // console.log('Preferred Day of Week:', formData.get('startTime')); 
             // }}
         >
-            <div className=''>
+            <div className='flex flex-col justify-start'>
                 <InputField 
                     fieldName='name'
                     placeholder='Enter task name'
                     inputType='string'
+                    className='border-0 text-lg placeholder:text-lg pl-0'
+                    onChange={handleTaskNameInput}
                 />
-                <Dropdown 
-                    fieldName='mindset'
-                    prompt='Select a mindset'
-                    list={DEFAULT_MINDSET_LIST}
-                    defaultValue=''
-                    onChange={handleMindsetSelect}
-                />
+                {taskName && 
+                    <Dropdown 
+                        fieldName='mindset'
+                        prompt='Select a mindset'
+                        list={DEFAULT_MINDSET_LIST}
+                        defaultValue=''
+                        onChange={handleMindsetSelect}
+                        label='Mindset'
+                />}
                 { selectedMindset !== null && (<>
                     {/* <SelectionField 
                         fieldName='status'
@@ -93,25 +111,31 @@ export default function CreateTask() {
                         prompt='Priority'
                         list={priorityList}
                         type='radio'
+                        onChange={handleSetPriority}
                     />
-                    <SelectionField 
+                    {priority && <SelectionField 
                         fieldName='isScheduled'
                         prompt=''
                         list={['Scheduled', 'Flexible']}
                         type='radio'
                         onChange={handleScheduledToggle}
-                    />
+                    />}
                     {isScheduled === 'Scheduled' && (<>
-                        <InputField 
-                            fieldName='startTime'
-                            placeholder='Enter start time'
-                            inputType='time'
-                        />
-                        <InputField 
-                            fieldName='startDate'
-                            placeholder='Enter start date'
-                            inputType='date'
-                        />
+                        <div className='flex items-center gap-2'>
+                        <div className='flex flex-col'>
+                            <InputField 
+                                fieldName='startTime'
+                                placeholder='Enter start time'
+                                inputType='time'
+                            />
+                            <InputField 
+                                fieldName='startDate'
+                                placeholder='Enter start date'
+                                inputType='date'
+                            />
+                        </div>
+                        {'>'}
+                        <div className='flex flex-col justify-start'>
                         <InputField 
                             fieldName='endTime'
                             placeholder='Enter end time'
@@ -122,49 +146,61 @@ export default function CreateTask() {
                             placeholder='Enter end date'
                             inputType='date'
                         />
+                        </div>
+                        </div>
                     </>)}
 
                     {isScheduled === 'Flexible' && (<>
                         <InputField 
                             fieldName='duration'
                             placeholder=''
-                            inputType='duration'
+                            inputType='number'
+                            label='Ideal duration'
                         />
                         <InputField 
                             fieldName='idealStartTime'
                             placeholder='Enter start time'
                             inputType='time'
+                            label='Ideal start'
                         />
                     </>)}
-                    <SelectionField 
-                        fieldName='repeat'
-                        prompt=''
-                        list={['One time', 'Repeat']}
-                        type='radio'
-                        onChange={handleRepeatToggle}
-                        defaultSelected={['One time']}
-                    />
-                    {isRepeating === 'Repeat' && (<>
+                    { isScheduled && <>
+                        <div className='divider h-[1px] bg-violet-600 w-full mb-8 mt-4'></div>
+                        <SelectionField 
+                            fieldName='repeat'
+                            prompt=''
+                            list={['One time', 'Repeat']}
+                            type='radio'
+                            onChange={handleRepeatToggle}
+                        />
+                    </>
+                    }
+                    
+                    {chosenRepeat === 'Repeat' && (<div className='flex gap-2 mb-4 items-top *:mb-0 overflow-x-scroll'>
+                        {/* <div className='flex flex-col *:mb-0'> */}
                         {repeatUnit === 'sessions' ? (<>
                             <InputField 
                                 fieldName='repeatFrequency'
-                                placeholder='How often'
+                                placeholder='1'
                                 inputType='number'
+                                onChange={handleRepeatFrequency}
                             />
                         </>) : (<>
                             <InputField 
                                 fieldName='repeatDuration'
-                                placeholder=''
-                                inputType='duration'
+                                placeholder='10'
+                                inputType='number'
                             />
                         </>)}
                         <Dropdown 
                             fieldName='repeatUnit'
                             prompt=''
-                            list={repeatUnitList as [string, ...string[]]}
+                            list={(((repeatUnit && repeatUnit.includes('session') && repeatFrequency && repeatFrequency !== 1) || (repeatUnit && repeatUnit.includes('minute'))) ? repeatUnitList : 
+                                repeatUnitList.map(item => item.slice(0, item.length - 1))) as [string, ...string[]]}
                             defaultValue='sessions'
                             onChange={handleRepeatUnitSelect}
                         />
+                        {/* </div> */}
                         <InputField 
                             fieldName='repeatTimespanMultiplier'
                             label = 'Every'
@@ -172,33 +208,36 @@ export default function CreateTask() {
                             inputType='number'
                             onChange={handleTimespanMultiplierInput}
                         />
-                        <SelectionField 
+                        <Dropdown 
                             fieldName='repeatTimespan'
                             prompt=''
                             list={timespanList}
-                            type='radio'
                             onChange={handleRepeatTimespanToggle}
+                            defaultValue='Day'
                         />
-                    </>)}
-                    {(isScheduled !== 'Scheduled' && (repeatTimespan !== '' || isRepeating !== 'Repeat')) && (<>
-                        {(isRepeating !== 'Repeat' || !['hour'].includes(repeatTimespan)) && (<>
+                    </div>)}
+                    {(chosenRepeat && isScheduled !== 'Scheduled' && (repeatTimespan !== '' || chosenRepeat !== 'Repeat')) && (<>
+                        {(chosenRepeat !== 'Repeat' || !['hour'].includes(repeatTimespan)) && (<>
+                            <div className='h-[1px] bg-violet-600 w-full mb-8 mt-4'></div>
                             <MultiSelectionField
                                 fieldName='preferredTimeOfDay'
                                 prompt='Preferred time of day'
                                 list={timeOfDayList}
                                 type='checkbox'
+                                className='multi-line'
                             />
                         </>)}
-                        {(isRepeating !== 'Repeat' || !['hour', 'day'].includes(repeatTimespan)) && (<>
+                        {(chosenRepeat !== 'Repeat' || !['hour', 'day'].includes(repeatTimespan)) && (<>
                             <MultiSelectionField 
                                 fieldName='preferredDayOfWeek'
                                 prompt='Preferred days of the week'
-                                list={dayOfWeekList}
+                                list={dayOfWeekList.map(day => day.slice(0, 2))}
                                 type='checkbox'
                             />
                         </>)}
                     </>)}
-                    {isRepeating === 'Repeat' && (<>
+                    {chosenRepeat === 'Repeat' && (<>
+                        <div className='h-[1px] bg-violet-600 w-full mb-8 mt-4'></div>
                         <SelectionField 
                             fieldName='endRepeat'
                             prompt='End Repeat?'
@@ -208,7 +247,7 @@ export default function CreateTask() {
                             defaultSelected={['No']}
                         />
                     </>)}
-                    {(isRepeating === 'Repeat' && endRepeat === 'Yes') && (<>
+                    {(chosenRepeat === 'Repeat' && endRepeat === 'Yes') && (<>
                         <InputField 
                             fieldName='totalDuration'
                             placeholder='Total duration'
@@ -225,9 +264,11 @@ export default function CreateTask() {
                             inputType='date'
                         />
                     </>)}
-                    {(isRepeating !== 'Repeat') && (<>
+                    {(isScheduled && chosenRepeat && chosenRepeat !== 'Repeat') && (<>
+                        <div className='h-[1px] bg-violet-600 w-full mb-8 mt-4'></div>
                         <InputField 
                             fieldName='deadline'
+                            label='Deadline'
                             placeholder='Enter deadline'
                             inputType='date'
                         />
@@ -236,7 +277,7 @@ export default function CreateTask() {
                 
                 
             </div>
-            <div className='mt-6 flex justify-center gap-4'>
+            <div className='flex justify-center gap-4'>
                 {/* <Link
                     href='/'
                     className='flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200'

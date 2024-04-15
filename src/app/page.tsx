@@ -35,7 +35,7 @@ export default async function Page({ searchParams }: SearchParamProps) {
         <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={handleOrganise}>Organise</Button>
         <Link
           href="/timeline"
-          className="mt-4 rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-400"
+          className="mt-4 rounded-md bg-violet-600 px-4 py-2 text-sm text-white transition-colors hover:bg-violet-600"
         >
           Timeline
         </Link>
