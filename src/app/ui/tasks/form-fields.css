@@ -11,3 +11,10 @@ input[type=number]::-webkit-outer-spin-button {
    opacity: 1;
 
 }
+
+input:focus, input:focus-visible, select:focus {
+  --tw-ring-color: none!important;
+  --tw-ring-shadow: none!important;
+  /* border-color: inherit!important; */
+  outline: none;
+}

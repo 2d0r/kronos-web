@@ -81,12 +81,12 @@ export default function CreateTask() {
             //     // console.log('Preferred Day of Week:', formData.get('startTime')); 
             // }}
         >
-            <div className='flex flex-col justify-start'>
+            <div className='flex flex-col justify-start gap-8'>
                 <InputField 
                     fieldName='name'
                     placeholder='Enter task name'
                     inputType='string'
-                    className='border-0 text-lg placeholder:text-lg pl-0'
+                    className={`!border-0 !text-lg placeholder:text-lg pl-0`}
                     onChange={handleTaskNameInput}
                 />
                 {taskName && 
@@ -153,9 +153,10 @@ export default function CreateTask() {
                     {isScheduled === 'Flexible' && (<>
                         <InputField 
                             fieldName='duration'
-                            placeholder=''
+                            placeholder='30'
                             inputType='number'
                             label='Ideal duration'
+                            tail='minutes'
                         />
                         <InputField 
                             fieldName='idealStartTime'
@@ -165,7 +166,7 @@ export default function CreateTask() {
                         />
                     </>)}
                     { isScheduled && <>
-                        <div className='divider h-[1px] bg-violet-600 w-full mb-8 mt-4'></div>
+                        <div className='divider h-[1px] bg-violet-600 w-full'></div>
                         <SelectionField 
                             fieldName='repeat'
                             prompt=''
@@ -176,8 +177,8 @@ export default function CreateTask() {
                     </>
                     }
                     
-                    {chosenRepeat === 'Repeat' && (<div className='flex gap-2 mb-4 items-top *:mb-0 overflow-x-scroll'>
-                        {/* <div className='flex flex-col *:mb-0'> */}
+                    {chosenRepeat === 'Repeat' && (<div className=''>
+                        <div className='flex gap-2 mb-2 items-top *:mb-0 overflow-x-scroll'>
                         {repeatUnit === 'sessions' ? (<>
                             <InputField 
                                 fieldName='repeatFrequency'
@@ -200,7 +201,8 @@ export default function CreateTask() {
                             defaultValue='sessions'
                             onChange={handleRepeatUnitSelect}
                         />
-                        {/* </div> */}
+                        </div>
+                        <div className='flex gap-2 mb-4 items-top *:mb-0 overflow-x-scroll'>
                         <InputField 
                             fieldName='repeatTimespanMultiplier'
                             label = 'Every'
@@ -215,10 +217,11 @@ export default function CreateTask() {
                             onChange={handleRepeatTimespanToggle}
                             defaultValue='Day'
                         />
+                        </div>
                     </div>)}
                     {(chosenRepeat && isScheduled !== 'Scheduled' && (repeatTimespan !== '' || chosenRepeat !== 'Repeat')) && (<>
                         {(chosenRepeat !== 'Repeat' || !['hour'].includes(repeatTimespan)) && (<>
-                            <div className='h-[1px] bg-violet-600 w-full mb-8 mt-4'></div>
+                            <div className='h-[1px] bg-violet-600 w-full'></div>
                             <MultiSelectionField
                                 fieldName='preferredTimeOfDay'
                                 prompt='Preferred time of day'
@@ -237,7 +240,7 @@ export default function CreateTask() {
                         </>)}
                     </>)}
                     {chosenRepeat === 'Repeat' && (<>
-                        <div className='h-[1px] bg-violet-600 w-full mb-8 mt-4'></div>
+                        <div className='h-[1px] bg-violet-600 w-full'></div>
                         <SelectionField 
                             fieldName='endRepeat'
                             prompt='End Repeat?'
@@ -265,7 +268,7 @@ export default function CreateTask() {
                         />
                     </>)}
                     {(isScheduled && chosenRepeat && chosenRepeat !== 'Repeat') && (<>
-                        <div className='h-[1px] bg-violet-600 w-full mb-8 mt-4'></div>
+                        <div className='h-[1px] bg-violet-600 w-full'></div>
                         <InputField 
                             fieldName='deadline'
                             label='Deadline'
@@ -274,18 +277,12 @@ export default function CreateTask() {
                         />
                     </>)}
                 </>)}
-                
-                
             </div>
-            <div className='flex justify-center gap-4'>
-                {/* <Link
-                    href='/'
-                    className='flex h-10 items-center rounded-lg bg-gray-100 px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-200'
-                >
-                    Cancel
-                </Link> */}
-                <Button type='submit' className='bg-violet-600 hover:bg-violet-500'>Add</Button>
-            </div>
+            { chosenRepeat &&
+                <div className='flex justify-center gap-4 mt-8'>
+                    <Button type='submit' className='bg-violet-600 hover:bg-violet-500'>Add</Button>
+                </div>
+            }
         </form>
     </div>
     </div>);

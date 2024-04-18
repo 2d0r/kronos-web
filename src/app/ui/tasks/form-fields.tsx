@@ -15,13 +15,14 @@ function camelcaseToTitlecase(text: string) {
 }
 
 export function InputField(
-    { fieldName, placeholder, inputType, label, onChange = () => {}, className } : { 
+    { fieldName, placeholder, inputType, label, onChange = () => {}, className, tail } : { 
         fieldName: string, 
         placeholder: string, 
         inputType: string,
         label?: string,
         onChange?: any,
         className?: string,
+        tail?: string,
     }
 ) {
 
@@ -32,7 +33,7 @@ export function InputField(
     }
 
     return (<>
-        <div className={clsx('mb-8 flex items-baseline', label && 'gap-2')}>
+        <div className={clsx('flex items-baseline', label && 'gap-2')}>
             <label htmlFor={fieldName} className='mb-2 block text-sm font-medium'>
                 {label}
             </label>
@@ -42,10 +43,9 @@ export function InputField(
                     name={fieldName}
                     type={inputType}
                     className={clsx(
+                        inputType === 'number' ? 'w-[60px]' : 'w-fit',
+                        'p-2 cursor-pointer items-baseline rounded-lg border-[1px] border-violet-600 text-sm outline-2 placeholder:text-gray-400 focus:!border-0 focus:!border-violet-600',
                         className,
-                        inputType === 'number' && 'w-[60px]',
-                        'w-fit p-2 cursor-pointer items-baseline rounded-lg border-[1px] border-violet-600 text-sm outline-2 placeholder:text-gray-400',
-                        
                     )}
                     placeholder={placeholder}
                     onChange={handleInput}
@@ -54,6 +54,7 @@ export function InputField(
                     step={['repeatTimespanMultiplier', 'repeatFrequency'].includes(fieldName) ? '1' : '5'}
                 />
             </div>
+            <div>{tail}</div>
             {/* <div id='task-error' aria-live='polite' aria-atomic='true'>
             {state.errors?.customerId &&
                 state.errors.customerId.map((error: string) => (
@@ -83,7 +84,7 @@ export function Dropdown (
     }
 
     return (
-        <div className={clsx('mb-8 flex items-baseline', label && 'gap-2')}>
+        <div className={clsx(' flex items-baseline', label && 'gap-2')}>
             <label htmlFor={fieldName} className='mb-2 block text-sm font-medium'>
                 {label}
             </label>
@@ -91,7 +92,7 @@ export function Dropdown (
             <select
                 id={fieldName}
                 name={fieldName}
-                className='peer block cursor-pointer rounded-lg border border-violet-600 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500'
+                className='peer block cursor-pointer rounded-lg border border-violet-600 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 focus:!border-violet-600'
                 defaultValue={defaultValue}
                 onChange={handleSelect}
                 aria-describedby='task-error'
@@ -155,7 +156,7 @@ export function SelectionField(
                     name={fieldName}
                     type={type}
                     value={item}
-                    className='opacity-0 absolute' 
+                    className='opacity-0 absolute focus:!border-violet-600' 
                     aria-describedby='task-error'
                     onChange={handleSelect}
                     checked={checked}
@@ -174,7 +175,7 @@ export function SelectionField(
     })
 
     return (<div className={clsx(
-        'mb-8 flex flex-row items-baseline', 
+        ' flex flex-row items-baseline', 
         isFocused ? '' : '', 
         prompt && 'gap-2'
     )}>
@@ -223,7 +224,6 @@ export function MultiSelectionField(
         const checked = (type === 'radio' && selectedOptions[selectedOptions.length - 1] === item) ||
             (type === 'checkbox' && selectedOptions.includes(item));
         const hidden = false;// if not selected and field is not in focus
-
         return (hidden ? <></> :
             <div className={clsx(
                 className?.includes('multi-line') ? 'border-violet-600 border-[1px] rounded-lg' 
@@ -236,7 +236,7 @@ export function MultiSelectionField(
                     name={fieldName}
                     type={type}
                     value={item}
-                    className='hidden h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
+                    className='hidden h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-none focus:!border-violet-600'
                     aria-describedby='task-error'
                     onChange={handleSelect}
                 />
@@ -251,7 +251,7 @@ export function MultiSelectionField(
       </div>);
     })
 
-    return (<fieldset className='mb-8'>
+    return (<fieldset className=''>
         <legend className='mb-2 block text-sm font-medium'>
           {prompt}
         </legend>
@@ -299,7 +299,7 @@ export function MultiField(
         onChange(event);
     }
 
-    return (<fieldset className='mb-8'>
+    return (<fieldset className=''>
         <legend className='mb-2 block text-sm font-medium'>
           {prompt}
         </legend>
@@ -312,7 +312,7 @@ export function MultiField(
                             name={fieldName}
                             type={typeList[idx]}
                             value={item}
-                            className='h-4 w-24 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2'
+                            className='h-4 w-24 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2 focus:!border-violet-600'
                             aria-describedby='task-error'
                             onChange={handleSelect}
                             // checked={

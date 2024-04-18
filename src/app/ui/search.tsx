@@ -21,16 +21,16 @@ export default function Search({ placeholder }: { placeholder: string }) {
     // }, 300);
 
     return (
-        <div className="relative w-1/3 max-w-[400px] flex focus-within:outline-none">
+        <div className="relative w-1/3 max-w-[400px] flex ">
         <label htmlFor="search" className="sr-only peer-focus:outline-none">
             Search
         </label>
         <input
             className="peer block w-full bg-transparent border-x-0 border-t-0 border-b-white py-[9px] pl-10 
                 text-lg placeholder:text-slate-100 text-white
-                focus-peer:border-none focus:outline-none
+                focus-peer:border-none focus:!outline-none focus:!ring-transparent focus:!border-white
                 hover:border-x-0 hover:border-t-0 hover:border-b-white
-                active:border-none active:outline-none"
+                active:!ring-transparent active:!outline-none"
             placeholder={placeholder}
             // onChange={(e) => {
             //     handleSearch(e.target.value)
