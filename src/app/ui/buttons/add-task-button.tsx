@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { SearchParamProps } from '../../lib/definitions';
+import { SearchParamProps, URLSearchParamsKronos } from '../../lib/definitions';
 
-export default function AddTaskButton({ searchParams }: SearchParamProps) {
+export default function AddTaskButton({searchParams}: {searchParams: URLSearchParamsKronos}) {
     const pathname = usePathname();
     const [showAddTask, setShowAddTask] = useState(false);
 

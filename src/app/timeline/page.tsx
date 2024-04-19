@@ -3,13 +3,12 @@ import { fetchTasksPrisma } from '../lib/data';
 import TopBar from '../ui/top-bar';
 import EventCard from '../ui/tasks/event-card';
 import BottomBar from '../ui/bottom-bar';
-import { CARD_SCALES, SMALL_CARD_HEIGHT, SearchParamProps } from '../lib/definitions';
+import { CARD_SCALES, SMALL_CARD_HEIGHT, SearchParamProps, URLSearchParamsKronos } from '../lib/definitions';
 import TransportControls from '../ui/tasks/transport-controls';
 import Menu from '../ui/menu';
-import { useSearchParams } from 'next/navigation';
 import CreateTask from '../ui/tasks/create-task';
 
-export default async function Page({ searchParams }: SearchParamProps) {
+export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
     const tasks = await fetchTasksPrisma();
     const currTask = tasks.sort((a, b) => b.priorityScore - a.priorityScore)[0];
     const nextTask = tasks.sort((a, b) => b.priorityScore - a.priorityScore)[1];

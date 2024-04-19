@@ -7,10 +7,10 @@ import { handleOrganise } from './lib/organiser-idealFirst';
 import TaskCard from './ui/tasks/task-card';
 import Link from 'next/link';
 import TopBar from './ui/top-bar';
-import { SearchParamProps } from './lib/definitions';
+import { SearchParamProps, URLSearchParamsKronos } from './lib/definitions';
 import BottomBar from './ui/bottom-bar';
 
-export default async function Page({ searchParams }: SearchParamProps) {
+export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
   const tasks = await fetchTasksPrisma();
   const mindsetList = await getMindsetNames();
 

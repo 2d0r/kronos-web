@@ -4,7 +4,7 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 // import { useDebouncedCallback } from 'use-debounce';
 
-export default function Search({ placeholder }: { placeholder: string }) {
+export default function SearchBar({ placeholder }: { placeholder: string }) {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const { replace } = useRouter();
@@ -27,7 +27,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
         </label>
         <input
             className="peer block w-full bg-transparent border-x-0 border-t-0 border-b-white py-[9px] pl-10 
-                text-lg placeholder:text-slate-100 text-white
+                text-lg placeholder:text-white placeholder:text-opacity-50 text-white
                 focus-peer:border-none focus:!outline-none focus:!ring-transparent focus:!border-white
                 hover:border-x-0 hover:border-t-0 hover:border-b-white
                 active:!ring-transparent active:!outline-none"

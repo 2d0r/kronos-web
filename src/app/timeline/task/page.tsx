@@ -1,5 +1,5 @@
 import { fetchTasksPrisma } from '@/app/lib/data';
-import { CARD_SCALES, SearchParamProps } from '@/app/lib/definitions';
+import { CARD_SCALES, SearchParamProps, URLSearchParamsKronos } from '@/app/lib/definitions';
 import { whiteGlassBg, wireCard } from '@/app/lib/styles';
 import BottomBar from '@/app/ui/bottom-bar';
 import Menu from '@/app/ui/menu';
@@ -10,7 +10,7 @@ import TopBar from '@/app/ui/top-bar';
 import clsx from 'clsx';
 import React from 'react';
 
-export default async function Page({ searchParams }: SearchParamProps) {
+export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
     const taskId = searchParams?.taskId;
     const tasks = await fetchTasksPrisma();
     const currTask = tasks.sort((a, b) => b.priorityScore - a.priorityScore)[0];

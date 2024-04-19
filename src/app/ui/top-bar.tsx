@@ -2,13 +2,18 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react';
-import { SearchParamProps } from '../lib/definitions';
+import { FC, useEffect, useState } from 'react';
+import { SearchParamProps, ContainerProps, URLSearchParamsKronos } from '../lib/definitions';
 import { useRouter } from 'next/navigation';
+import { URLSearchParams } from 'url';
 
-export default function TopBar({ searchParams, back = false } : {
-    searchParams: Record<string, string> | null | undefined, back?: boolean
-}) {
+interface TopBarProps {
+    children?: JSX.Element; // Or a more specialized type
+    searchParams: URLSearchParamsKronos; // Adjust the type if needed
+    back?: boolean;
+}
+
+const TopBar: FC<TopBarProps> = ({children, searchParams, back}) => {
     const pathname = usePathname();
     const [showMenu, setShowMenu] = useState(false);
     const router = useRouter();
@@ -22,11 +27,12 @@ export default function TopBar({ searchParams, back = false } : {
     }, [searchParams?.showMenu, searchParams?.showAddTask]);
 
 
-    return (<div className='fixed z-50 w-full flex justify-between p-4'>
+    return (<div className='top-0 fixed z-50 w-full flex justify-between items-start p-4'>
         {back === true ?
         <button onClick={() => router.back()}>
             <img src='../icons/back.svg' className='w-8 h-8'/>
         </button> : <div></div>}
+        {children}
         <Link href={showMenu ? pathname.slice(-1 * '?showMenu=true'.length) : `${pathname}?showMenu=true`} onClick={handleMenuClick}>
             {/* <div className='w-8 h-8 bg-white rounded-full'></div> */}
 
@@ -35,3 +41,5 @@ export default function TopBar({ searchParams, back = false } : {
         
     </div>)
 }
+
+export default TopBar;

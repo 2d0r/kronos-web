@@ -1,0 +1,43 @@
+hf-timegrid::part(toolbar) {
+    size: 1rem;
+}
+
+hf-timegrid::part(header) {
+    font-size: 0.9em;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+  
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+
+    height: 40px;
+   
+    --bottom-border: 0px;
+    --time-grid-vertical-border: 0px;
+    --grid-horizontal-border: 0px;
+    --grid-vertical-border: 1px solid red;
+    --grid-vertical-group-border: 0;
+    --grid-vertical-right-border: 1px solid #ccc;
+}
+
+hf-timegrid::part(body) {
+    /* --color: blue; */
+    --time-indicator-color: red;
+    --time-horizontal-border: 1px solid transparent;
+    --time-grid-vertical-border: 1px solid transparent;
+    --grid-horizontal-border: 1px solid #edeef0;
+    --grid-vertical-border: 0.5px solid #edeef0;
+}
+
+hf-timegrid::part(header-date-day-today), hf-timegrid::part(header-date-name-today) {
+    color: blueviolet!important;
+}
+
+hf-timegrid::part(header-date-day-0), 
+hf-timegrid::part(header-date-name-0),
+hf-timegrid::part(header-date-day-6),
+hf-timegrid::part(header-date-name-6) {
+    color: darkgray;
+}

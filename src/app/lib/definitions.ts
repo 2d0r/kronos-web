@@ -1,5 +1,6 @@
 import { Status, TimeSpan, Priority, TimeOfDay, DayOfWeek, RepeatUnit } from '@prisma/client';
 import { Url } from 'next/dist/shared/lib/router/router';
+import { ReactElement } from 'react';
 
 export const DEFAULT_AVERAGE_SLEEP = 8 * 60; // 8 hours, expressed in minutes
 export const DEFAULT_AVERAGE_MEALS = 3 * 60; // 3 hours, expressed in minutes
@@ -100,7 +101,7 @@ export let prismaEnums = {
 };
 
 export type SearchParamProps = {
-    searchParams: Record<string, string> | null | undefined;
+    searchParams: Record<string, string>;
 };
 
 export interface CardProps {
@@ -109,4 +110,41 @@ export interface CardProps {
     subtitle?: string,
     icon: string,
     href?: Url,
+}
+
+export interface ITodo {
+    _id: string
+    title: string
+    color?: string
+}
+
+export interface IEventInfo extends Event {
+    _id: string
+    description: string
+    todoId?: string
+    start: Date | undefined
+    end: Date | undefined
+}
+
+export interface EventFormData {
+    description: string
+    todoId?: string
+}
+
+export interface DatePickerEventFormData {
+    description: string
+    todoId?: string
+    allDay: boolean
+    start?: Date
+    end?: Date
+}
+
+export interface ContainerProps {
+    children: ReactElement | ReactElement[] | null; // Accepts single or multiple children
+}
+
+export interface URLSearchParamsKronos extends URLSearchParams {
+    showMenu: boolean
+    showAddTask: boolean
+    taskId: string
 }
