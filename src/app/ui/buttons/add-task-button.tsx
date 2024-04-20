@@ -16,7 +16,7 @@ export default function AddTaskButton({searchParams}: {searchParams: URLSearchPa
     return (
         <Link
             href={showAddTask ? pathname.slice(-1 * '?showAddTask=true'.length) : `${pathname}?showAddTask=true`}
-            className='w-10 h-10 text-white bg-violet-600 rounded-full flex items-center justify-center'
+            className='absolute z-50 bottom-[2vh] right-[2vw] w-10 h-10 text-white bg-violet-600 rounded-full flex items-center justify-center'
         >
             <img src={showAddTask ? '../icons/close.svg' : '../icons/add.svg'} 
                 className='w-8 h-8'/>

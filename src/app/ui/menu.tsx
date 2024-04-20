@@ -26,8 +26,8 @@ export default function Menu() {
         </>);
     } else {
         return (<>
-            <div className='absolute z-50 right-10 top-10 w-auto h-auto p-4 gap-1 flex flex-col text-white border-[0.5px] border-white rounded-3xl 
-                bg-gradient-to-br from-gray-400/10 to-gray-100/10'>
+            <div className='absolute z-50 right-10 top-10 w-auto h-auto p-4 gap-1 flex flex-col text-black border-[0.5px] border-white rounded-3xl 
+                bg-gradient-to-br from-white to-white/50 backdrop-blur-lg shadow-lg'>
                 { !pathname.includes('/task') && <Link href={'/timeline'}>Timeline</Link>}
                 <Link href={'/calendar'}>Calendar</Link>
                 <Link href={pathname}>Tasks & Projects</Link>

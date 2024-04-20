@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
 import { createTaskPrisma} from '@/app/lib/actions';
-import { Button } from '@/app/ui/buttons/button';
+import Button from '@/components/button';
 import { Dropdown, InputField, MultiField, MultiSelectionField, SelectionField } from './form-fields';
 import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, statusList, repeatUnitList, DEFAULT_MINDSET_LIST } from '@/app/lib/definitions';
 import { getMindsetNames } from '@/app/lib/data';
@@ -64,8 +64,8 @@ export default function CreateTask() {
     }
     
 
-    return (<div className='fixed z-50 w-full h-full flex items-start justify-center overflow-y-scroll backdrop-blur-sm py-4'>
-    <div className='top-1/3 rounded-2xl bg-white p-4 md:p-6 w-1/3 min-w-80 overflow-x-hidden shadow-2xl shadow-slate-500 text-black'>
+    return (<div className='z-40 absolute w-full h-full flex items-start justify-center overflow-y-scroll backdrop-blur-sm py-4'>
+    <div className='z-50 top-1/3 rounded-2xl bg-white p-4 md:p-6 w-1/3 min-w-80 overflow-x-hidden shadow-2xl shadow-slate-500 text-black'>
         <div className='w-full flex justify-between items-center pb-4'>
             <div className='w-8 h-8'></div>
             <div className='text-lg'>Add task</div>
@@ -280,7 +280,7 @@ export default function CreateTask() {
             </div>
             { chosenRepeat &&
                 <div className='flex justify-center gap-4 mt-8'>
-                    <Button type='submit' className='bg-violet-600 hover:bg-violet-500'>Add</Button>
+                    <Button type='submit' className='h-10 bg-violet-600 hover:bg-violet-500'>Add</Button>
                 </div>
             }
         </form>

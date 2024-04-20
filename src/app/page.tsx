@@ -1,4 +1,3 @@
-import Button from '@/components/Button';
 import { fetchTasksPrisma, getMindsetNames } from './lib/data';
 import CreateTask from './ui/tasks/create-task';
 import Breadcrumbs from './ui/tasks/breadcrumbs';
@@ -9,6 +8,7 @@ import Link from 'next/link';
 import TopBar from './ui/top-bar';
 import { SearchParamProps, URLSearchParamsKronos } from './lib/definitions';
 import BottomBar from './ui/bottom-bar';
+import Button from '@/components/button';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
   const tasks = await fetchTasksPrisma();

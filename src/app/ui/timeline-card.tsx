@@ -5,7 +5,7 @@ import { URLSearchParamsKronos } from '../lib/definitions';
 import SearchBar from './search';
 
 interface TimelineCardProps {
-    children?: JSX.Element;
+    children?: JSX.Element | JSX.Element[];
     searchParams: URLSearchParamsKronos;
     back?: boolean
 }
