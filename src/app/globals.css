@@ -25,3 +25,46 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+/* Task table */
+
+table.task-table {
+  border-spacing: 0 6px;
+  border-collapse: separate;
+}
+table.task-table th {
+  @apply pb-2 px-4 font-medium text-left text-sm;
+}
+table.task-table td {
+  @apply p-4 text-white text-left;
+}
+table.task-table td:first-child {
+  @apply rounded-tl-lg rounded-bl-lg;
+}
+table.task-table td:last-child {
+  @apply rounded-tr-lg rounded-br-lg;
+}
+
+
+/* Input and forms */
+
+input[type="radio"]:checked ~ .peer-checked, 
+input[type="checkbox"]:checked ~ .peer-checked {
+  /* Apply your 'selected' styles as needed (colors from existing classes) */
+  background-color: var(--tw-bg-opacity); 
+  color: var(--tw-text-opacity);  
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button {  
+
+   opacity: 1;
+
+}
+
+input:focus, input:focus-visible, select:focus {
+  --tw-ring-color: none!important;
+  --tw-ring-shadow: none!important;
+  /* border-color: inherit!important; */
+  outline: none;
+}

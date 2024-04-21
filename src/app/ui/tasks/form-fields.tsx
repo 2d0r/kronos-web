@@ -2,16 +2,11 @@
 
 import clsx from 'clsx';
 import React, { useEffect, useRef, useState } from 'react';
-import './form-fields.css';
+import { camelcaseToTitlecase } from '@/app/utils/textUtils';
+import '@/app/globals.css';
 
 function capitalise(text: string) {
     return text[0].toUpperCase() + text.slice(1);
-}
-
-function camelcaseToTitlecase(text: string) {
-    const textWithSpaces = text.replace(/([A-Z])/g, ' $1');
-    const titlecaseText = textWithSpaces.charAt(0).toUpperCase() + textWithSpaces.slice(1);
-    return titlecaseText;
 }
 
 export function InputField(
@@ -97,7 +92,7 @@ export function Dropdown (
                 onChange={handleSelect}
                 aria-describedby='task-error'
             >
-                <option value='' disabled>{prompt}</option>
+                {prompt && <option value='' disabled>{prompt}</option>}
                 {list.map((item, idx) => (
                     <option key={idx} value={item}>
                         {camelcaseToTitlecase(item)}

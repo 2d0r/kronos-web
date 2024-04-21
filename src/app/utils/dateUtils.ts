@@ -123,3 +123,12 @@ export function startOfDay(date: Date): Date {
 export function dateToDDMMYYYY (date: Date) {
     return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
 }
+
+export function minutesToDisplayDuration (durationMinutes: number) {
+    const hours = Math.floor(durationMinutes / 60);
+    const minutes = durationMinutes - hours * 60;
+    const minutesDisplay = minutes > 0 ? ` ${minutes} min` : '';
+    const hoursPlural = hours === 1 ? '' : 's';
+    // const minutesPlural = minutes - (minutes / 60 % 1) === 1 ? '' : 's';
+    return `${hours} hr${hoursPlural}${minutesDisplay}`;
+}

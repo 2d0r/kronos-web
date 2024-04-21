@@ -16,7 +16,7 @@ export default function Menu() {
             </div>
             <div className='w-full max-w-[1200px] h-1/2 flex p-8 gap-4'>
                 <MenuCard title='Calendar' icon='../icons/calendar-month.svg' href='/calendar'/>
-                <MenuCard title='Tasks & Projects' icon='../icons/list-bulleted.svg' href='/'/>
+                <MenuCard title='Tasks & Projects' icon='../icons/list-bulleted-violet.svg' href='/browse'/>
                 <MenuCard title='Stats' subtitle='Coming soon!' icon='../icons/stats.svg' className='text-gray-400'/>
                 <div className='flex flex-col h-full w-full gap-4'>
                     <MenuCard title='Logbook' icon='../icons/history.svg'/>
@@ -30,7 +30,7 @@ export default function Menu() {
                 bg-gradient-to-br from-white to-white/50 backdrop-blur-lg shadow-lg'>
                 { !pathname.includes('/task') && <Link href={'/timeline'}>Timeline</Link>}
                 <Link href={'/calendar'}>Calendar</Link>
-                <Link href={pathname}>Tasks & Projects</Link>
+                <Link href={'/browse'}>Tasks & Projects</Link>
                 <Link href={pathname}>Stats</Link>
                 <Link href={pathname}>Logbook</Link>
                 <Link href={pathname}>Settings</Link>

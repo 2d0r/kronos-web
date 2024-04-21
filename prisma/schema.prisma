@@ -21,6 +21,7 @@ model User {
 model Task {
   id                       String      @id @default(uuid())
   name                     String
+  type                     TaskType    @default(task)
   events                   Event[]
   priorityScore            Int         @default(0)
   timeScore                Int         @default(0)

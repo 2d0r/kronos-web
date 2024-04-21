@@ -27,13 +27,13 @@ const TopBar: FC<TopBarProps> = ({children, searchParams, back}) => {
     }, [searchParams?.showMenu, searchParams?.showAddTask]);
 
 
-    return (<div className='top-0 w-full flex justify-between items-start p-4'>
+    return (<div className='top-0 fixed z-40 w-full flex justify-between items-start p-4'>
         {back === true ?
         <button onClick={() => router.back()}>
             <img src='../icons/back.svg' className='w-8 h-8'/>
         </button> : <div></div>}
         {children}
-        <Link className='absolute z-50 top-[2vh] right-[2vw]' href={showMenu ? pathname.slice(-1 * '?showMenu=true'.length) : `${pathname}?showMenu=true`} onClick={handleMenuClick}>
+        <Link className='top-[2vh] right-[2vw]' href={showMenu ? pathname.slice(-1 * '?showMenu=true'.length) : `${pathname}?showMenu=true`} onClick={handleMenuClick}>
             {/* <div className='w-8 h-8 bg-white rounded-full'></div> */}
 
             <img src={showMenu ? '../icons/close.svg' : '../icons/menu.svg'} className='w-8 h-8'/>
