@@ -1,6 +1,7 @@
 import { sql } from '@vercel/postgres';
 import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
 import {
+  TaskWithRelations,
     User,
 } from './definitions';
 import prisma from './db';
@@ -18,6 +19,25 @@ export async function fetchTasksPrisma() {
       console.error('Database Error:', error);
       // throw new Error('Failed to fetch the latest tasks.');
       process.exit(1);
+  }
+}
+
+export async function fetchTasksWithRelations() {
+  try {
+    const tasks = await prisma.task.findMany({
+      include: { 
+          tasksBefore: true,
+          tasksAfter: true,
+          tasksRightBefore: true,
+          tasksRightAfter: true,
+          tasksParent: true,
+          tasksChild: true,
+      } // Include the subtasks relation
+    }); 
+    return tasks;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch the latest tasks.');
   }
 }
 
@@ -63,37 +83,13 @@ export async function getCurrentTask() {
 }
 
 export async function fetchMindsets() {
-
-    try {
-        const mindsets = await prisma.mindset.findMany();
-        await prisma.$disconnect();
-        return mindsets;
-    } catch (error) {
-        console.error('Database Error:', error);
-        // throw new Error('Failed to fetch the latest tasks.');
-        await prisma.$disconnect();
-        process.exit(1);
-    }
-}
-
-export async function updateTaskField(entryId: string, field: string, value: any) {
-    // get type of field from database
-    try {
-      await prisma.task.update({
-          where: {
-            id: entryId,
-          },
-          data: {
-            [field]: value
-          }
-      });
-      await prisma.$disconnect();
-    } catch (error) {
-        console.error('Failed to find and update task with id:', entryId, error);
-        // throw new Error('Failed to fetch the latest tasks.');
-        await prisma.$disconnect();
-        process.exit(1);
-    }
+  try {
+    const mindsets = await prisma.mindset.findMany();
+    return mindsets;
+  } catch (error) {
+    console.log('Failed to fetch mindset list', error);
+    process.exit(1);
+  }
 }
 
 export async function getMindsetNames() {
@@ -167,5 +163,22 @@ export async function getTaskMindset(task: Task) {
     console.error('Error getting mindset of task:', task.name);
     await prisma.$disconnect();
     process.exit(1);
+  }
+}
+
+export async function fetchMindsetList() {
+  try {
+    const mindsetNames = await prisma.mindset.findMany({
+      select: {
+        name: true
+      }
+    });
+    const mindsetList = mindsetNames.map(el => {
+      return el.name;
+    });
+    return mindsetList;
+  } catch (error) {
+    console.log('Failed to fetch mindset list', error);
+    return [];
   }
 }

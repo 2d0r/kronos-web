@@ -1,10 +1,3 @@
-import { revalidatePath } from 'next/cache';
-import {
-    fetchTasksPrisma,
-    fetchMindsets,
-    updateTaskField,
-    getCurrentTask
-} from './data';
 import {
     DAYS_OF_WEEK_DICT,
     DEFAULT_AVERAGE_SLEEP, DEFAULT_AVERAGE_MEALS, DEFAULT_MINDSET,
@@ -14,6 +7,7 @@ import {
     getCurrentTimeOfDay
 } from '../utils/dateUtils';
 import { Task, Mindset } from '@prisma/client';
+import { getCurrentTask } from './data';
 
 export function calculatePriorityScores(tasks : Task[], mindsets: Mindset[], targetTime?: Date) : Task[] {
 

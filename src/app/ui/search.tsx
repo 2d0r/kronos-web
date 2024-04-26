@@ -21,12 +21,12 @@ export default function SearchBar({ placeholder }: { placeholder: string }) {
     // }, 300);
 
     return (
-        <div className="relative w-1/4 max-w-[400px] flex ">
+        <div className="relative max-w-[400px] flex ">
         <label htmlFor="search" className="sr-only peer-focus:outline-none">
             Search
         </label>
         <input
-            className="peer block w-full bg-transparent border-0 py-[9px] pl-10 
+            className="peer block bg-transparent border-0 py-[9px] pl-10 
                 text-lg placeholder:text-white placeholder:text-opacity-50 text-white
                 focus-peer:border-none focus:!outline-none focus:!border-b focus:!ring-transparent focus:!border-white
                 hover:border-x-0 hover:border-t-0 hover:border-b-white

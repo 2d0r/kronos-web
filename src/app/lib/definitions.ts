@@ -95,6 +95,10 @@ export type TaskWithRelations = Prisma.TaskGetPayload<{
     }
 }>
 
+export type CheckboxStatus = ('checked' | 'blank');
+
+// Enums
+
 const getEnumValues = (enumType: Record<string, string>) => {
     return enumType ? Object.values(enumType) : [];
 }

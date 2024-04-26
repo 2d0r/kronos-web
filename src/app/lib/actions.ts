@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import prisma from './db';
 import { Event, RepeatUnit, Task } from '@prisma/client';
 import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION, repeatUnitList } from './definitions';
-import { fetchTasksPrisma, updateTaskField } from './data';
+import { fetchMindsets, fetchTasksPrisma } from './data';
 import { calculatePriorityScores } from './priorityScore';
 import { calculateTimeScore } from './time-score';
 import { v4 as uuidv4 } from 'uuid';
@@ -235,30 +235,23 @@ export async function createEventPrisma(event: Event) {
 
 }
 
-export async function fetchMindsets() {
+export async function updateTaskField(entryId: string, field: keyof Task, value: any) {
+  // get type of field from database
   try {
-    const mindsets = await prisma.mindset.findMany();
-    return mindsets;
-  } catch (error) {
-    console.log('Failed to fetch mindset list', error);
-    return [];
-  }
-}
-
-export async function fetchMindsetList() {
-  try {
-    const mindsetNames = await prisma.mindset.findMany({
-      select: {
-        name: true
-      }
+    await prisma.task.update({
+        where: {
+          id: entryId,
+        },
+        data: {
+          [field]: value
+        }
     });
-    const mindsetList = mindsetNames.map(el => {
-      return el.name;
-    });
-    return mindsetList;
+    await prisma.$disconnect();
   } catch (error) {
-    console.log('Failed to fetch mindset list', error);
-    return [];
+      console.error('Failed to find and update task with id:', entryId, error);
+      // throw new Error('Failed to fetch the latest tasks.');
+      await prisma.$disconnect();
+      process.exit(1);
   }
 }
 

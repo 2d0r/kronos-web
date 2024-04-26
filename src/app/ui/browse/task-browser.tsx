@@ -1,17 +1,29 @@
 'use client';
 
-import { Mindset, Priority, Task, TaskType } from '@prisma/client';
+import { Mindset, Priority, Status, Task, TaskType } from '@prisma/client';
 import { FC, useEffect, useState } from 'react';
 import { Dropdown } from '../tasks/form-fields';
 import { DEFAULT_MINDSET_LIST, TaskWithRelations } from '@/app/lib/definitions';
 import clsx from 'clsx';
 import '@/app/globals.css';
 import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/app/utils/dateUtils';
-import ToDoItem from '../tasks/to-do-item';
+import Checkbox from '../buttons/checkbox';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
 const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tasks, mindsets}) => {
+
+    const [ taskCache, setTaskCache ] = useState<TaskWithRelations[]>(tasks);
+    const handleTaskStatusUpdated = (taskId: string, status: Status) => {
+        setTaskCache((taskCache) => {
+            return taskCache.map(task => {
+                if (task.id === taskId) {
+                    return { ...task, status: status }
+                } 
+                return task;
+            });
+        });
+    };
 
     const [ taskTypeFilter, setTaskTypeFilter ] = useState<TaskType>('task');
     const [ mindsetFilter, setMindsetFilter ] = useState<string>('All');
@@ -21,14 +33,13 @@ const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tas
 
     const changeTaskDisplay = (mindsetFilter: string, type: TaskType, tableView: boolean, sort?: SortItem) => {
         const mindsetList = mindsetFilter === 'All' ? DEFAULT_MINDSET_LIST : [mindsetFilter];
-        const tasksFilteredByType = tasks.filter(task => task.type === type);
-        console.log('changing display', mindsetFilter, type, tableView);
+        const tasksFilteredByType = taskCache.filter(task => task.type === type);
 
         // Filter tasks
         let filteredTasks = tasksFilteredByType;
         if (mindsetFilter !== 'All') {
             const mindsetId = mindsets.filter(el => el.name === mindsetFilter)[0].id;
-            filteredTasks = tasksFilteredByType.filter(task => task.mindsetId === mindsetId);
+            filteredTasks = tasksFilteredByType?.filter(task => task.mindsetId === mindsetId);
         }
 
         // Sort tasks
@@ -55,7 +66,7 @@ const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tas
                             {sortedTasks.map(task => {
                                 return(
                                     <div key={task.id} className='flex gap-2 items-center'>
-                                        <img src={'./icons/checkbox-blank.svg'} className='w-6 h-6' />
+                                        <Checkbox type={task.type} taskId={task.id} status={task.status} onTaskStatusUpdated={handleTaskStatusUpdated}/>
                                         <span>{task.name}</span>
                                     </div>
                                 );
@@ -69,15 +80,22 @@ const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tas
                     return (
                         <div className='flex gap-2 w-full items-start justify-start'>
                             {sortedTasks.map((task, idx) => {
-                                console.log('sorted tasks', task);
                                 return(
                                     <div key={task.id} className='flex flex-col items-center justify-start gap-2 w-[200px] p-4 rounded-lg bg-violet-600 text-white'>
-                                        <img src={type === 'project' ? './icons/project.svg': './icons/goal.svg'} />
+                                        <Checkbox type={task.type} status={task.status} taskId={task.id} fill='white' width='36' height='36'
+                                            onTaskStatusUpdated={handleTaskStatusUpdated}
+                                        />
                                         <span className='text-lg'>{task.name}</span>
                                         <span className='text-sm'>{task.notes}</span>
                                         <div className='w-full flex flex-col gap-2 items-start'>
-                                            { tasks.filter(subtask => subtask.tasksParent.some((parentTask: Task) => parentTask.id === task.id)).map(taskContained => {
-                                                return(<ToDoItem key={taskContained.id} task={taskContained} keyProp={taskContained.id} className='text-sm'/>);
+                                            { taskCache.filter(subtask => subtask.tasksParent.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
+                                                return(<div className={'flex gap-2 items-center text-sm'} key={innerTask.id}>
+                                                    <Checkbox taskId={innerTask.id} status={innerTask.status} type={innerTask.type}
+                                                        height='20' width='20' fill='white'
+                                                        onTaskStatusUpdated={handleTaskStatusUpdated}
+                                                    />
+                                                    <span>{innerTask.name}</span>
+                                                </div>);
                                             })}
                                         </div>
                                     </div>
