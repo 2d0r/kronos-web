@@ -1,4 +1,4 @@
-import { Status, TimeSpan, Priority, TimeOfDay, DayOfWeek, RepeatUnit } from '@prisma/client';
+import { Status, TimeSpan, Priority, TimeOfDay, DayOfWeek, RepeatUnit, Prisma } from '@prisma/client';
 import { Url } from 'next/dist/shared/lib/router/router';
 import { ReactElement } from 'react';
 
@@ -44,6 +44,8 @@ export const DAYS_OF_WEEK_DICT : { [key: string]: number } = {
     'Saturday': 6
 }
 
+// TYPES
+
 export type Frequency = {
     times: number,
     timeRange: string,
@@ -82,6 +84,17 @@ export type StatusField = {
     name: string;
 }
 
+export type TaskWithRelations = Prisma.TaskGetPayload<{
+    include: { 
+        tasksBefore: true,
+        tasksAfter: true,
+        tasksRightBefore: true,
+        tasksRightAfter: true,
+        tasksParent: true,
+        tasksChild: true,
+    }
+}>
+
 const getEnumValues = (enumType: Record<string, string>) => {
     return enumType ? Object.values(enumType) : [];
 }
@@ -99,6 +112,8 @@ export let prismaEnums = {
     preferredTimeOfDay: getEnumValues(TimeOfDay),
     preferredDayOfWeek: getEnumValues(DayOfWeek),
 };
+
+// Props
 
 export type SearchParamProps = {
     searchParams: Record<string, string>;

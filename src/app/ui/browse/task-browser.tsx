@@ -3,18 +3,15 @@
 import { Mindset, Priority, Task, TaskType } from '@prisma/client';
 import { FC, useEffect, useState } from 'react';
 import { Dropdown } from '../tasks/form-fields';
-import { DEFAULT_MINDSET_LIST } from '@/app/lib/definitions';
-import { getTaskMindset } from '@/app/lib/data';
-import prisma from '../../lib/db';
-import checkBoxBlank from '../../../../public/icons/check-box-blank.svg';
-import { camelcaseToTitlecase } from '@/app/utils/textUtils';
+import { DEFAULT_MINDSET_LIST, TaskWithRelations } from '@/app/lib/definitions';
 import clsx from 'clsx';
 import '@/app/globals.css';
 import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/app/utils/dateUtils';
+import ToDoItem from '../tasks/to-do-item';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
-const TaskBrowser: FC<{tasks: Task[], mindsets: Mindset[]}> = ({tasks, mindsets}) => {
+const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tasks, mindsets}) => {
 
     const [ taskTypeFilter, setTaskTypeFilter ] = useState<TaskType>('task');
     const [ mindsetFilter, setMindsetFilter ] = useState<string>('All');
@@ -47,29 +44,55 @@ const TaskBrowser: FC<{tasks: Task[], mindsets: Mindset[]}> = ({tasks, mindsets}
             : filteredTasks : filteredTasks;
         (sort && sort[1] === 'Descending') && sortedTasks.reverse();
         
-
+        let newTaskDisplay = () => <></>;
         if ( tableView === false ) {
-            const newTaskDisplay = () => { 
-                return (
-                    <div className='flex flex-col gap-2 w-full max-w-1/2 items-start justify-start'>
-                        {/* <div className='pb-2'>{camelcaseToTitlecase(mindset)}</div> */}
-                        {sortedTasks.map(task => {
-                            return(
-                                <div key={task.id} className='flex gap-2 items-center'>
-                                    <img src={'./icons/check-box-blank.svg'} className='w-6 h-6' />
-                                    <span>{task.name}</span>
-                                </div>
-                            );
+            if ( type === 'task' ) {
+                newTaskDisplay = () => { 
+                    return (
+                        <div className='flex flex-col gap-2 w-full max-w-1/2 items-start justify-start'>
+                            {/* <div className='pb-2'>{camelcaseToTitlecase(mindset)}</div> */}
                             
-                        })}
-                    </div>
-                );
-            };
+                            {sortedTasks.map(task => {
+                                return(
+                                    <div key={task.id} className='flex gap-2 items-center'>
+                                        <img src={'./icons/checkbox-blank.svg'} className='w-6 h-6' />
+                                        <span>{task.name}</span>
+                                    </div>
+                                );
+                                
+                            })}
+                        </div>
+                    );
+                };
+            } else if ( type === 'project' || type === 'goal') {
+                newTaskDisplay = () => {
+                    return (
+                        <div className='flex gap-2 w-full items-start justify-start'>
+                            {sortedTasks.map((task, idx) => {
+                                console.log('sorted tasks', task);
+                                return(
+                                    <div key={task.id} className='flex flex-col items-center justify-start gap-2 w-[200px] p-4 rounded-lg bg-violet-600 text-white'>
+                                        <img src={type === 'project' ? './icons/project.svg': './icons/goal.svg'} />
+                                        <span className='text-lg'>{task.name}</span>
+                                        <span className='text-sm'>{task.notes}</span>
+                                        <div className='w-full flex flex-col gap-2 items-start'>
+                                            { tasks.filter(subtask => subtask.tasksParent.some((parentTask: Task) => parentTask.id === task.id)).map(taskContained => {
+                                                return(<ToDoItem key={taskContained.id} task={taskContained} keyProp={taskContained.id} className='text-sm'/>);
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )
+                }
+            }
+            
             setTaskDisplay(newTaskDisplay);
         } else if ( tableView === true ) {
             const newTaskDisplayRows = sortedTasks.map(task => {
                 return (
-                    <tr className='mb-4 rounded-md bg-violet-600'>
+                    <tr className='mb-4 rounded-lg bg-violet-600' key={task.id}>
                         <td>{task.name}</td>
                         <td>{task.priority}</td>
                         <td>{minutesToDisplayDuration(task.duration)}</td>
@@ -82,7 +105,7 @@ const TaskBrowser: FC<{tasks: Task[], mindsets: Mindset[]}> = ({tasks, mindsets}
                     </tr>
                 );
             });
-            const newTaskDisplay = () => {
+            newTaskDisplay = () => {
                 return (<table className='task-table'>
                     <tr className=''>
                         <th>Name</th>
@@ -102,9 +125,9 @@ const TaskBrowser: FC<{tasks: Task[], mindsets: Mindset[]}> = ({tasks, mindsets}
 
     const handleTaskTypeFilter = (type: TaskType) => {
         setMindsetFilter('All'); // reset bucket when changing tab
-        changeTaskDisplay(mindsetFilter, type, tableView);
+        type === 'goal' && setTableView(false);
+        changeTaskDisplay(mindsetFilter, type, type === 'goal' ? false : tableView);
         setTaskTypeFilter(type);
-        
     }
     const handleMindsetFilter = (event : React.ChangeEvent<HTMLSelectElement>) => {
         const newMindsetFilter = event.target.value ? event.target.value : 'All';
@@ -134,6 +157,7 @@ const TaskBrowser: FC<{tasks: Task[], mindsets: Mindset[]}> = ({tasks, mindsets}
 
     return(
         <div className='flex flex-col items-center gap-4'>
+            {/* <div className='bg-gray-100 w-full'> */}
             <div className='flex gap-4 items-center justify-center'>
                 <button 
                     className={clsx('border-[1px] border-gray-200 rounded-md p-2',
@@ -152,7 +176,7 @@ const TaskBrowser: FC<{tasks: Task[], mindsets: Mindset[]}> = ({tasks, mindsets}
                     )} 
                     onClick={() => handleTaskTypeFilter('task')}>Tasks</button>
             </div>
-            { taskTypeFilter === 'task' && 
+            { taskTypeFilter !== 'goal' && 
             <div className='flex gap-4 items-center'>
                 <Dropdown 
                     fieldName='chooseMindset'
@@ -175,6 +199,7 @@ const TaskBrowser: FC<{tasks: Task[], mindsets: Mindset[]}> = ({tasks, mindsets}
                     <img src={sort[1] === 'Ascending' ? './icons/sort-desc.svg' : './icons/sort-asc.svg'} />
                 </div>
             </div>}
+            {/* </div> */}
             <div className='flex h-2/3 w-full items-start justify-center gap-6'>
                 {taskDisplay}
             </div>

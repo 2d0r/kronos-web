@@ -51,10 +51,12 @@ model Task {
   totalRepetitions         Int?
   endRepeatDate            DateTime?
   notes                    String?
-  tasks_TaskCausality_A    Task[]      @relation("TaskCausality")
-  tasks_TaskCausality_B    Task[]      @relation("TaskCausality")
-  tasks_TaskChain_A        Task[]      @relation("TaskChain")
-  tasks_TaskChain_B        Task[]      @relation("TaskChain")
+  tasksBefore              Task[]      @relation("TaskCausality")
+  tasksAfter               Task[]      @relation("TaskCausality")
+  tasksRightBefore         Task[]      @relation("TaskChain")
+  tasksRightAfter          Task[]      @relation("TaskChain")
+  tasksParent              Task[]      @relation("Subtasks")
+  tasksChild               Task[]      @relation("Subtasks")
   createdAt                DateTime    @default(now())
 
   @@index([name])
@@ -62,11 +64,11 @@ model Task {
 }
 
 model Mindset {
-  id           String       @id @default(cuid())
-  name         String       @unique
-  maslowLevel  Int          @default(1)
-  tasks        Task[]
-  colour       String       @default("grey")
+  id          String @id @default(cuid())
+  name        String @unique
+  maslowLevel Int    @default(1)
+  tasks       Task[]
+  colour      String @default("grey")
 
   @@index([name])
   @@map("mindsets")
@@ -136,19 +138,19 @@ enum RepeatUnit {
 }
 
 model Event {
-  id            String      @id @default(uuid())
+  id            String    @id @default(uuid())
   name          String
-  task          Task        @relation(fields: [taskId], references: [id])
+  task          Task      @relation(fields: [taskId], references: [id])
   taskId        String
-  fixed         Boolean     @default(false)
-  status        Status      @default(toDo)
+  fixed         Boolean   @default(false)
+  status        Status    @default(toDo)
   startTime     DateTime
   endTime       DateTime
   userStartTime DateTime?
   userEndTime   DateTime?
   breaks        Break[]
   notes         String?
-  createdAt     DateTime    @default(now())
+  createdAt     DateTime  @default(now())
 
   @@index([name])
   @@map("events")
