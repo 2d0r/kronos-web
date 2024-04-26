@@ -132,3 +132,7 @@ export function minutesToDisplayDuration (durationMinutes: number) {
     // const minutesPlural = minutes - (minutes / 60 % 1) === 1 ? '' : 's';
     return `${hours} hr${hoursPlural}${minutesDisplay}`;
 }
+
+export function dateToHHMM (date: Date) {
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+}

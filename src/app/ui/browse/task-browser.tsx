@@ -125,14 +125,16 @@ const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tas
             });
             newTaskDisplay = () => {
                 return (<table className='task-table'>
-                    <tr className=''>
+                    <thead><tr className=''>
                         <th>Name</th>
                         <th>Priority</th>
                         <th>Duration</th>
                         <th>Frequency</th>
                         <th>End</th>
-                    </tr>
-                    {newTaskDisplayRows}
+                    </tr></thead>
+                    <tbody>
+                        {newTaskDisplayRows}
+                    </tbody>
                 </table>);
             }
             setTaskDisplay(newTaskDisplay);

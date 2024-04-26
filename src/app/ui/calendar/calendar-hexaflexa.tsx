@@ -1,11 +1,25 @@
+'use client';
+
 import React, { RefObject } from 'react';
 import { HfTimegrid, defineCustomElements } from '@hexaflexa/timegrid-react';
-import { HfTimegridConfig, utcDateToString, HfEvent } from '@hexaflexa/timegrid';
+import { HfTimegridConfig, utcDateTimeToString, utcDateToString, HfEvent } from '@hexaflexa/timegrid';
 import './calendar-hexaflexa.css';
+import { Event } from '@prisma/client';
 defineCustomElements();
 
-const CalendarComponent: React.FC = () => {
+const CalendarComponent: React.FC<{ events: Event[] }> = ({ events }) => {
     const startDate: string = utcDateToString(new Date());
+    const eventsForHf = events.map(event => {
+        return ({
+            id: event.id,
+            title: event.name,
+            resources: ['1'],
+            start: utcDateTimeToString(event.startTime),
+            end: utcDateTimeToString(event.endTime),
+        })
+    });
+    console.log('eventsForHf', eventsForHf);
+
     let timegridConfig: HfTimegridConfig = {
         daysConfig: {
             daysCount: 7,
@@ -16,22 +30,7 @@ const CalendarComponent: React.FC = () => {
         resources: [
             { id: '1', title: 'Resource 1' }
         ],
-        events: [
-            {
-                id: '1',
-                title: 'Event 1',
-                resources: ['1'],
-                start: '2024-02-15 09:00',
-                end: '2024-02-15 10:00',
-            },
-            {
-                id: '2',
-                title: 'Event 2',
-                resources: ['1'],
-                start: '2024-02-15 10:00',
-                end: '2024-02-15 11:00',
-            },
-        ],
+        events: eventsForHf,
         bodyConfig: {
             enableNewEvents: true,
             switchDragResizeAction: 'tap',

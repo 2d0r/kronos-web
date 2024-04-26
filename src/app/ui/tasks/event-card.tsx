@@ -1,30 +1,36 @@
 import React from 'react';
 import { DeleteTask } from './delete-task';
 import { getTaskMindset } from '@/app/lib/data';
-import { Task } from '@prisma/client';
+import { Event, Task } from '@prisma/client';
+import { minutesToDisplayDuration } from '@/app/utils/dateUtils';
 
 interface EventCardProps {
+    event: Event;
     task: Task;
     className?: string;
 }
 
-export default async function EventCard({ task, className } : EventCardProps) {
+export default async function EventCard({ event, task, className } : EventCardProps) {
     const mindset = await getTaskMindset(task);
-    
-
-    // Get duration display
-    const hours = task.duration / 60;
-    const minutes = task.duration - hours * 60;
-    const durationDisplay = `${hours > 0 ? String(hours) + 'h' : ''}${minutes > 0 ? String(minutes) + 'min' : ''}`;
+    const durationDisplay = minutesToDisplayDuration(task.duration);
+    const currEventDuration = (event.endTime.getTime() - event.startTime.getTime()) / 1000 / 60;
+    const cardSize : ('small' | 'medium' | 'large') = currEventDuration > 180 ? 'large' :
+        currEventDuration > 60 ? 'medium' : 'small';
     
     return (<>
-        <div className={`${className} w-1/3 max-w-[400px] bg-violet-600 text-white rounded-2xl flex flex-col justify-center align-middle p-6 text-center`}
+        <div className={`${className} w-1/3 max-w-[400px] bg-violet-600 text-white rounded-2xl flex flex-col justify-between items-center p-6 text-center`}
             style = {{
                 // backgroundColor: mindset.colour
+                height: cardSize === 'small' ? '15vh' : cardSize === 'medium' ? '25vh' : '50vh',
+                minHeight: cardSize === 'small' ? '100px' : cardSize === 'medium' ? '150px' : '300px'
             }}
         >
-            <div className='text-2xl'>{task.name}</div>
-            <div>{durationDisplay}</div>
+            <div>{`${event.startTime.getHours().toString().padStart(2, '0')}:${event.startTime.getMinutes().toString().padStart(2, '0')}`}</div>
+            <div>
+                <div className='text-2xl'>{event.name}</div>
+                <div>{durationDisplay}</div>
+            </div>
+            <div>{`${event.endTime.getHours().toString().padStart(2, '0')}:${event.endTime.getMinutes().toString().padStart(2, '0')}`}</div>
             {/* <div className='overflow-scroll flex flex-row justify-start align-middle gap-8 w-2/3'>
                 <div><div className='font-bold'>Status</div><div>{task.status}</div></div>
                 <div><div className='font-bold'>Priority</div><div>{task.priority}</div></div>

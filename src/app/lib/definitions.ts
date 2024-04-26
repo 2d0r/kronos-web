@@ -95,6 +95,12 @@ export type TaskWithRelations = Prisma.TaskGetPayload<{
     }
 }>
 
+export type EventWithRelations = Prisma.EventGetPayload<{
+    include: { 
+        task: true,
+    }
+}>
+
 export type CheckboxStatus = ('checked' | 'blank');
 
 // Enums
@@ -165,5 +171,5 @@ export interface ContainerProps {
 export interface URLSearchParamsKronos extends URLSearchParams {
     showMenu: boolean
     showAddTask: boolean
-    taskId: string
+    eventId: string
 }
