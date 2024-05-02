@@ -1,10 +1,11 @@
+import clsx from 'clsx';
 import Link from 'next/link';
 import React from 'react';
 
 export default function TransportControls ({ eventId, context, className }: { 
     eventId: string | undefined, context?: string, className?: string 
 }) {
-    return (<div className='w-5/6 max-w-[400px] flex justify-between items-center'>
+    return (<div className={clsx('w-1/3 max-w-[400px] flex justify-between items-center', className)}>
         { context === 'taskPage' && <>
             <Link href='/timeline'>
                 <img src='../icons/close.svg' className='h-8 w-8' />

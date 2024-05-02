@@ -10,7 +10,7 @@ import TopBar from '@/app/ui/top-bar';
 import clsx from 'clsx';
 import React from 'react';
 import prisma from '@/app/lib/db';
-import { Task } from '@prisma/client';
+import { Task, Event } from '@prisma/client';
 import { dateToHHMM, minutesBetweenDates, minutesToDisplayDuration } from '@/app/utils/dateUtils';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
@@ -32,7 +32,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
     const eventQueue = events.filter(event => event.startTime >= new Date());
     const taskQueue = eventQueue.map(event => event.task as Task);
     const showAddTask = searchParams?.showAddTask;
-    const event = eventQueue[0];
+    const[event, nextEvent] = eventQueue.length > 1 ? eventQueue : [eventQueue[0], {} as Event];
 
     return (<div className='w-screen h-screen bg-gradient-to-br from-violet-500 to-violet-800 text-white flex justify-center'>
         <TopBar searchParams={searchParams}/>
@@ -81,11 +81,11 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             </div>
         </div>
         {/* Next task */}
-        {eventQueue.length > 1 && 
-            <EventCard event={eventQueue[1]} task={taskQueue[1]}  className='fixed bottom-[-10px] mb-[-45px] opacity-70 drop-shadow-2xl drop-shadow-white'/>
+        {(eventQueue.length > 1 && minutesBetweenDates(new Date(), nextEvent.startTime) < 30) && 
+            <EventCard event={nextEvent} task={taskQueue[1]} nextTask={true}  className='fixed bottom-[-10px] mb-[-45px] drop-shadow-2xl drop-shadow-white'/>
         }
         <BottomBar searchParams={searchParams}/>
-        { searchParams?.showMenu && <>
+        { searchParams?.menu && <>
             <Menu />
         </>}  
     </div> 

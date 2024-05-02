@@ -92,6 +92,20 @@ export async function fetchMindsets() {
   }
 }
 
+export async function fetchMindsetsWithRelations() {
+  try {
+    const mindsets = await prisma.mindset.findMany({
+      include: {
+        tasks: true
+      }
+    });
+    return mindsets;
+  } catch (error) {
+    console.log('Failed to fetch mindset list', error);
+    process.exit(1);
+  }
+}
+
 export async function getMindsetNames() {
   try {
     // Use Prisma to query all 'name' values from the 'mindset' table

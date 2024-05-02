@@ -136,3 +136,21 @@ export function minutesToDisplayDuration (durationMinutes: number) {
 export function dateToHHMM (date: Date) {
     return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
 }
+
+// export function areSameDay(date1: Date, date2: Date) {
+//     return (
+//         date1.getFullYear() === date2.getFullYear() &&
+//         date1.getMonth() === date2.getMonth() &&
+//         date1.getDate() === date2.getDate()
+//     );
+// }
+
+export function areSameDay(date1: Date, date2: Date) {
+    const date1Copy = new Date(date1.getTime()); // Create a copy
+    const date2Copy = new Date(date2.getTime()); // Create a copy
+
+    date1Copy.setUTCHours(0, 0, 0, 0);
+    date2Copy.setUTCHours(0, 0, 0, 0);
+
+    return date1Copy.getTime() === date2Copy.getTime();
+  }

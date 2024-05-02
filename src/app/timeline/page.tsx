@@ -20,7 +20,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
     const eventQueue = events.filter(event => event.startTime > new Date());
     const taskQueue = eventQueue.map(event => event.task as Task);
     const showAddTask = searchParams?.showAddTask;
-    const showMenu = searchParams?.showMenu;
+    const showMenu = searchParams?.menu;
 
     return (<div className='w-screen h-screen bg-gradient-to-br from-violet-200 to-violet-400'>
         <TopBar searchParams={searchParams}/>
@@ -34,7 +34,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
                 </div>
             }
             {eventQueue.length > 1 &&
-                <EventCard event={eventQueue[1]} task={taskQueue[1]} className='fixed bottom-[-10px] mb-[-45px] bg-gradient-to-br from-gray-400 to-gray-600 opacity-70'/>
+                <EventCard event={eventQueue[1]} task={taskQueue[1]} nextTask={true} />
             }
 
         </div>

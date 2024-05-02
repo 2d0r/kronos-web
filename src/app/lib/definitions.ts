@@ -169,7 +169,7 @@ export interface ContainerProps {
 }
 
 export interface URLSearchParamsKronos extends URLSearchParams {
-    showMenu: boolean
+    menu: boolean
     showAddTask: boolean
     eventId: string
 }

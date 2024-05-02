@@ -2,15 +2,17 @@ import React from 'react';
 import { DeleteTask } from './delete-task';
 import { getTaskMindset } from '@/app/lib/data';
 import { Event, Task } from '@prisma/client';
-import { minutesToDisplayDuration } from '@/app/utils/dateUtils';
+import { dateToHHMM, minutesToDisplayDuration } from '@/app/utils/dateUtils';
+import clsx from 'clsx';
 
 interface EventCardProps {
     event: Event;
     task: Task;
     className?: string;
+    nextTask?: boolean;
 }
 
-export default async function EventCard({ event, task, className } : EventCardProps) {
+export default async function EventCard({ event, task, className, nextTask = false } : EventCardProps) {
     const mindset = await getTaskMindset(task);
     const durationDisplay = minutesToDisplayDuration(task.duration);
     const currEventDuration = (event.endTime.getTime() - event.startTime.getTime()) / 1000 / 60;
@@ -18,19 +20,22 @@ export default async function EventCard({ event, task, className } : EventCardPr
         currEventDuration > 60 ? 'medium' : 'small';
     
     return (<>
-        <div className={`${className} w-1/3 max-w-[400px] bg-violet-600 text-white rounded-2xl flex flex-col justify-between items-center p-6 text-center`}
+        <div className={clsx(className, 'w-1/3 bg-violet-600 text-white rounded-2xl flex flex-col justify-between items-center p-4 text-center',
+            nextTask && 'absolute top-[90vh] mb-[-45px] bg-gradient-to-br from-gray-400 to-gray-600 opacity-80'
+        )}
             style = {{
-                // backgroundColor: mindset.colour
-                height: cardSize === 'small' ? '15vh' : cardSize === 'medium' ? '25vh' : '50vh',
-                minHeight: cardSize === 'small' ? '100px' : cardSize === 'medium' ? '150px' : '300px'
+                backgroundColor: mindset.colour,
+                height: nextTask ? '10vh' : cardSize === 'small' ? '20vh' : cardSize === 'medium' ? '30vh' : '50vh',
+                minHeight: nextTask ? '100px' : cardSize === 'small' ? '100px' : cardSize === 'medium' ? '150px' : '300px'
             }}
         >
-            <div>{`${event.startTime.getHours().toString().padStart(2, '0')}:${event.startTime.getMinutes().toString().padStart(2, '0')}`}</div>
+            <div className='text-sm w-full flex items-start'>{dateToHHMM(event.startTime)}</div>
             <div>
                 <div className='text-2xl'>{event.name}</div>
-                <div>{durationDisplay}</div>
+                <div>{nextTask ? '' : durationDisplay}</div>
             </div>
-            <div>{`${event.endTime.getHours().toString().padStart(2, '0')}:${event.endTime.getMinutes().toString().padStart(2, '0')}`}</div>
+            <div className='h-4'> </div>
+            {/* <div className='text-sm'>{dateToHHMM(event.endTime)}</div> */}
             {/* <div className='overflow-scroll flex flex-row justify-start align-middle gap-8 w-2/3'>
                 <div><div className='font-bold'>Status</div><div>{task.status}</div></div>
                 <div><div className='font-bold'>Priority</div><div>{task.priority}</div></div>

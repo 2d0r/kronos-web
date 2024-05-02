@@ -158,8 +158,8 @@ model Event {
 
 model Break {
   id        String   @id @default(uuid())
-  event     Event    @relation(fields: [eventId], references: [id])
-  eventId   String
+  event     Event?   @relation(fields: [eventId], references: [id])
+  eventId   String?
   startTime DateTime
   endTime   DateTime
   createdAt DateTime @default(now())

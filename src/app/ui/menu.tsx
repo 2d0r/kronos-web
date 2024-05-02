@@ -31,6 +31,7 @@ export default function Menu() {
                 { !pathname.includes('/task') && <Link href={'/timeline'}>Timeline</Link>}
                 <Link href={'/calendar'}>Calendar</Link>
                 <Link href={'/browse'}>Tasks & Projects</Link>
+                <Link href={'/'}>Tests</Link>
                 <Link href={pathname}>Stats</Link>
                 <Link href={pathname}>Logbook</Link>
                 <Link href={pathname}>Settings</Link>

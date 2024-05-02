@@ -23,8 +23,8 @@ const TopBar: FC<TopBarProps> = ({children, searchParams, back}) => {
     }
 
     useEffect(() => {
-        setShowMenu(searchParams?.showMenu && !searchParams?.showAddTask ? true : false);
-    }, [searchParams?.showMenu, searchParams?.showAddTask]);
+        setShowMenu(searchParams?.menu && !searchParams?.showAddTask ? true : false);
+    }, [searchParams?.menu, searchParams?.showAddTask]);
 
 
     return (<div className='top-0 fixed z-40 w-full flex justify-between items-center px-4 py-2'>
@@ -33,7 +33,7 @@ const TopBar: FC<TopBarProps> = ({children, searchParams, back}) => {
             <img src='../icons/back.svg' className='w-8 h-8'/>
         </button> : <div></div>}
         {children}
-        <Link className='top-[2vh] right-[2vw]' href={showMenu ? pathname.slice(-1 * '?showMenu=true'.length) : `${pathname}?showMenu=true`} onClick={handleMenuClick}>
+        <Link className='top-[2vh] right-[2vw]' href={showMenu ? pathname.slice(-1 * '?menu=true'.length) : `${pathname}?menu=true`} onClick={handleMenuClick}>
             {/* <div className='w-8 h-8 bg-white rounded-full'></div> */}
 
             <img src={showMenu ? '../icons/close.svg' : '../icons/menu.svg'} className='w-8 h-8'/>

@@ -13,13 +13,13 @@ interface TimelineCardProps {
 }
 
 const TimelineCard: FC<TimelineCardProps> = ({children, searchParams, back }) => {
-    const showMenu = searchParams?.showMenu;
+    const showMenu = searchParams?.menu;
     const showAddTask = searchParams?.showAddTask;
 
     return (<div className='w-screen h-screen bg-gradient-to-br from-violet-200 to-violet-400 flex flex-col gap-8 items-center justify-start pt-[20vh]'>
         <TopBar searchParams={searchParams} back={back}><SearchBar placeholder='Search events, dates...'/></TopBar>
-        {showMenu && <Menu />}
-        {showAddTask && <CreateTask />}
+        {/* {showMenu && <Menu />}
+        {showAddTask && <CreateTask />} */}
         <div className='bg-white max-h-[70vh] rounded-3xl shadow-xl w-fit p-4 flex items-center justify-start'>
             {children}
         </div>
