@@ -9,19 +9,8 @@ export default function SearchBar({ placeholder }: { placeholder: string }) {
     const pathname = usePathname();
     const { replace } = useRouter();
 
-    // const handleSearch = useDebouncedCallback((term) => {
-    //     const params = new URLSearchParams(searchParams);
-    //     params.set('page', '1');
-    //     if (term) {
-    //         params.set('query', term);
-    //     } else {
-    //         params.delete('query');
-    //     }
-    //     replace(`${pathname}?${params.toString()}`);
-    // }, 300);
-
     return (
-        <div className="relative max-w-[400px] flex ">
+        <div className="relative flex">
         <label htmlFor="search" className="sr-only peer-focus:outline-none">
             Search
         </label>

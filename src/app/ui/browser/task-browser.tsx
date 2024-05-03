@@ -4,14 +4,16 @@ import { Mindset, Priority, Status, Task, TaskType } from '@prisma/client';
 import { FC, useEffect, useState } from 'react';
 import { Dropdown } from '../tasks/form-fields';
 import { DEFAULT_MINDSET_LIST, TaskWithRelations } from '@/app/lib/definitions';
-import clsx from 'clsx';
 import '@/app/globals.css';
 import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/app/utils/dateUtils';
 import Checkbox from '../buttons/checkbox';
+import { getTaskColour } from '@/app/utils/taskUtils';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
-const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tasks, mindsets}) => {
+const TaskBrowser: FC<{
+    tasks: TaskWithRelations[], mindsets: Mindset[], mindsetColour: string
+}> = ({tasks, mindsets, mindsetColour}) => {
 
     const [ taskCache, setTaskCache ] = useState<TaskWithRelations[]>(tasks);
     const handleTaskStatusUpdated = (taskId: string, status: Status) => {
@@ -84,7 +86,7 @@ const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tas
                     return (
                         <div className='flex gap-2 w-full items-start justify-start'>
                             {sortedTasks.map((task, idx) => {
-                                const taskColour = mindsets.filter(el => el.id === task.mindsetId)[0].colour;
+                                const taskColour = getTaskColour(task, mindsets);
                                 return(
                                     <div key={task.id} 
                                         className='flex flex-col items-center justify-start gap-2 w-[200px] p-4 rounded-lg text-white'
@@ -117,8 +119,9 @@ const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tas
             setTaskDisplay(newTaskDisplay);
         } else if ( tableView === true ) {
             const newTaskDisplayRows = sortedTasks.map(task => {
+                const taskColour = getTaskColour(task, mindsets);
                 return (
-                    <tr className='mb-4 rounded-lg bg-violet-600' key={task.id}>
+                    <tr className='mb-4 rounded-lg' style={{background: taskColour}} key={task.id}>
                         <td>{task.name}</td>
                         <td>{task.priority}</td>
                         <td>{minutesToDisplayDuration(task.duration)}</td>
@@ -188,20 +191,29 @@ const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tas
             {/* <div className='bg-gray-100 w-full'> */}
             <div className='flex gap-4 items-center justify-center'>
                 <button 
-                    className={clsx('border-[1px] border-gray-200 rounded-md p-2',
-                        taskTypeFilter === 'goal' && 'bg-gray-200' 
-                    )} 
+                    className='border rounded-md p-2 focus:text-white'
+                    style={{
+                        background: taskTypeFilter === 'goal' ? mindsetColour : 'transparent',
+                        color: taskTypeFilter === 'goal' ? 'white' : mindsetColour,
+                        borderColor: mindsetColour,
+                    }}
                     onClick={() => handleTaskTypeFilter('goal')}
                 >Goals</button>
                 <button 
-                    className={clsx('border-[0.5px] border-gray-200 rounded-md p-2',
-                        taskTypeFilter === 'project' ? 'bg-gray-200' : '' 
-                    )} 
+                    className='border rounded-md p-2 focus:text-white'
+                    style={{
+                        background: taskTypeFilter === 'project' ? mindsetColour : 'transparent',
+                        color: taskTypeFilter === 'project' ? 'white' : mindsetColour,
+                        borderColor: mindsetColour,
+                    }}
                     onClick={() => handleTaskTypeFilter('project')}>Projects</button>
                 <button 
-                    className={clsx('border-[0.5px] border-gray-200 rounded-md p-2',
-                        taskTypeFilter === 'task' ? 'bg-gray-200' : '' 
-                    )} 
+                    className='border rounded-md p-2 focus:text-white'
+                    style={{
+                        background: taskTypeFilter === 'task' ? mindsetColour : 'transparent',
+                        color: taskTypeFilter === 'task' ? 'white' : mindsetColour,
+                        borderColor: mindsetColour,
+                    }}
                     onClick={() => handleTaskTypeFilter('task')}>Tasks</button>
             </div>
             { taskTypeFilter !== 'goal' && 
@@ -212,6 +224,7 @@ const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tas
                     defaultValue='All'
                     onChange={handleMindsetFilter}
                     prompt=''
+                    colour={mindsetColour}
                 />
                 <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
                     <img src={ tableView === false ? './icons/table-rows.svg' : './icons/list-bulleted.svg'} />
@@ -222,6 +235,7 @@ const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tas
                     defaultValue='All'
                     onChange={handleSort}
                     prompt=''
+                    colour={mindsetColour}
                 />
                 <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleSortDirection()}>
                     <img src={sort[1] === 'Ascending' ? './icons/sort-desc.svg' : './icons/sort-asc.svg'} />

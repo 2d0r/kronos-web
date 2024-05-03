@@ -16,7 +16,7 @@ export const MAX_OFFSET = 120;
 export const DEFAULT_MINDSET_LIST = [
     'restReward', 'survive', 'maintain', 'play', 'socialise', 'learn', 'create', 'selfChallenge', 'selfCare', 'achieve'
 ] as [string, ...string[]];
-export const NEUTRAL_MINDSET_COLOUR = '#C0C0C0';
+export const NEUTRAL_MINDSET_COLOUR = '#899499';
 
 export const CARD_SCALES = {
     small: 1,

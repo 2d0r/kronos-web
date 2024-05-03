@@ -20,7 +20,7 @@ export default async function EventCard({ event, task, className, nextTask = fal
         currEventDuration > 60 ? 'medium' : 'small';
     
     return (<>
-        <div className={clsx(className, 'w-1/3 bg-violet-600 text-white rounded-2xl flex flex-col justify-between items-center p-4 text-center',
+        <div className={clsx(className, 'w-1/3 text-white rounded-2xl flex flex-col justify-between items-center p-4 text-center',
             nextTask && 'absolute top-[90vh] mb-[-45px] bg-gradient-to-br from-gray-400 to-gray-600 opacity-80'
         )}
             style = {{

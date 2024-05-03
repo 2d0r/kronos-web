@@ -1,15 +1,19 @@
 'use client';
 
-import React, { RefObject } from 'react';
+import React, { RefObject, useEffect } from 'react';
 import { HfTimegrid, defineCustomElements } from '@hexaflexa/timegrid-react';
 import { HfTimegridConfig, utcDateTimeToString, utcDateToString, HfEvent } from '@hexaflexa/timegrid';
 import './calendar-hexaflexa.css';
 import { Event } from '@prisma/client';
-import Link from 'next/link';
 import { areSameDay } from '@/app/utils/dateUtils';
 defineCustomElements();
 
-const CalendarComponent: React.FC<{ events: Event[], eventColours: string[] }> = ({ events, eventColours }) => {
+const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], mindsetColour: string }> = ({ events, eventColours, mindsetColour }) => {
+
+    useEffect(() => {
+        document.documentElement.style.setProperty('--mindset-colour', mindsetColour);
+    }, []);
+
     const startDate: string = utcDateToString(new Date());
     let eventsForHf = [];
     for (let i = 0; i < events.length; i++) {
@@ -44,28 +48,6 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[] }> =
             }
         }
     }
-    // const eventsForHf = events.map(event => {
-    //     if (event.startTime.getDate() === event.endTime.getDate()) {
-    //         return ({
-    //             id: event.id,
-    //             title: event.name,
-    //             resources: ['1'],
-    //             start: utcDateTimeToString(event.startTime),
-    //             end: utcDateTimeToString(event.endTime)
-    //         });
-    //     } else {
-    //         for (let d = event.startTime; d <= event.endTime; d.setDate(d.getDate() + 1)) {
-    //             return ({
-    //                 id: event.id,
-    //                 title: event.name,
-    //                 resources: ['1'],
-    //                 start: d === event.startTime ? utcDateTimeToString(event.startTime) : utcDateTimeToString(new Date(d.setUTCHours(0))),
-    //                 end: utcDateTimeToString(event.endTime)
-    //             });
-    //         }
-    //     }  
-    // });
-    console.log('eventsForHf', eventsForHf);
     
     const handleClickEvent = (event : React.MouseEvent<HTMLInputElement>) => {
 

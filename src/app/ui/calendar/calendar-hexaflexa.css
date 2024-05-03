@@ -32,7 +32,8 @@ hf-timegrid::part(body) {
 }
 
 hf-timegrid::part(header-date-day-today), hf-timegrid::part(header-date-name-today) {
-    color: blueviolet!important;
+    --mindset-colour: red;
+    color: var(--mindset-colour)!important;
 }
 
 hf-timegrid::part(header-date-day-0), 

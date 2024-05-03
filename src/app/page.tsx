@@ -4,7 +4,7 @@ import { handleOrganise } from './lib/organiser-idealFirst';
 import TaskCard from './ui/tasks/task-card';
 import Link from 'next/link';
 import TopBar from './ui/top-bar';
-import { EventWithRelations, SearchParamProps, URLSearchParamsKronos } from './lib/definitions';
+import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, SearchParamProps, URLSearchParamsKronos } from './lib/definitions';
 import BottomBar from './ui/bottom-bar';
 import Button from '@/components/button';
 import prisma from './lib/db';
@@ -41,7 +41,8 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         <Button className='rounded-md bg-slate-300 from-neutral-950 p-6 w-1/4' onClick={handleOrganise}>Organise</Button>
         <Link
           href="/timeline"
-          className="mt-4 rounded-md bg-violet-600 px-4 py-2 text-sm text-white transition-colors hover:bg-violet-600"
+          className="flex items-center justify-center w-1/4 rounded-md px-4 py-2 text-sm text-white transition-colors hover:bg-violet-600"
+          style={{background: NEUTRAL_MINDSET_COLOUR}}
         >
           Timeline
         </Link>

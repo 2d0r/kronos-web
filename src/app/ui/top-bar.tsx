@@ -31,7 +31,7 @@ const TopBar: FC<TopBarProps> = ({children, searchParams, back}) => {
         {back === true ?
         <button onClick={() => router.back()}>
             <img src='../icons/back.svg' className='w-8 h-8'/>
-        </button> : <div></div>}
+        </button> : <div className='w-8 h-8'></div>}
         {children}
         <Link className='top-[2vh] right-[2vw]' href={showMenu ? pathname : `${pathname}?menu=true`} onClick={handleMenuClick}>
             <img src={showMenu ? '../icons/close.svg' : '../icons/menu.svg'} className='w-8 h-8'/>

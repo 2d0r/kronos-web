@@ -4,15 +4,17 @@ import { useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
 import { createTaskPrisma} from '@/app/lib/actions';
 import Button from '@/components/button';
-import { Dropdown, InputField, MultiField, MultiSelectionField, SelectionField } from './form-fields';
-import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, statusList, repeatUnitList, DEFAULT_MINDSET_LIST } from '@/app/lib/definitions';
+import { Dropdown, InputField, MultiSelectionField, SelectionField } from './form-fields';
+import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, statusList, repeatUnitList, DEFAULT_MINDSET_LIST, NEUTRAL_MINDSET_COLOUR } from '@/app/lib/definitions';
 import { getMindsetNames } from '@/app/lib/data';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { setPriority } from 'os';
+import { Mindset } from '@prisma/client';
+import { adjustLightness } from '@/app/utils/colourUtils';
 
 
-export default function CreateTask() {
+export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
     const pathname = usePathname();
     const initialState = { message: null, errors: {} };
     const createTaskHere : any = createTaskPrisma;
@@ -28,6 +30,7 @@ export default function CreateTask() {
     const [repeatUnit, setRepeatUnit] = useState<string | null>('sessions');
     const [selectedMindset, setSelectedMindset] = useState<string | null>(null);
     const [ inFocus, setInFocus ] = useState<string>('');
+    const [ mindsetColour, setMindsetColour] = useState<string>(NEUTRAL_MINDSET_COLOUR);
 
     const handleTaskNameInput = (event : React.ChangeEvent<HTMLSelectElement>) => {
         setTaskName(event.target.value ? event.target.value : null);
@@ -62,6 +65,10 @@ export default function CreateTask() {
     const handleRepeatUnitSelect = (event : React.ChangeEvent<HTMLSelectElement>) => {
         setRepeatUnit(event.target.value ? event.target.value : 'sessions');
     }
+
+    useEffect(() => {
+        setMindsetColour(mindsets.filter(el => el.name === selectedMindset)[0]?.colour || NEUTRAL_MINDSET_COLOUR);
+    }, [selectedMindset]);
     
 
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-start justify-center overflow-y-scroll backdrop-blur-sm py-4'>
@@ -88,15 +95,17 @@ export default function CreateTask() {
                     inputType='string'
                     className={`!border-0 !text-lg placeholder:text-lg pl-0`}
                     onChange={handleTaskNameInput}
+                    colour={mindsetColour}
                 />
                 {taskName && 
                     <Dropdown 
                         fieldName='mindset'
                         prompt='Select a mindset'
-                        list={DEFAULT_MINDSET_LIST}
+                        list={mindsets.map(el => el.name)}
                         defaultValue=''
                         onChange={handleMindsetSelect}
                         label='Mindset'
+                        colour={mindsetColour}
                 />}
                 { selectedMindset !== null && (<>
                     {/* <SelectionField 
@@ -112,6 +121,7 @@ export default function CreateTask() {
                         list={priorityList}
                         type='radio'
                         onChange={handleSetPriority}
+                        colour={mindsetColour}
                     />
                     {priority && <SelectionField 
                         fieldName='isScheduled'
@@ -119,6 +129,7 @@ export default function CreateTask() {
                         list={['Scheduled', 'Flexible']}
                         type='radio'
                         onChange={handleScheduledToggle}
+                        colour={mindsetColour}
                     />}
                     {isScheduled === 'Scheduled' && (<>
                         <div className='flex items-center gap-2'>
@@ -127,11 +138,13 @@ export default function CreateTask() {
                                 fieldName='startTime'
                                 placeholder='Enter start time'
                                 inputType='time'
+                                colour={mindsetColour}
                             />
                             <InputField 
                                 fieldName='startDate'
                                 placeholder='Enter start date'
                                 inputType='date'
+                                colour={mindsetColour}
                             />
                         </div>
                         {'>'}
@@ -140,11 +153,13 @@ export default function CreateTask() {
                             fieldName='endTime'
                             placeholder='Enter end time'
                             inputType='time'
+                            colour={mindsetColour}
                         />
                         <InputField 
                             fieldName='endDate'
                             placeholder='Enter end date'
                             inputType='date'
+                            colour={mindsetColour}
                         />
                         </div>
                         </div>
@@ -157,22 +172,25 @@ export default function CreateTask() {
                             inputType='number'
                             label='Ideal duration'
                             tail='minutes'
+                            colour={mindsetColour}
                         />
                         <InputField 
                             fieldName='idealStartTime'
                             placeholder='Enter start time'
                             inputType='time'
                             label='Ideal start'
+                            colour={mindsetColour}
                         />
                     </>)}
                     { isScheduled && <>
-                        <div className='divider h-[1px] bg-violet-600 w-full'></div>
+                        <div className={`divider h-[1px] w-full`} style={{background: mindsetColour}}></div>
                         <SelectionField 
                             fieldName='repeat'
                             prompt=''
                             list={['One time', 'Repeat']}
                             type='radio'
                             onChange={handleRepeatToggle}
+                            colour={mindsetColour}
                         />
                     </>
                     }
@@ -185,12 +203,14 @@ export default function CreateTask() {
                                 placeholder='1'
                                 inputType='number'
                                 onChange={handleRepeatFrequency}
+                                colour={mindsetColour}
                             />
                         </>) : (<>
                             <InputField 
                                 fieldName='repeatDuration'
                                 placeholder='10'
                                 inputType='number'
+                                colour={mindsetColour}
                             />
                         </>)}
                         <Dropdown 
@@ -200,6 +220,7 @@ export default function CreateTask() {
                                 repeatUnitList.map(item => item.slice(0, item.length - 1))) as [string, ...string[]]}
                             defaultValue='sessions'
                             onChange={handleRepeatUnitSelect}
+                            colour={mindsetColour}
                         />
                         </div>
                         <div className='flex gap-2 mb-4 items-top *:mb-0 overflow-x-scroll'>
@@ -209,6 +230,7 @@ export default function CreateTask() {
                             placeholder='1'
                             inputType='number'
                             onChange={handleTimespanMultiplierInput}
+                            colour={mindsetColour}
                         />
                         <Dropdown 
                             fieldName='repeatTimespan'
@@ -216,18 +238,20 @@ export default function CreateTask() {
                             list={timespanList}
                             onChange={handleRepeatTimespanToggle}
                             defaultValue='Day'
+                            colour={mindsetColour}
                         />
                         </div>
                     </div>)}
                     {(chosenRepeat && isScheduled !== 'Scheduled' && (repeatTimespan !== '' || chosenRepeat !== 'Repeat')) && (<>
                         {(chosenRepeat !== 'Repeat' || !['hour'].includes(repeatTimespan)) && (<>
-                            <div className='h-[1px] bg-violet-600 w-full'></div>
+                            <div className='divider h-[1px] w-full' style={{background: mindsetColour}}></div>
                             <MultiSelectionField
                                 fieldName='preferredTimeOfDay'
                                 prompt='Preferred time of day'
                                 list={timeOfDayList}
                                 type='checkbox'
                                 className='multi-line'
+                                colour={mindsetColour}
                             />
                         </>)}
                         {(chosenRepeat !== 'Repeat' || !['hour', 'day'].includes(repeatTimespan)) && (<>
@@ -236,11 +260,12 @@ export default function CreateTask() {
                                 prompt='Preferred days of the week'
                                 list={dayOfWeekList.map(day => day.slice(0, 2))}
                                 type='checkbox'
+                                colour={mindsetColour}
                             />
                         </>)}
                     </>)}
                     {chosenRepeat === 'Repeat' && (<>
-                        <div className='h-[1px] bg-violet-600 w-full'></div>
+                        <div className={`divider h-[1px] w-full`} style={{background: mindsetColour}}></div>
                         <SelectionField 
                             fieldName='endRepeat'
                             prompt='End Repeat?'
@@ -248,6 +273,7 @@ export default function CreateTask() {
                             type='radio'
                             onChange={handleEndRepeatToggle}
                             defaultSelected={['No']}
+                            colour={mindsetColour}
                         />
                     </>)}
                     {(chosenRepeat === 'Repeat' && endRepeat === 'Yes') && (<>
@@ -255,32 +281,38 @@ export default function CreateTask() {
                             fieldName='totalDuration'
                             placeholder='Total duration'
                             inputType='number'
+                            colour={mindsetColour}
                         />
                         <InputField 
                             fieldName='totalRepetitions'
                             placeholder='Number of totalRepetitions'
                             inputType='number'
+                            colour={mindsetColour}
                         />
                         <InputField 
                             fieldName='endRepeatDate'
                             placeholder='End repeat on date'
                             inputType='date'
+                            colour={mindsetColour}
                         />
                     </>)}
                     {(isScheduled && chosenRepeat && chosenRepeat !== 'Repeat') && (<>
-                        <div className='h-[1px] bg-violet-600 w-full'></div>
+                        <div className={`divider h-[1px] w-full`} style={{background: mindsetColour}}></div>
                         <InputField 
                             fieldName='deadline'
                             label='Deadline'
                             placeholder='Enter deadline'
                             inputType='date'
+                            colour={mindsetColour}
                         />
                     </>)}
                 </>)}
             </div>
             { chosenRepeat &&
                 <div className='flex justify-center gap-4 mt-8'>
-                    <Button type='submit' className='h-10 bg-violet-600 hover:bg-violet-500'>Add</Button>
+                    <Button type='submit' 
+                        className={`h-10 hover:bg-[${adjustLightness(mindsetColour, -0.2)}]`} 
+                        style={{background: mindsetColour}}>Add</Button>
                 </div>
             }
         </form>

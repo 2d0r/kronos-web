@@ -72,3 +72,9 @@ input:focus, input:focus-visible, select:focus {
 rect {
   fill: cyan;
 }
+
+/* Links */
+
+.menu-link {
+  @apply hover:bg-gray-200 rounded-lg px-2 py-1;
+}

@@ -4,13 +4,14 @@ import clsx from 'clsx';
 import React, { useEffect, useRef, useState } from 'react';
 import { camelcaseToTitlecase } from '@/app/utils/textUtils';
 import '@/app/globals.css';
+import { NEUTRAL_MINDSET_COLOUR } from '@/app/lib/definitions';
 
 function capitalise(text: string) {
     return text[0].toUpperCase() + text.slice(1);
 }
 
 export function InputField(
-    { fieldName, placeholder, inputType, label, onChange = () => {}, className, tail } : { 
+    { fieldName, placeholder, inputType, label, onChange = () => {}, className, tail, colour = NEUTRAL_MINDSET_COLOUR } : { 
         fieldName: string, 
         placeholder: string, 
         inputType: string,
@@ -18,6 +19,7 @@ export function InputField(
         onChange?: any,
         className?: string,
         tail?: string,
+        colour?: string,
     }
 ) {
 
@@ -39,9 +41,11 @@ export function InputField(
                     type={inputType}
                     className={clsx(
                         inputType === 'number' ? 'w-[60px]' : 'w-fit',
-                        'p-2 cursor-pointer items-baseline rounded-lg border-[1px] border-violet-600 text-sm outline-2 placeholder:text-gray-400 focus:!border-0 focus:!border-violet-600',
+                        'p-2 cursor-pointer items-baseline rounded-lg border-[1px] text-sm outline-2 placeholder:text-gray-400 focus:!border-0',
                         className,
+                        `focus:!border-[${colour}]`
                     )}
+                    style={{borderColor: colour}}
                     placeholder={placeholder}
                     onChange={handleInput}
                     aria-describedby='task-error'
@@ -63,13 +67,14 @@ export function InputField(
 }
 
 export function Dropdown ( 
-    { fieldName, list, defaultValue, prompt, onChange = () => {}, label } : {
+    { fieldName, list, defaultValue, prompt, onChange = () => {}, label, colour = NEUTRAL_MINDSET_COLOUR } : {
         fieldName: string,
         list: string[],
         defaultValue: string,
         prompt: string,
         onChange?: any,
         label?: string,
+        colour?: string,
     }
 ) {
     const [ selection, setSelection ] = useState<string>(defaultValue);
@@ -87,7 +92,8 @@ export function Dropdown (
             <select
                 id={fieldName}
                 name={fieldName}
-                className='peer block cursor-pointer rounded-lg border border-violet-600 py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 focus:!border-violet-600'
+                className={`peer block cursor-pointer rounded-lg border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 focus:![${colour}]`}
+                style={{borderColor: colour}}
                 defaultValue={defaultValue}
                 onChange={handleSelect}
                 aria-describedby='task-error'
@@ -113,13 +119,14 @@ export function Dropdown (
 }
 
 export function SelectionField( 
-    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [] } : {
+    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], colour = NEUTRAL_MINDSET_COLOUR } : {
         fieldName: string,
         list: string[],
         prompt: string,
         type: string,
         onChange?: any,
-        defaultSelected?: string[]
+        defaultSelected?: string[],
+        colour?: string
     }
 ) {
     const [ selectedOptions, setSelectedOptions ] = useState<string[]>(defaultSelected);
@@ -142,16 +149,17 @@ export function SelectionField(
         const hidden = !checked && !isFocused && selectedOptions.length > 0;
 
         return (<div 
-                className={clsx('flex items-center border-y-none border-l-none border-r-[1px] border-r-violet-600 last:border-r-0',
+                className={clsx('flex items-center border-y-none border-l-none border-r-[1px] last:border-r-0',
                     hidden && 'hidden'
                 )} 
+                style={{ borderColor: colour }}
                 key={idx}>
                 <input
                     id={item}
                     name={fieldName}
                     type={type}
                     value={item}
-                    className='opacity-0 absolute focus:!border-violet-600' 
+                    className={`opacity-0 absolute focus:!border-[${colour}]`}
                     aria-describedby='task-error'
                     onChange={handleSelect}
                     checked={checked}
@@ -159,10 +167,12 @@ export function SelectionField(
                 <label
                     htmlFor={item}
                     className={clsx(
-                        checked && 'bg-violet-600 text-white',
-                        'customButton flex cursor-pointer items-center gap-1.5 p-2 text-sm font-medium text-violet-600',
-                        
+                        'customButton flex cursor-pointer items-center gap-1.5 p-2 text-sm font-medium',
                     )}
+                    style={{ 
+                        background: checked ? colour : 'transparent',
+                        color: checked ? 'white' : colour,
+                    }}
                 >
                 {capitalise(item)}
                 </label>
@@ -177,7 +187,9 @@ export function SelectionField(
         <legend className='mb-2 text-sm font-medium'>
             {prompt}
         </legend>
-        <div className='relative flex w-fit rounded-lg overflow-hidden border-[1px] border-violet-600' onMouseOver={handleFocus} onMouseOut={handleBlur}>
+        <div className={`relative flex w-fit rounded-lg overflow-hidden border-[1px]`} 
+            onMouseOver={handleFocus} onMouseOut={handleBlur}
+            style={{ borderColor: colour }}>
             {selectionList}
         </div>
         
@@ -193,14 +205,15 @@ export function SelectionField(
 }
 
 export function MultiSelectionField( 
-    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], className } : {
+    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], className, colour = NEUTRAL_MINDSET_COLOUR } : {
         fieldName: string,
         list: string[],
         prompt: string,
         type: string,
         onChange?: any,
         defaultSelected?: string[],
-        className?: string
+        className?: string,
+        colour?: string,
     }
 ) {
     const [ selectedOptions, setSelectedOptions ] = useState<string[]>(defaultSelected);
@@ -221,25 +234,28 @@ export function MultiSelectionField(
         const hidden = false;// if not selected and field is not in focus
         return (hidden ? <></> :
             <div className={clsx(
-                className?.includes('multi-line') ? 'border-violet-600 border-[1px] rounded-lg' 
-                : 'border-r-violet-600 border-l-none border-y-none last:border-r-0',
+                className?.includes('multi-line') ? `border-[1px] rounded-lg` : `border-l-none border-y-none last:border-r-0`,
                 'flex items-center border-r-[1px], overflow-hidden'
                 )} 
-                key={idx}>
+                style={className?.includes('multi-line') ? { borderColor: colour } : { borderRightColor: colour }}
+                key={idx}
+            >
                 <input
                     id={item}
                     name={fieldName}
                     type={type}
                     value={item}
-                    className='hidden h-4 w-4 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-none focus:!border-violet-600'
+                    className={`hidden h-4 w-4 cursor-pointer bg-gray-100 text-gray-600 focus:ring-none focus:!border-[${colour}]`}
+                    style={{ borderColor: colour }}
                     aria-describedby='task-error'
                     onChange={handleSelect}
                 />
                 <label
                     htmlFor={item}
-                    className={clsx('flex cursor-pointer items-center gap-1.5 p-2 text-sm font-medium text-violet-600',
-                        checked && 'bg-violet-600 text-white'
+                    className={clsx(`flex cursor-pointer items-center gap-1.5 p-2 text-sm font-medium`,
+                        checked && `bg-[${colour}] text-white`
                     )}
+                    style={checked ? {color: 'white', backgroundColor: colour} : {color: colour}}
                 >
                     {capitalise(item)}
                 </label>
@@ -252,8 +268,9 @@ export function MultiSelectionField(
         </legend>
         <div className={clsx(
             className?.includes('multi-line') && 'border-0',
-            'w-fit rounded-lg border border-violet-600 bg-white overflow-hidden'
-        )}>
+            `w-fit rounded-lg border bg-white overflow-hidden`
+        )} style={{ borderColor: colour }}
+        >
           <div className={clsx('flex',
             className?.includes('multi-line') && 'flex-wrap gap-2'
           )}>
@@ -268,68 +285,5 @@ export function MultiSelectionField(
               </p>
             ))} */}
         </div>
-    </fieldset>);
-}
-
-export function MultiField( 
-    { fieldName, list, prompt, typeList, onChange = () => {}, defaultSelected = [] } : {
-        fieldName: string,
-        list: string[],
-        prompt: string,
-        typeList: string[],
-        onChange?: any,
-        defaultSelected?: string[]
-    }
-) {
-    const [ selectedOptions, setSelectedOptions ] = useState<string[]>(defaultSelected);
-    const handleSelect = (event : React.ChangeEvent<HTMLInputElement>) => {
-        const isChecked = event.target.checked; // If checkbox was toggled
-        setSelectedOptions(prevOptions => {
-            if (isChecked) {
-                return [...prevOptions, event.target.value]; // Add if checked
-            } else {
-                return prevOptions.filter(option => option !== event.target.value); // Remove if unchecked
-            }
-        });
-        onChange(event);
-    }
-
-    return (<fieldset className=''>
-        <legend className='mb-2 block text-sm font-medium'>
-          {prompt}
-        </legend>
-        <div className='rounded-lg border border-gray-200 bg-white px-[14px] py-3'>
-            <div className='flex gap-4 flex-wrap'>
-                {list.map((item, idx) => {
-                    return (<div className='flex items-center' key={idx}>
-                        <input
-                            id={item}
-                            name={fieldName}
-                            type={typeList[idx]}
-                            value={item}
-                            className='h-4 w-24 cursor-pointer border-gray-300 bg-gray-100 text-gray-600 focus:ring-2 focus:!border-violet-600'
-                            aria-describedby='task-error'
-                            onChange={handleSelect}
-                            // checked={
-                            //     (type === 'radio' && selectedOptions[selectedOptions.length - 1] === item) ||
-                            //     (type === 'checkbox' && selectedOptions.includes(item))
-                            // }
-                        />
-                        <label
-                            htmlFor={item}
-                            className='ml-2 flex cursor-pointer items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600'
-                        >{capitalise(item)}</label>
-                    </div>)
-                })}
-            </div>
-        </div>
-        {/* <div id='customer-error' aria-live='polite' aria-atomic='true'>
-          {state.errors?.status &&
-            state.errors.status.map((error: string) => (
-              <p className='mt-2 text-sm text-red-500' key={error}>
-                {error}
-              </p>
-            ))}
-        </div> */}
     </fieldset>);
 }
