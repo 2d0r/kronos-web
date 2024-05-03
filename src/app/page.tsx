@@ -1,18 +1,24 @@
-import { fetchTasksPrisma, getMindsetNames } from './lib/data';
-import CreateTask from './ui/tasks/create-task';
-import Breadcrumbs from './ui/tasks/breadcrumbs';
+import { fetchTasks, getEventMindset, getMindsetNames } from './lib/data';
 import { updateTimeScores } from './lib/actions';
 import { handleOrganise } from './lib/organiser-idealFirst';
 import TaskCard from './ui/tasks/task-card';
 import Link from 'next/link';
 import TopBar from './ui/top-bar';
-import { SearchParamProps, URLSearchParamsKronos } from './lib/definitions';
+import { EventWithRelations, SearchParamProps, URLSearchParamsKronos } from './lib/definitions';
 import BottomBar from './ui/bottom-bar';
 import Button from '@/components/button';
+import prisma from './lib/db';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
-  const tasks = await fetchTasksPrisma();
+  const tasks = await fetchTasks();
   const mindsetList = await getMindsetNames();
+  const events: EventWithRelations[] = await prisma.event.findMany({
+      include: {
+          task: true
+      }
+  });
+  const eventQueue = events.filter(event => event.startTime >= new Date());
+  const eventMindset = await getEventMindset(eventQueue[0]);
 
   // const minutes = 5, interval = minutes * 60 * 1000;
   // setInterval(updatePriorityScores, interval);

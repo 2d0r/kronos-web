@@ -68,3 +68,7 @@ input:focus, input:focus-visible, select:focus {
   /* border-color: inherit!important; */
   outline: none;
 }
+
+rect {
+  fill: cyan;
+}

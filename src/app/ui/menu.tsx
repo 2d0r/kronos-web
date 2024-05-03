@@ -5,22 +5,38 @@ import MenuCard from './cards/menu-card';
 import SearchBar from './search';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import CalendarSVG from './svg/calendar-svg';
+import BulletListSVG from './svg/bullet-list-svg';
+import StatsSVG from './svg/stats-svg';
+import HistorySVG from './svg/history-svg';
+import SettingsSVG from './svg/settings-svg';
 
-export default function Menu() {
+export default function Menu({mindsetColour = 'black'}: {mindsetColour?: string}) {
     const pathname = usePathname();
 
     if (pathname.endsWith('/timeline')) {
+
         return (<>
             <div className='w-full flex items-center justify-center'>
                 <SearchBar placeholder="Search tasks, projects, dates..." />
             </div>
             <div className='w-full max-w-[1200px] h-1/2 flex p-8 gap-4'>
-                <MenuCard title='Calendar' icon='../icons/calendar-month.svg' href='/calendar'/>
-                <MenuCard title='Tasks & Projects' icon='../icons/list-bulleted-violet.svg' href='/browse'/>
-                <MenuCard title='Stats' subtitle='Coming soon!' icon='../icons/stats.svg' className='text-gray-400'/>
+                <MenuCard title='Calendar' href='/calendar'>
+                    <CalendarSVG fill={mindsetColour} height='24' width='24' />
+                </MenuCard>
+                <MenuCard title='Tasks & Projects' href='/browse'>
+                    <BulletListSVG fill={mindsetColour} height='24' width='24' />
+                </MenuCard>
+                <MenuCard title='Stats' subtitle='Coming soon!' className='text-gray-400'>
+                    <StatsSVG fill={mindsetColour} height='24' width='24' />
+                </MenuCard>
                 <div className='flex flex-col h-full w-full gap-4'>
-                    <MenuCard title='Logbook' icon='../icons/history.svg'/>
-                    <MenuCard title='Settings' icon='../icons/settings.svg'/>
+                    <MenuCard title='Logbook' iconURL='../icons/history.svg'>
+                        <HistorySVG fill={mindsetColour} height='24' width='24' />
+                    </MenuCard>
+                    <MenuCard title='Settings' iconURL='../icons/settings.svg'>
+                        <SettingsSVG fill={mindsetColour} height='24' width='24' />
+                    </MenuCard>
                 </div>
             </div>
         </>);

@@ -3,12 +3,11 @@ import TimelineCard from '../ui/timeline-card';
 import { URLSearchParamsKronos } from '../lib/definitions';
 import Menu from '../ui/menu';
 import CreateTask from '../ui/tasks/create-task';
-import { fetchEvents, fetchMindsets, fetchMindsetsWithRelations } from '../lib/data';
-import prisma from '../lib/db';
+import { fetchEvents, fetchMindsetsWithRelations } from '../lib/data';
 
 export default async function Page({searchParams}: {searchParams: URLSearchParamsKronos}) {
   const showMenu: boolean = searchParams?.menu;
-  const showAddTask = searchParams?.showAddTask;
+  const showAddTask = searchParams?.addTask;
   const events = await fetchEvents();
   const mindsets = await fetchMindsetsWithRelations();
   const eventColours = events.map(event => {

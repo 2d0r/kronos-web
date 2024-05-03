@@ -69,7 +69,7 @@ export default function CreateTask() {
         <div className='w-full flex justify-between items-center pb-4'>
             <div className='w-8 h-8'></div>
             <div className='text-lg'>Add task</div>
-            <Link href={pathname.slice(-1 * '?showAddTask:true'.length)} >
+            <Link href={pathname.slice(-1 * '?addTask:true'.length)} >
                 <img src='../icons/close-black.svg' className='w-8 h-8'/>
             </Link>
         </div>

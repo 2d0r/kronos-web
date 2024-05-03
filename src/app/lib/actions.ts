@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import prisma from './db';
 import { Event, RepeatUnit, Task } from '@prisma/client';
 import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION, repeatUnitList } from './definitions';
-import { fetchMindsets, fetchTasksPrisma } from './data';
+import { fetchMindsets, fetchTasks } from './data';
 import { calculatePriorityScores } from './priorityScore';
 import { calculateTimeScore } from './time-score';
 import { v4 as uuidv4 } from 'uuid';
@@ -256,7 +256,7 @@ export async function updateTaskField(entryId: string, field: keyof Task, value:
 }
 
 export async function updatePriorityScores() {
-  const tasks = await fetchTasksPrisma();
+  const tasks = await fetchTasks();
   const mindsets = await fetchMindsets();
   const updatedTasks = calculatePriorityScores(tasks, mindsets);
   updatedTasks.forEach((task) => {
@@ -267,7 +267,7 @@ export async function updatePriorityScores() {
 }
 
 export async function updateTimeScores() {
-  const tasks = await fetchTasksPrisma();
+  const tasks = await fetchTasks();
   tasks.forEach((task) => {
     const timeScore = calculateTimeScore(task);
     updateTaskField(task.id, 'timeScore', timeScore);

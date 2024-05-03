@@ -16,6 +16,7 @@ export const MAX_OFFSET = 120;
 export const DEFAULT_MINDSET_LIST = [
     'restReward', 'survive', 'maintain', 'play', 'socialise', 'learn', 'create', 'selfChallenge', 'selfCare', 'achieve'
 ] as [string, ...string[]];
+export const NEUTRAL_MINDSET_COLOUR = '#C0C0C0';
 
 export const CARD_SCALES = {
     small: 1,
@@ -101,6 +102,12 @@ export type EventWithRelations = Prisma.EventGetPayload<{
     }
 }>
 
+export type MindsetWithRelations = Prisma.MindsetGetPayload<{
+    include: {
+        tasks: true
+    }
+}>
+
 export type CheckboxStatus = ('checked' | 'blank');
 
 // Enums
@@ -128,14 +135,6 @@ export let prismaEnums = {
 export type SearchParamProps = {
     searchParams: Record<string, string>;
 };
-
-export interface CardProps {
-    className?: string,
-    title: string,
-    subtitle?: string,
-    icon: string,
-    href?: Url,
-}
 
 export interface ITodo {
     _id: string
@@ -170,6 +169,6 @@ export interface ContainerProps {
 
 export interface URLSearchParamsKronos extends URLSearchParams {
     menu: boolean
-    showAddTask: boolean
+    addTask: boolean
     eventId: string
 }

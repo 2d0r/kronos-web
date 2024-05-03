@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import TimelineCard from '../ui/timeline-card';
 import { TaskWithRelations, URLSearchParamsKronos } from '../lib/definitions';
 import Button from '@/components/button';
-import { fetchMindsets, fetchTasksPrisma, fetchTasksWithRelations } from '../lib/data';
+import { fetchMindsets, fetchTasks, fetchTasksWithRelations } from '../lib/data';
 import TaskBrowser from '../ui/browse/task-browser';
 import { Mindset, Task } from '@prisma/client';
 import prisma from '../lib/db';

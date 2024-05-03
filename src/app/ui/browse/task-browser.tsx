@@ -64,9 +64,13 @@ const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tas
                             {/* <div className='pb-2'>{camelcaseToTitlecase(mindset)}</div> */}
                             
                             {sortedTasks.map(task => {
+                                const taskColour = mindsets.filter(el => el.id === task.mindsetId)[0].colour;
                                 return(
                                     <div key={task.id} className='flex gap-2 items-center'>
-                                        <Checkbox type={task.type} taskId={task.id} status={task.status} onTaskStatusUpdated={handleTaskStatusUpdated}/>
+                                        <Checkbox type={task.type} taskId={task.id} status={task.status} 
+                                            onTaskStatusUpdated={handleTaskStatusUpdated}
+                                            fill={taskColour}
+                                        />
                                         <span>{task.name}</span>
                                     </div>
                                 );
@@ -80,8 +84,12 @@ const TaskBrowser: FC<{tasks: TaskWithRelations[], mindsets: Mindset[]}> = ({tas
                     return (
                         <div className='flex gap-2 w-full items-start justify-start'>
                             {sortedTasks.map((task, idx) => {
+                                const taskColour = mindsets.filter(el => el.id === task.mindsetId)[0].colour;
                                 return(
-                                    <div key={task.id} className='flex flex-col items-center justify-start gap-2 w-[200px] p-4 rounded-lg bg-violet-600 text-white'>
+                                    <div key={task.id} 
+                                        className='flex flex-col items-center justify-start gap-2 w-[200px] p-4 rounded-lg text-white'
+                                        style={{ background: taskColour }}
+                                    >
                                         <Checkbox type={task.type} status={task.status} taskId={task.id} fill='white' width='36' height='36'
                                             onTaskStatusUpdated={handleTaskStatusUpdated}
                                         />

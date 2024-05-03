@@ -5,18 +5,19 @@ import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { SearchParamProps, URLSearchParamsKronos } from '../../lib/definitions';
 
-export default function AddTaskButton({searchParams}: {searchParams: URLSearchParamsKronos}) {
+export default function AddTaskButton({searchParams, mindsetColour}: {searchParams: URLSearchParamsKronos, mindsetColour?: string}) {
     const pathname = usePathname();
     const [showAddTask, setShowAddTask] = useState(false);
 
     useEffect(() => {
-        setShowAddTask(searchParams?.showAddTask ? true : false);
-    }, [searchParams?.showAddTask]);
+        setShowAddTask(searchParams?.addTask ? true : false);
+    }, [searchParams?.addTask]);
 
     return (
         <Link
-            href={showAddTask ? pathname.slice(-1 * '?showAddTask=true'.length) : `${pathname}?showAddTask=true`}
-            className='bottom-[2vh] right-[2vw] w-10 h-10 text-white bg-violet-600 rounded-full flex items-center justify-center'
+            href={showAddTask ? pathname.slice(-1 * '?addTask=true'.length) : `${pathname}?addTask=true`}
+            className='bottom-[2vh] right-[2vw] w-10 h-10 text-white rounded-full flex items-center justify-center'
+            style={{ background: mindsetColour }}
         >
             <img src={showAddTask ? '../icons/close.svg' : '../icons/add.svg'} 
                 className='w-8 h-8'/>

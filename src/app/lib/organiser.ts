@@ -4,7 +4,7 @@ import React from 'react';
 import prisma from './db';
 import { addDaysToDate, addMinutesToDate, minutesBetweenDates } from '../utils/dateUtils';
 import { MINIMUM_TRANSITION, MIN_TASK_DURATION } from './definitions';
-import { allTasksHaveActiveEvents, fetchMindsets, fetchTasksPrisma } from './data';
+import { allTasksHaveActiveEvents, fetchMindsets, fetchTasks } from './data';
 import { calculatePriorityScores } from './priorityScore';
 import { Task, Event } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
@@ -72,7 +72,7 @@ export async function organiseWeek() {
 
     // console.log(timeGaps); // ✅
 
-    const tasks = await fetchTasksPrisma();
+    const tasks = await fetchTasks();
     const mindsets = await fetchMindsets();
 
     const scheduledTaskIds = await prisma.event.findMany({

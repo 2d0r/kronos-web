@@ -1,17 +1,17 @@
-import { sql } from '@vercel/postgres';
-import { unstable_noStore as noStore, revalidatePath } from 'next/cache';
 import {
+  MindsetWithRelations,
+  EventWithRelations,
   TaskWithRelations,
-    User,
+  NEUTRAL_MINDSET_COLOUR,
 } from './definitions';
 import prisma from './db';
-import { calculatePriorityScores } from './priorityScore';
-import { Mindset, Task } from '@prisma/client';
-import { Emilys_Candy } from 'next/font/google';
-import { createEventPrisma } from './actions';
+import { Event, Task } from '@prisma/client';
+import { addHours } from 'date-fns';
 
 
-export async function fetchTasksPrisma() {
+// Tasks
+
+export async function fetchTasks() {
   try {
       const allTasks = await prisma.task.findMany();
       return allTasks;
@@ -24,7 +24,7 @@ export async function fetchTasksPrisma() {
 
 export async function fetchTasksWithRelations() {
   try {
-    const tasks = await prisma.task.findMany({
+    const tasks: TaskWithRelations[] = await prisma.task.findMany({
       include: { 
           tasksBefore: true,
           tasksAfter: true,
@@ -41,35 +41,26 @@ export async function fetchTasksWithRelations() {
   }
 }
 
-export async function fetchEvents() {
-  try {
-    const allEvents = await prisma.event.findMany();
-    return allEvents;
-} catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest events.');
-}
-}
-
 export async function getCurrentTask() {
   const now = new Date();
   try {
     const currentEvents = await prisma.event.findMany({
       where: {
         startTime: {
-          lt: now, // Start time is less than (before) now
+          lt: now, // Start time is less than now
         }, 
         endTime: {
-          gt: now, // End time is greater than (after) now 
+          gt: now, // End time is greater than now 
         },
       }, 
+      
       select: {
         taskId: true
       }
     });
     if (currentEvents.length > 0) {
       const currentEventsTaskIds = currentEvents.map(el => el.taskId);
-      const tasks = await fetchTasksPrisma();
+      const tasks = await fetchTasks();
       const currentTasks = tasks.filter(el => currentEventsTaskIds.includes(el.id))
         .sort((a,b) => (a.priorityScore - b.priorityScore));
       return currentTasks;
@@ -81,6 +72,51 @@ export async function getCurrentTask() {
     throw error;
   }
 }
+
+export async function allTasksHaveActiveEvents() {
+  const tasksWithoutActiveEvents = await prisma.task.findMany({
+    where: {
+      events: {
+        none: {}  // Filter for tasks where 'events' is empty
+      }
+    }
+  })
+  if (tasksWithoutActiveEvents.length === 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+// Events
+
+export async function fetchEvents() {
+  try {
+    const allEvents = await prisma.event.findMany();
+    return allEvents;
+  } catch (error) {
+      console.error('Database Error:', error);
+      throw new Error('Failed to fetch the latest events.');
+  }
+}
+
+export async function fetchEventsWithRelations() {
+  try {
+    const events: EventWithRelations[] = await prisma.event.findMany({
+        include: {
+            task: true
+        }
+    });
+    return events;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch the latest events with relations.');
+  }
+}
+
+
+// Mindsets
 
 export async function fetchMindsets() {
   try {
@@ -114,52 +150,30 @@ export async function getMindsetNames() {
         name: true,
       },
     });
-
     // Extract the 'name' values from the result
     const namesArray = mindsetNames.map((mindset) => mindset.name);
     return namesArray;
   } catch (error) {
     console.error('Error fetching mindsets:', error);
     throw error;
-  } finally {
-    await prisma.$disconnect(); // Disconnect the Prisma client when done
   }
 }
   
 export async function getMindsetById (id : string) {
   try {
-    const mindsetByID = await prisma.mindset.findUnique({
+    const mindset = await prisma.mindset.findUnique({
       where: {
         id: id
-      },
-      select: {
-        name: true
       }
     });
-    if (mindsetByID) {
-      return mindsetByID.name;
-    }
+    return mindset;
   } catch (error) {
       console.error('Error getting mindset by id:', id);
-      await prisma.$disconnect();
       process.exit(1);
   }
 }
 
-export async function allTasksHaveActiveEvents() {
-  const tasksWithoutActiveEvents = await prisma.task.findMany({
-    where: {
-      events: {
-        none: {}  // Filter for tasks where 'events' is empty
-      }
-    }
-  })
-  if (tasksWithoutActiveEvents.length === 0) {
-    return true;
-  } else {
-    return false;
-  }
-}
+
 
 export async function getTaskMindset(task: Task) {
   try {
@@ -175,7 +189,6 @@ export async function getTaskMindset(task: Task) {
     return taskMindset[0];
   } catch (error) {
     console.error('Error getting mindset of task:', task.name);
-    await prisma.$disconnect();
     process.exit(1);
   }
 }
@@ -195,4 +208,46 @@ export async function fetchMindsetList() {
     console.log('Failed to fetch mindset list', error);
     return [];
   }
+}
+
+export async function getEventMindset(event: Event) {
+  try {
+      const mindsets: MindsetWithRelations[] = await fetchMindsetsWithRelations();
+      const eventMindset = mindsets.filter(mindset => mindset.tasks.some(task => {
+        return Object.values(task).includes(event.taskId);
+      }))[0];
+    return eventMindset;
+  } catch (error) {
+    console.log('Failed to find event mindset', error);
+    process.exit(1);
+  }
+}
+
+export async function getCurrentMindsetColour() {
+  // Get nearest event with task
+  // Get its task id
+  const now = new Date();
+  try {
+    const nearestEvents: EventWithRelations[] = await prisma.event.findMany({
+      where: {
+        // startTime: {
+        //   lt: now, // Start time is less than now
+        // }, 
+        endTime: {
+          gt: now, // End time is greater than now 
+          // lt: addHours(now, 3)
+        },
+      }, 
+      include: {
+        task: true
+      },
+    });
+    const nearestMindsetId = nearestEvents[0].task.mindsetId;
+    const nearestMindset = await getMindsetById(nearestMindsetId);
+    return nearestMindset?.colour;
+  } catch (error) {
+    console.log('Failed to get mindset', error);
+  } 
+  
+  
 }
