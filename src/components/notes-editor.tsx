@@ -17,6 +17,7 @@ import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
 import TextStyle from '@tiptap/extension-text-style';
 import Toolbar from '@/components/toolbar';
+import Placeholder from '@tiptap/extension-placeholder';
 
 const NotesEditor: FC<{ 
   notes: string, 
@@ -52,6 +53,10 @@ const NotesEditor: FC<{
           levels: [3]
         }
       }),
+      Placeholder.configure({
+        // Use a placeholder:
+        placeholder: 'Add notes...',
+      }),
     ],
     content: notes || '',
     editorProps: {
@@ -70,19 +75,19 @@ const NotesEditor: FC<{
   const [ showToolbar, setShowToolbar ] = useState<boolean>(false);
   const handleNotesBlur = (event: React.ChangeEvent<HTMLDivElement>) => {
     setShowToolbar(false);
+    console.log('show toolbar', false);
   }
   const handleNotesSelect = (event: React.ChangeEvent<HTMLDivElement>) => {
     setShowToolbar(true);
+    console.log('show toolbar', true);
   }
 
-  return (<>
-    <Toolbar editor={editor} hidden={!showToolbar} />
+  return (<div onFocus={handleNotesSelect} onBlur={handleNotesBlur}>
+    <Toolbar editor={editor} />
     <EditorContent editor={editor} 
-      className='p-3 pt-4 focus-visible:!border-none focus-visible:!outline-none focus:!ring-transparent text-left'
-      onFocus={handleNotesSelect}
-      onBlur={handleNotesBlur}
+      className='p-4 focus-visible:!border-none focus-visible:!outline-none focus:!ring-transparent text-left'
     />
-  </>);
+  </div>);
 }
 
 export default NotesEditor;

@@ -13,6 +13,7 @@ import { Task, Event } from '@prisma/client';
 import { dateToHHMM, minutesBetweenDates, minutesToDisplayDuration } from '@/app/utils/dateUtils';
 import { adjustLightness } from '@/app/utils/colourUtils';
 import NotesEditor from '@/components/notes-editor';
+import ChecklistEditor from '@/components/checklist-editor';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
     const showAddTask = searchParams?.addTask;
@@ -35,16 +36,9 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         {showMenu && <Menu />}
         <div className='w-full h-full content-center justify-center flex flex-row text-center'>
             {/* Left area */}
-            <div className='h-full w-1/3 flex flex-col items-end justify-center overflow-hidden'>
-                <div className={clsx(wireCard, 'w-5/6')}>
+            <div className='h-full w-1/3 flex flex-col items-end justify-center'>
+                <div className={clsx(wireCard, 'w-5/6 min-h-24 max-h-3/2 my-16 overflow-scroll')}>
                     <NotesEditor notes={currentTask.notes || ''} taskId={currentTask.id}/>
-                    {/* <textarea 
-                        
-                        placeholder={'Add notes'}
-                    /> */}
-                    {/* <MarkdownEditor taskNotes={currentTask.notes || ''} taskId={currentTask.id}
-                        className='w-full bg-transparent border-0 placeholder:text-white/40 focus:outline-none focus:outline-0'
-                    /> */}
                 </div>
             </div>
             {/* Central widget */}
@@ -69,12 +63,13 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             {/* Right area */}
             <div className='h-full w-1/3 flex flex-col items-start justify-center'>
                 <div className={clsx(
-                    wireCard, 'p-3 w-5/6'
+                    wireCard, 'p-4 w-5/6 min-h-24'
                 )}>
-                    <textarea 
+                    {/* <textarea 
                         className='w-full bg-transparent border-0 placeholder:text-white/40 focus:outline-none focus:outline-0'
                         placeholder={'Add item'}
-                    />
+                    /> */}
+                    <ChecklistEditor checklist={currentTask.checklist || ''} taskId={currentTask.id} />
                 </div>
             </div>
         </div>

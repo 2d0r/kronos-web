@@ -246,11 +246,9 @@ export async function updateTaskField(entryId: string, field: keyof Task, value:
           [field]: value
         }
     });
-    await prisma.$disconnect();
   } catch (error) {
       console.error('Failed to find and update task with id:', entryId, error);
       // throw new Error('Failed to fetch the latest tasks.');
-      await prisma.$disconnect();
       process.exit(1);
   }
 }
