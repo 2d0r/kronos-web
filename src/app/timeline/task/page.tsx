@@ -1,4 +1,4 @@
-import { fetchEventsWithRelations, getEventMindset } from '@/app/lib/data';
+import { fetchEventsWithRelations, fetchMindsets, getEventMindset } from '@/app/lib/data';
 import { URLSearchParamsKronos } from '@/app/lib/definitions';
 import { whiteGlassBg, wireCard } from '@/app/lib/styles';
 import BottomBar from '@/app/ui/bottom-bar';
@@ -12,33 +12,39 @@ import React from 'react';
 import { Task, Event } from '@prisma/client';
 import { dateToHHMM, minutesBetweenDates, minutesToDisplayDuration } from '@/app/utils/dateUtils';
 import { adjustLightness } from '@/app/utils/colourUtils';
+import NotesEditor from '@/components/notes-editor';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
-    const events = await fetchEventsWithRelations();
-    const eventQueue = events.filter(event => event.endTime >= new Date());
-    const taskQueue = eventQueue.map(event => event.task as Task);
     const showAddTask = searchParams?.addTask;
     const showMenu = searchParams?.menu;
-    const[currentEvent, nextEvent] = eventQueue.length > 1 ? eventQueue : [eventQueue[0], {} as Event];
+
+    const events = await fetchEventsWithRelations();
+    const eventQueue = events.filter(event => event.endTime >= new Date());
+    const [currentEvent, nextEvent] = eventQueue.length > 1 ? eventQueue : [eventQueue[0], {} as Event];
+    const taskQueue = eventQueue.map(event => event.task as Task);
+    const currentTask = taskQueue[0];
     const eventMindset = await getEventMindset(currentEvent);
+    const mindsets = await fetchMindsets();
 
     return (<div className='w-screen h-screen text-white flex justify-center'
         style={{
             backgroundImage: `linear-gradient(to bottom left, ${adjustLightness(eventMindset.colour, 0.2)}, ${adjustLightness(eventMindset.colour, -0.2)})`
         }}>
         <TopBar searchParams={searchParams}/>
-        {showAddTask && <CreateTask />}
+        {showAddTask && <CreateTask mindsets={mindsets}/>}
         {showMenu && <Menu />}
         <div className='w-full h-full content-center justify-center flex flex-row text-center'>
             {/* Left area */}
-            <div className='h-full w-1/3 flex flex-col items-end justify-center'>
-                <div className={clsx(
-                        wireCard, 'p-3 w-5/6'
-                    )}>
-                        <textarea 
-                            className='w-full bg-transparent border-0 placeholder:text-white/40 focus:outline-none focus:outline-0'
-                            placeholder={'Add notes'}
-                        />
+            <div className='h-full w-1/3 flex flex-col items-end justify-center overflow-hidden'>
+                <div className={clsx(wireCard, 'w-5/6')}>
+                    <NotesEditor notes={currentTask.notes || ''} taskId={currentTask.id}/>
+                    {/* <textarea 
+                        
+                        placeholder={'Add notes'}
+                    /> */}
+                    {/* <MarkdownEditor taskNotes={currentTask.notes || ''} taskId={currentTask.id}
+                        className='w-full bg-transparent border-0 placeholder:text-white/40 focus:outline-none focus:outline-0'
+                    /> */}
                 </div>
             </div>
             {/* Central widget */}

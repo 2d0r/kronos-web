@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 
 const BulletListSVG: FC<{
-    fill?: string, width?: string, height?: string
-}> = ({fill = 'white', width, height}) => {
-    return (<svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+    fill?: string, width?: string, height?: string, size?: number
+}> = ({fill = 'white', width, height, size}) => {
+    return (<svg width={width} height={height} viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
         <mask id="mask0_322_2079" style={{maskType: 'alpha'}} maskUnits="userSpaceOnUse" x="0" y="0" width="25" height="25">
         <rect x="0.761719" y="0.903206" width="24" height="24" fill={fill}/>
         </mask>

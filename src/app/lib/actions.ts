@@ -316,3 +316,18 @@ export async function scheduleEventForTask(task: Task, startTime: Date, duration
 
   return eventToSchedule as Event;
 }
+
+export async function updateTaskNotes(notes: string, taskId: string) {
+  try {
+    const updateTaskNotes = await prisma.task.update({
+      where: {
+        id: taskId,
+      },
+      data: {
+        notes: notes
+      }
+    });
+  } catch (error) {
+    console.log('Failed to update task notes for task:', taskId);
+  }
+}

@@ -50,7 +50,7 @@ model Task {
   totalDuration            Int?
   totalRepetitions         Int?
   endRepeatDate            DateTime?
-  notes                    String?
+  notes                    String?     
   tasksBefore              Task[]      @relation("TaskCausality")
   tasksAfter               Task[]      @relation("TaskCausality")
   tasksRightBefore         Task[]      @relation("TaskChain")
