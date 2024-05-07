@@ -14,6 +14,7 @@ import { dateToHHMM, minutesBetweenDates, minutesToDisplayDuration } from '@/app
 import { adjustLightness } from '@/app/utils/colourUtils';
 import NotesEditor from '@/components/notes-editor';
 import ChecklistEditor from '@/components/checklist-editor';
+import CircleTimer from '@/components/circle-timer';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
     const showAddTask = searchParams?.addTask;
@@ -49,14 +50,15 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
                         <div className='text-3xl'>{currentEvent.name}</div>
                         <div className='text-sm'>{minutesToDisplayDuration(minutesBetweenDates(currentEvent.startTime, currentEvent.endTime))}</div>
                     </div>
-                    <div className={`border-[10px] border-white rounded-full w-5/6 aspect-square
+                    <CircleTimer duration={minutesBetweenDates(currentEvent.startTime, currentEvent.endTime)}/>
+                    {/* <div className={`border-[10px] border-white rounded-full w-5/6 aspect-square
                         flex flex-col items-center justify-center gap-1
                         `}
                     >
                         <div className='text-3xl'>2h</div>
                         <div className='text-xs'>LEFT</div>
-                    </div>
-                    <TransportControls eventId={currentEvent.id} mindsetColour={eventMindset.colour} context='taskPage' className='w-5/6'/>
+                    </div> */}
+                    {/* <TransportControls eventId={currentEvent.id} mindsetColour={eventMindset.colour} context='taskPage' className='w-5/6'/> */}
                 </div>
                 <div>{currentEvent ? dateToHHMM(currentEvent.endTime) : ''}</div>
             </div>

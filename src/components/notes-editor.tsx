@@ -1,14 +1,12 @@
 'use client';
 
 import { useEditor, EditorContent, type Editor } from '@tiptap/react';
+import { FC, ReactElement, useState } from 'react';
+import { updateTaskNotes } from '@/app/lib/actions';
+import '@/app/globals.css';
 import StarterKit from '@tiptap/starter-kit';
 import Strike from '@tiptap/extension-strike';
 import Heading from '@tiptap/extension-heading';
-import Bulletlist from '@tiptap/extension-bullet-list';
-import { FC, ReactElement, useState } from 'react';
-import { updateTaskNotes } from '@/app/lib/actions';
-import clsx from 'clsx';
-import '@/app/globals.css';
 import { Color } from '@tiptap/extension-color';
 import BulletList from '@tiptap/extension-bullet-list';
 import Document from '@tiptap/extension-document';
@@ -32,17 +30,17 @@ const NotesEditor: FC<{
       // TextStyle.configure({ types: [ListItem.name] }),
       Text,
       StarterKit.configure({
-        bulletList: {
-          itemTypeName: 'listItem',
-          keepMarks: false,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
-        },
+        // bulletList: {
+        //   itemTypeName: 'listItem',
+        //   keepMarks: false,
+        //   keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+        // },
         orderedList: {
           keepMarks: true,
           keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
         },
       }),
-      Bulletlist.configure({
+      BulletList.configure({
         keepAttributes: false
       }),
       ListItem,

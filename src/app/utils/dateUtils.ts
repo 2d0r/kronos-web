@@ -124,13 +124,31 @@ export function dateToDDMMYYYY (date: Date) {
     return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
 }
 
-export function minutesToDisplayDuration (durationMinutes: number) {
+export function minutesToDisplayDuration (durationMinutes: number, displaySeconds: boolean = false) {
     const hours = Math.floor(durationMinutes / 60);
-    const minutes = durationMinutes - hours * 60;
-    const minutesDisplay = minutes > 0 ? ` ${minutes} min` : '';
     const hoursPlural = hours === 1 ? '' : 's';
+    const hoursDisplay = hours > 0 ? `${hours} hr${hoursPlural}` : '';
+
+    const minutes = Math.floor(durationMinutes - hours * 60);
+    const minutesDisplay = minutes > 0 ? ` ${minutes} min` : '';
     // const minutesPlural = minutes - (minutes / 60 % 1) === 1 ? '' : 's';
-    return `${hours} hr${hoursPlural}${minutesDisplay}`;
+
+    const seconds = Math.floor((durationMinutes - hours * 60 - minutes) * 60);
+    const secondsDisplay = displaySeconds ? seconds > 0 ? ` ${seconds} s` : '' : '';
+
+    return `${hoursDisplay}${minutesDisplay}${secondsDisplay}`;
+}
+
+export function minutesToTimerDisplay (durationMinutes: number) {
+    const hours = Math.floor(durationMinutes / 60);
+    const hoursDisplay = hours > 0 ? `${String(hours).padStart(2, '0')}:` : '';
+
+    const minutes = Math.floor(durationMinutes - hours * 60);
+    const minutesDisplay = minutes > 0 ? `${String(minutes).padStart(2, '0')}:` : '';
+
+    const seconds = Math.floor((durationMinutes - hours * 60 - minutes) * 60);
+
+    return `${hoursDisplay}${minutesDisplay}${String(seconds).padStart(2, '0')}`;
 }
 
 export function dateToHHMM (date: Date) {

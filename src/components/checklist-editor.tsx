@@ -9,7 +9,6 @@ import Text from '@tiptap/extension-text';
 import Placeholder from '@tiptap/extension-placeholder';
 import { EditorContent, useEditor } from '@tiptap/react';
 import React, { FC } from 'react';
-import StarterKit from '@tiptap/starter-kit';
 
 const CustomDocument = Document.extend({
   content: 'taskList',
@@ -40,7 +39,6 @@ const ChecklistEditor: FC<{
         Text,
         TaskList,
         CustomTaskItem,
-        StarterKit,
         Placeholder.configure({
             // Use a placeholder:
             placeholder: 'Add items',
