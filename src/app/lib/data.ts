@@ -32,6 +32,8 @@ export async function fetchTasksWithRelations() {
           tasksRightAfter: true,
           tasksParent: true,
           tasksChild: true,
+          mindset: true,
+          events: true,
       } // Include the subtasks relation
     }); 
     return tasks;

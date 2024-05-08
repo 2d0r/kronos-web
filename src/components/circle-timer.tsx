@@ -6,7 +6,8 @@ import PlaySVG from '@/app/ui/svg/play-svg';
 import ShuffleSVG from '@/app/ui/svg/shuffle-svg';
 import { minutesToDisplayDuration, minutesToTimerDisplay } from '@/app/utils/dateUtils';
 import clsx from 'clsx';
-import { Link, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
+import Link from 'next/link';
 import { FC, useState } from 'react';
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
@@ -62,9 +63,11 @@ const CircleTimer:FC<{
             {renderTime}
         </CountdownCircleTimer>
         <div className='w-full max-w-[400px] px-6 flex justify-between items-center'>
-            <div className='cursor-pointer ' onClick={handleExit}>
-                <img src='../icons/close.svg' className='h-8 w-8' />
-            </div>
+            <Link href='/timeline'>
+                <div className='cursor-pointer ' onClick={handleExit}>
+                    <img src='../icons/close.svg' className='h-8 w-8' />
+                </div>
+            </Link>
             <div className='cursor-pointer' onClick={handlePlayPause}>
                 { playing ? <PauseSVG /> : <PlaySVG /> }
             </div>

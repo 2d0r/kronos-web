@@ -141,14 +141,15 @@ export function minutesToDisplayDuration (durationMinutes: number, displaySecond
 
 export function minutesToTimerDisplay (durationMinutes: number) {
     const hours = Math.floor(durationMinutes / 60);
-    const hoursDisplay = hours > 0 ? `${String(hours).padStart(2, '0')}:` : '';
+    const hoursDisplay = hours > 0 ? `${String(hours)}:` : '';
 
     const minutes = Math.floor(durationMinutes - hours * 60);
     const minutesDisplay = minutes > 0 ? `${String(minutes).padStart(2, '0')}:` : '';
 
     const seconds = Math.floor((durationMinutes - hours * 60 - minutes) * 60);
+    const secondsDisplay = minutes > 0 || hours > 0 ? String(seconds).padStart(2, '0') : String(seconds);
 
-    return `${hoursDisplay}${minutesDisplay}${String(seconds).padStart(2, '0')}`;
+    return `${hoursDisplay}${minutesDisplay}${secondsDisplay}`;
 }
 
 export function dateToHHMM (date: Date) {

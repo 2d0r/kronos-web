@@ -93,6 +93,8 @@ export type TaskWithRelations = Prisma.TaskGetPayload<{
         tasksRightAfter: true,
         tasksParent: true,
         tasksChild: true,
+        mindset: true,
+        events: true,
     }
 }>
 

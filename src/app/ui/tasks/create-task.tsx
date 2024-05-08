@@ -76,7 +76,7 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
         <div className='w-full flex justify-between items-center pb-4'>
             <div className='w-8 h-8'></div>
             <div className='text-lg'>Add task</div>
-            <Link href={pathname.slice(-1 * '?addTask:true'.length)} >
+            <Link href={pathname} >
                 <img src='../icons/close-black.svg' className='w-8 h-8'/>
             </Link>
         </div>

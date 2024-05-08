@@ -1,5 +1,5 @@
 import { fetchEventsWithRelations, fetchMindsets, getEventMindset } from '@/app/lib/data';
-import { URLSearchParamsKronos } from '@/app/lib/definitions';
+import { TaskWithRelations, URLSearchParamsKronos } from '@/app/lib/definitions';
 import { whiteGlassBg, wireCard } from '@/app/lib/styles';
 import BottomBar from '@/app/ui/bottom-bar';
 import Menu from '@/app/ui/menu';
@@ -23,9 +23,10 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
     const events = await fetchEventsWithRelations();
     const eventQueue = events.filter(event => event.endTime >= new Date());
     const [currentEvent, nextEvent] = eventQueue.length > 1 ? eventQueue : [eventQueue[0], {} as Event];
-    const taskQueue = eventQueue.map(event => event.task as Task);
+    const taskQueue = eventQueue.map(event => event.task as TaskWithRelations);
     const currentTask = taskQueue[0];
     const eventMindset = await getEventMindset(currentEvent);
+    const nextEventMindset = await getEventMindset(nextEvent);
     const mindsets = await fetchMindsets();
 
     return (<div className='w-screen h-screen text-white flex justify-center'
@@ -77,7 +78,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         </div>
         {/* Next task */}
         {(eventQueue.length > 1 && minutesBetweenDates(new Date(), nextEvent.startTime) < 30) && 
-            <EventCard event={nextEvent} task={taskQueue[1]} nextTask={true}  className='fixed bottom-[-10px] mb-[-45px] drop-shadow-2xl drop-shadow-white'/>
+            <EventCard event={nextEvent} task={taskQueue[1]} mindset={nextEventMindset} nextTask={true}  className='fixed bottom-[-10px] mb-[-45px] drop-shadow-2xl drop-shadow-white'/>
         }
         <BottomBar searchParams={searchParams}/>
     </div> 

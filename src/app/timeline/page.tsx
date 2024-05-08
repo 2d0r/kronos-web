@@ -13,6 +13,9 @@ import { adjustLightness } from '../utils/colourUtils';
 import SearchBar from '../ui/search';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
+    const showAddTask = searchParams?.addTask;
+    const showMenu = searchParams?.menu;
+
     const mindsets = await fetchMindsets();
     const events: EventWithRelations[] = await prisma.event.findMany({
         include: {
@@ -21,9 +24,11 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
     });
     const eventQueue = events.filter(event => event.startTime > new Date());
     const taskQueue = eventQueue.map(event => event.task as Task);
-    const showAddTask = searchParams?.addTask;
-    const showMenu = searchParams?.menu;
+    
     const mindsetColour = await getCurrentMindsetColour() || NEUTRAL_MINDSET_COLOUR;
+    const mindsetQueue = taskQueue.map(task => {
+        return mindsets.filter(el => el.id === task.mindsetId)[0];
+    })
 
     return (<div className='w-screen h-screen' style={{
         backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour, 0.5)}, ${adjustLightness(mindsetColour, 0.7)})`
@@ -37,7 +42,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             {eventQueue.length > 0 && 
                 <div className='w-full items-center justify-center flex flex-col gap-4'>
                     {!showMenu && (<>
-                        <EventCard event={eventQueue[0]} task={taskQueue[0]} />
+                        <EventCard event={eventQueue[0]} task={taskQueue[0]} mindset={mindsetQueue[0]} expand={true} />
                         <TransportControls eventId={eventQueue[0].id} mindsetColour={mindsetColour} context='timeline'/>
                     </>)}
                 </div>
@@ -45,7 +50,8 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             {(eventQueue.length > 1) &&
                 <EventCard nextTask={true}
                     event={showMenu ? eventQueue[0] : eventQueue[1]} 
-                    task={showMenu ? eventQueue[0].task : eventQueue[1].task} />
+                    task={showMenu ? eventQueue[0].task : eventQueue[1].task}
+                    mindset={showMenu ? mindsetQueue[0] : mindsetQueue[1]} />
             }
 
         </div>
