@@ -6,6 +6,7 @@ import { FC, useEffect, useState } from 'react';
 import { SearchParamProps, ContainerProps, URLSearchParamsKronos } from '../lib/definitions';
 import { useRouter } from 'next/navigation';
 import { URLSearchParams } from 'url';
+import Menu from './menu';
 
 interface TopBarProps {
     children?: JSX.Element; // Or a more specialized type
@@ -33,9 +34,15 @@ const TopBar: FC<TopBarProps> = ({children, searchParams, back}) => {
             <img src='../icons/back.svg' className='w-8 h-8'/>
         </button> : <div className='w-8 h-8'></div>}
         {children}
+        {pathname.endsWith('/timeline') ? 
         <Link className='top-[2vh] right-[2vw]' href={showMenu ? pathname : `${pathname}?menu=true`} onClick={handleMenuClick}>
             <img src={showMenu ? '../icons/close.svg' : '../icons/menu.svg'} className='w-8 h-8'/>
-        </Link>
+        </Link> :
+        <div onClick={handleMenuClick} className='cursor-default' >
+            <img src={showMenu ? '../icons/close.svg' : '../icons/menu.svg'} className='w-8 h-8'/>
+            {showMenu && <Menu onBlur={handleMenuClick} />}
+        </div>}
+        
     </div>);
 }
 

@@ -52,14 +52,6 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
                         <div className='text-sm'>{minutesToDisplayDuration(minutesBetweenDates(currentEvent.startTime, currentEvent.endTime))}</div>
                     </div>
                     <CircleTimer duration={minutesBetweenDates(currentEvent.startTime, currentEvent.endTime)}/>
-                    {/* <div className={`border-[10px] border-white rounded-full w-5/6 aspect-square
-                        flex flex-col items-center justify-center gap-1
-                        `}
-                    >
-                        <div className='text-3xl'>2h</div>
-                        <div className='text-xs'>LEFT</div>
-                    </div> */}
-                    {/* <TransportControls eventId={currentEvent.id} mindsetColour={eventMindset.colour} context='taskPage' className='w-5/6'/> */}
                 </div>
                 <div>{currentEvent ? dateToHHMM(currentEvent.endTime) : ''}</div>
             </div>
@@ -68,10 +60,6 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
                 <div className={clsx(
                     wireCard, 'p-4 w-5/6 min-h-24'
                 )}>
-                    {/* <textarea 
-                        className='w-full bg-transparent border-0 placeholder:text-white/40 focus:outline-none focus:outline-0'
-                        placeholder={'Add item'}
-                    /> */}
                     <ChecklistEditor checklist={currentTask.checklist || ''} taskId={currentTask.id} />
                 </div>
             </div>

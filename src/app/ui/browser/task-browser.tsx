@@ -8,6 +8,7 @@ import '@/app/globals.css';
 import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/app/utils/dateUtils';
 import Checkbox from '../buttons/checkbox';
 import { getTaskColour } from '@/app/utils/taskUtils';
+import { adjustLightness } from '@/app/utils/colourUtils';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
@@ -191,27 +192,24 @@ const TaskBrowser: FC<{
             {/* <div className='bg-gray-100 w-full'> */}
             <div className='flex gap-4 items-center justify-center'>
                 <button 
-                    className='border rounded-md p-2 focus:text-white'
+                    className='p-2 focus:text-white uppercase text-sm font-medium'
                     style={{
-                        background: taskTypeFilter === 'goal' ? mindsetColour : 'transparent',
-                        color: taskTypeFilter === 'goal' ? 'white' : mindsetColour,
+                        color: taskTypeFilter === 'goal' ? mindsetColour : adjustLightness(mindsetColour, 0.5),
                         borderColor: mindsetColour,
                     }}
                     onClick={() => handleTaskTypeFilter('goal')}
                 >Goals</button>
                 <button 
-                    className='border rounded-md p-2 focus:text-white'
+                    className='p-2 focus:text-white uppercase text-bold text-sm font-medium'
                     style={{
-                        background: taskTypeFilter === 'project' ? mindsetColour : 'transparent',
-                        color: taskTypeFilter === 'project' ? 'white' : mindsetColour,
+                        color: taskTypeFilter === 'project' ? mindsetColour : adjustLightness(mindsetColour, 0.5) ,
                         borderColor: mindsetColour,
                     }}
                     onClick={() => handleTaskTypeFilter('project')}>Projects</button>
                 <button 
-                    className='border rounded-md p-2 focus:text-white'
+                    className='p-2 focus:text-white uppercase text-bold text-sm font-medium'
                     style={{
-                        background: taskTypeFilter === 'task' ? mindsetColour : 'transparent',
-                        color: taskTypeFilter === 'task' ? 'white' : mindsetColour,
+                        color: taskTypeFilter === 'task' ? mindsetColour : adjustLightness(mindsetColour, 0.5) ,
                         borderColor: mindsetColour,
                     }}
                     onClick={() => handleTaskTypeFilter('task')}>Tasks</button>

@@ -36,10 +36,10 @@ const CircleTimer:FC<{
       
         return (
           <div className='flex flex-col gap-1 items-center'>
-            <div className='h-8'></div>
+            <div className='h-4'></div>
             <div className='text-3xl'>{minutesToTimerDisplay(remainingTime / 60)}</div>
             {/* <div className="text">{remainingTime > 3600 ? 'h:mm:ss' : remainingTime > 60 ? 'mm:ss' : 'seconds'}</div> */}
-            <div className='h-8'>{playing ? ' ' : 'Paused'}</div>
+            <div className='h-8'>{playing ? 'Left' : 'Paused'}</div>
           </div>
         );
     };

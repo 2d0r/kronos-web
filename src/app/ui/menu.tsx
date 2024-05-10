@@ -12,7 +12,7 @@ import HistorySVG from './svg/history-svg';
 import SettingsSVG from './svg/settings-svg';
 import '@/app/globals.css';
 
-export default function Menu({mindsetColour = 'black'}: {mindsetColour?: string}) {
+export default function Menu({mindsetColour = 'black', onBlur}: {mindsetColour?: string, onBlur?: () => void}) {
     const pathname = usePathname();
 
     if (pathname.endsWith('/timeline')) {
@@ -40,9 +40,9 @@ export default function Menu({mindsetColour = 'black'}: {mindsetColour?: string}
             </div>
         </>);
     } else {
-        return (<>
+        return (<div className='absolute w-screen h-screen top-0 left-0'>
             <div className='absolute z-50 right-10 top-10 w-auto h-auto p-3 gap-1 flex flex-col text-black border-[0.5px] border-white rounded-3xl 
-                bg-gradient-to-br from-white to-white/50 backdrop-blur-lg shadow-lg'>
+                bg-gradient-to-br from-white to-white/50 backdrop-blur-lg shadow-lg' onBlur={onBlur} tabIndex={0}>
                 { !pathname.includes('/task') && <Link href={'/timeline'} className='menu-link'>Timeline</Link>}
                 <Link href={'/calendar'} className='menu-link'>Calendar</Link>
                 <Link href={'/browser'} className='menu-link'>Tasks & Projects</Link>
@@ -51,7 +51,7 @@ export default function Menu({mindsetColour = 'black'}: {mindsetColour?: string}
                 <Link href={pathname} className='menu-link'>Logbook</Link>
                 <Link href={pathname} className='menu-link'>Settings</Link>
             </div>
-        </>);
+        </div>);
     }
     
 }

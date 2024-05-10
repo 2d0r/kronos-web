@@ -47,11 +47,16 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
                     </>)}
                 </div>
             }
-            {(eventQueue.length > 1) &&
+            {(eventQueue.length > 1 && !showMenu) ?
                 <EventCard nextTask={true}
-                    event={showMenu ? eventQueue[0] : eventQueue[1]} 
-                    task={showMenu ? eventQueue[0].task : eventQueue[1].task}
-                    mindset={showMenu ? mindsetQueue[0] : mindsetQueue[1]} />
+                    event={eventQueue[1]} 
+                    task={eventQueue[1].task}
+                    mindset={mindsetQueue[1]} 
+                /> : showMenu ? <EventCard nextTask={true}
+                    event={eventQueue[0]} 
+                    task={eventQueue[0].task}
+                    mindset={mindsetQueue[0]} 
+                /> : <></>
             }
 
         </div>

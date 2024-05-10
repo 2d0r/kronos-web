@@ -17,7 +17,7 @@ export default async function Page({searchParams}: {searchParams: URLSearchParam
 
     return (<>
         <TimelineCard searchParams={searchParams} back={true}>
-            <TaskBrowser tasks={tasks} mindsets={mindsets} mindsetColour={adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR,  0.4)}/>
+            <TaskBrowser tasks={tasks} mindsets={mindsets} mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}/>
         </TimelineCard>
     </>);
 }
