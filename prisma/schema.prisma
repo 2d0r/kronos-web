@@ -49,7 +49,6 @@ model Task {
   endRepeat                Boolean     @default(false)
   totalDuration            Int?
   totalRepetitions         Int?
-  endRepeatDate            DateTime?
   notes                    String?
   checklist                String?     
   tasksBefore              Task[]      @relation("TaskCausality")

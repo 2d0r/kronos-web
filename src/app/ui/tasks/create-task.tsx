@@ -26,11 +26,12 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
     const [timespanList, setTimespanList] = useState<string[]>(timeSpanList);
     const [repeatTimespan, setRepeatTimespan] = useState<string>('');
     const [chosenRepeat, setChosenRepeat] = useState<string | null>(null);
-    const [endRepeat, setEndRepeat] = useState<string | null>(null);
+    const [endRepeat, setEndRepeat] = useState<(string | null)>('No');
     const [repeatUnit, setRepeatUnit] = useState<string | null>('sessions');
     const [selectedMindset, setSelectedMindset] = useState<string | null>(null);
     const [ inFocus, setInFocus ] = useState<string>('');
     const [ mindsetColour, setMindsetColour] = useState<string>(NEUTRAL_MINDSET_COLOUR);
+    const [ deadline, setDeadline ] = useState<boolean>(false);
 
     const handleTaskNameInput = (event : React.ChangeEvent<HTMLSelectElement>) => {
         setTaskName(event.target.value ? event.target.value : null);
@@ -72,7 +73,7 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
     
 
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-start justify-center overflow-y-scroll backdrop-blur-sm py-4'>
-    <div className='z-50 absolute top-1/3 rounded-2xl bg-white p-4 md:p-6 w-1/3 min-w-80 overflow-x-hidden shadow-2xl shadow-slate-500 text-black'>
+    <div className='z-50 absolute top-1/3 rounded-2xl bg-white p-4 md:p-6 w-1/3 min-w-80 overflow-x-hidden shadow-2xl shadow-slate-500 text-sm text-black'>
         <div className='w-full flex justify-between items-center pb-4'>
             <div className='w-8 h-8'></div>
             <div className='text-lg'>Add task</div>
@@ -88,24 +89,23 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
             //     // console.log('Preferred Day of Week:', formData.get('startTime')); 
             // }}
         >
-            <div className='flex flex-col justify-start gap-8'>
+            <div className='flex flex-col justify-start gap-6'>
                 <InputField 
                     fieldName='name'
                     placeholder='Enter task name'
                     inputType='string'
-                    className={`!border-0 !text-lg placeholder:text-lg pl-0`}
+                    className={`!border-0 !text-lg placeholder:text-lg pl-0 cursor-text !bg-transparent rounded-none`}
                     onChange={handleTaskNameInput}
                     colour={mindsetColour}
                 />
                 {taskName && 
-                    <Dropdown 
+                    <SelectionField 
                         fieldName='mindset'
-                        prompt='Select a mindset'
+                        prompt='Mindset'
                         list={mindsets.map(el => el.name)}
-                        defaultValue=''
                         onChange={handleMindsetSelect}
-                        label='Mindset'
                         colour={mindsetColour}
+                        type='radio'
                 />}
                 { selectedMindset !== null && (<>
                     {/* <SelectionField 
@@ -130,6 +130,7 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                         type='radio'
                         onChange={handleScheduledToggle}
                         colour={mindsetColour}
+                        collapse={false}
                     />}
                     {isScheduled === 'Scheduled' && (<>
                         <div className='flex items-center gap-2'>
@@ -191,6 +192,7 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                             type='radio'
                             onChange={handleRepeatToggle}
                             colour={mindsetColour}
+                            collapse={false}
                         />
                     </>
                     }
@@ -265,46 +267,79 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                         </>)}
                     </>)}
                     {chosenRepeat === 'Repeat' && (<>
-                        <div className={`divider h-[1px] w-full`} style={{background: mindsetColour}}></div>
-                        <SelectionField 
-                            fieldName='endRepeat'
-                            prompt='End Repeat?'
-                            list={['No', 'Yes']}
-                            type='radio'
-                            onChange={handleEndRepeatToggle}
-                            defaultSelected={['No']}
-                            colour={mindsetColour}
-                        />
+                        <div className={`divider h-[1px] w-full`} style={{background: 'black'}}></div>
+                        <div className='flex flex-col gap-2'>
+                            {/* <SelectionField 
+                                fieldName='endRepeat'
+                                prompt='End Repeat?'
+                                list={['No', 'Yes']}
+                                type='radio'
+                                onChange={handleEndRepeatToggle}
+                                defaultSelected={['No']}
+                                colour={mindsetColour}
+                            /> */}
+                            <button className='w-full flex mb-2'
+                                    onClick={() => {setEndRepeat(endRepeat === 'No' ? 'Yes' : 'No')}}
+                                    style={{color: ['No', null].includes(endRepeat) ? 'lightgrey' : 'black'}}
+                            >End repeat</button>
+                            {(chosenRepeat === 'Repeat' && endRepeat !== 'No' && endRepeat !== null) && (<>
+                                <div className='flex h-8 gap-2 items-center pl-2'>
+                                    <button 
+                                        onClick={() => {setEndRepeat(endRepeat === 'Date' ? 'Yes' : 'Date')}}
+                                        style={{color: endRepeat === 'Date' ? 'black' : 'lightgrey'}}
+                                    >On a date</button>
+                                    {endRepeat === 'Date' && <InputField 
+                                        fieldName='endRepeatDate'
+                                        placeholder='End repeat on date'
+                                        inputType='date'
+                                        colour={mindsetColour}
+                                    />}
+                                </div>
+                                <div className='flex h-8 gap-2 items-center text-left pl-2'>
+                                    <button 
+                                        onClick={() => {setEndRepeat(endRepeat === 'Duration' ? 'Yes' : 'Duration')}}
+                                        style={{color: endRepeat === 'Duration' ? 'black' : 'lightgrey'}}
+                                        className='text-left'
+                                    >After a total duration</button>
+                                    {endRepeat === 'Duration' && <InputField 
+                                        fieldName='totalDuration'
+                                        placeholder='Deadline'
+                                        inputType='number'
+                                        colour={mindsetColour}
+                                    />}
+                                </div>
+                                <div className='flex h-8 gap-2 items-center pl-2'>
+                                    <button 
+                                        onClick={() => {setEndRepeat(endRepeat === 'Repetitions' ? 'Yes' : 'Repetitions')}}
+                                        style={{color: endRepeat === 'Repetitions' ? 'black' : 'lightgrey'}}
+                                        className='text-left'
+                                    >After a number of repetitions</button>
+                                    {endRepeat === 'Repetitions' && <InputField 
+                                        fieldName='totalRepetitions'
+                                        placeholder=''
+                                        inputType='number'
+                                        colour={mindsetColour}
+                                    />}
+                                </div>
+                            </>)}
+                        </div>
                     </>)}
-                    {(chosenRepeat === 'Repeat' && endRepeat === 'Yes') && (<>
-                        <InputField 
-                            fieldName='totalDuration'
-                            placeholder='Total duration'
-                            inputType='number'
-                            colour={mindsetColour}
-                        />
-                        <InputField 
-                            fieldName='totalRepetitions'
-                            placeholder='Number of totalRepetitions'
-                            inputType='number'
-                            colour={mindsetColour}
-                        />
-                        <InputField 
-                            fieldName='endRepeatDate'
-                            placeholder='End repeat on date'
-                            inputType='date'
-                            colour={mindsetColour}
-                        />
-                    </>)}
+                    
                     {(isScheduled && chosenRepeat && chosenRepeat !== 'Repeat') && (<>
                         <div className={`divider h-[1px] w-full`} style={{background: mindsetColour}}></div>
-                        <InputField 
-                            fieldName='deadline'
-                            label='Deadline'
-                            placeholder='Enter deadline'
-                            inputType='date'
-                            colour={mindsetColour}
-                        />
+                        <div className='flex h-8 gap-2 items-center'>
+                            <button 
+                                onClick={() => {setDeadline(!deadline)}}
+                                style={{color: deadline ? 'black' : 'lightgrey'}}
+                                className='font-medium'
+                            >Deadline</button>
+                            {deadline && <InputField 
+                                fieldName='totalDuration'
+                                placeholder='Deadline'
+                                inputType='date'
+                                colour={mindsetColour}
+                            />}
+                        </div>
                     </>)}
                 </>)}
             </div>

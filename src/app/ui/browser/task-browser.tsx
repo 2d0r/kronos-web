@@ -135,7 +135,7 @@ const TaskBrowser: FC<{
                         <td>{task.priority}</td>
                         <td>{minutesToDisplayDuration(task.duration)}</td>
                         <td>{task.repeat === true ? `${task.repeatFrequency} / ${task.repeatTimespan}`: 'one time'}</td>
-                        <td>{task.endRepeatDate ? `on ${dateToDDMMYYYY(task.endRepeatDate)}` 
+                        <td>{task.deadline ? `on ${dateToDDMMYYYY(task.deadline)}` 
                             : task.totalDuration ? `after ${minutesToDisplayDuration(task.totalDuration)} hrs` 
                             : task.totalRepetitions ? `after ${task.totalRepetitions} reps`
                             : task.deadline ? `on ${dateToDDMMYYYY(task.deadline)}`
@@ -256,7 +256,7 @@ const TaskBrowser: FC<{
                     prompt=''
                     colour={mindsetColour}
                 />
-                <div className='border rounded-md flex items-center' style={{ borderColor: mindsetColour }}>
+                <div className='rounded-md flex items-center' style={{ backgroundColor: adjustLightness(mindsetColour, 0.95) }}>
                     <Dropdown 
                         fieldName='chooseMindset'
                         list={['Priority', 'Date', 'Duration']}

@@ -5,7 +5,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { camelcaseToTitlecase } from '@/app/utils/textUtils';
 import '@/app/globals.css';
 import { NEUTRAL_MINDSET_COLOUR } from '@/app/lib/definitions';
-import { adjustLightness } from '@/app/utils/colourUtils';
 
 function capitalise(text: string) {
     return text[0].toUpperCase() + text.slice(1);
@@ -42,10 +41,11 @@ export function InputField(
                     type={inputType}
                     className={clsx(
                         inputType === 'number' ? 'w-[60px]' : 'w-fit',
-                        'pr-4 cursor-pointer items-baseline text-sm rounded-lg border-0 outline-0 placeholder:text-gray-400 focus:!border-0 placeholder-slate-300',
+                        'p-2 cursor-pointer items-baseline rounded-lg border-[1px] text-sm outline-2 placeholder:text-gray-400 focus:!border-0',
                         className,
+                        `focus:!border-[${colour}]`
                     )}
-                    style={{ backgroundColor: adjustLightness(colour, 0.95) }}
+                    style={{borderColor: colour}}
                     placeholder={placeholder}
                     onChange={handleInput}
                     aria-describedby='task-error'
@@ -93,8 +93,8 @@ export function Dropdown (
             <select
                 id={fieldName}
                 name={fieldName}
-                className={`${className} peer block cursor-pointer rounded-lg border-none py-2 pl-4 text-sm outline-0 placeholder:text-gray-500 focus:![${colour}]`}
-                style={{ backgroundColor: adjustLightness(colour, 0.95) }}
+                className={`${className} peer block cursor-pointer rounded-lg border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 focus:![${colour}]`}
+                style={{borderColor: colour}}
                 defaultValue={defaultValue}
                 onChange={handleSelect}
                 aria-describedby='task-error'
@@ -120,15 +120,14 @@ export function Dropdown (
 }
 
 export function SelectionField( 
-    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], colour = NEUTRAL_MINDSET_COLOUR, collapse = true } : {
+    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], colour = NEUTRAL_MINDSET_COLOUR } : {
         fieldName: string,
         list: string[],
         prompt: string,
         type: string,
         onChange?: any,
         defaultSelected?: string[],
-        colour?: string,
-        collapse?: boolean,
+        colour?: string
     }
 ) {
     const [ selectedOptions, setSelectedOptions ] = useState<string[]>(defaultSelected);
@@ -148,27 +147,33 @@ export function SelectionField(
     const selectionList = list.map((item, idx) => {
         const checked = (type === 'radio' && selectedOptions[selectedOptions.length - 1] === item) ||
             (type === 'checkbox' && selectedOptions.includes(item));
-        const hidden = !checked && !isFocused && selectedOptions.length > 0 && collapse;
+        const hidden = !checked && !isFocused && selectedOptions.length > 0;
 
         return (<div 
-                className={clsx('flex items-center',
+                className={clsx('flex items-center border-y-none border-l-none border-r-[1px] last:border-r-0',
                     hidden && 'hidden'
-                )}
+                )} 
+                style={{ borderColor: colour }}
                 key={idx}>
                 <input
                     id={item}
                     name={fieldName}
                     type={type}
                     value={item}
-                    className={`opacity-0 absolute focus:!border-none`}
+                    className={`opacity-0 absolute focus:!border-[${colour}]`}
                     aria-describedby='task-error'
                     onChange={handleSelect}
                     checked={checked}
                 />
                 <label
                     htmlFor={item}
-                    className={'flex cursor-pointer items-center gap-1.5 pr-4 text-sm font-regular'}
-                    style={{ color: checked ? colour : adjustLightness(colour, 0.6) }}
+                    className={clsx(
+                        'customButton flex cursor-pointer items-center gap-1.5 p-2 text-sm font-medium',
+                    )}
+                    style={{ 
+                        background: checked ? colour : 'transparent',
+                        color: checked ? 'white' : colour,
+                    }}
                 >
                 {capitalise(item)}
                 </label>
@@ -183,9 +188,9 @@ export function SelectionField(
         <legend className='mb-2 text-sm font-medium'>
             {prompt}
         </legend>
-        <div className={`relative flex w-fit overflow-hidden`} 
+        <div className={`relative flex w-fit rounded-lg overflow-hidden border-[1px]`} 
             onMouseOver={handleFocus} onMouseOut={handleBlur}
-        >
+            style={{ borderColor: colour }}>
             {selectionList}
         </div>
         
@@ -229,8 +234,11 @@ export function MultiSelectionField(
             (type === 'checkbox' && selectedOptions.includes(item));
         const hidden = false;// if not selected and field is not in focus
         return (hidden ? <></> :
-            <div className='flex items-center overflow-hidden' 
-                style={{ color: colour }}
+            <div className={clsx(
+                className?.includes('multi-line') ? `border-[1px] rounded-lg` : `border-l-none border-y-none last:border-r-0`,
+                'flex items-center border-r-[1px], overflow-hidden'
+                )} 
+                style={className?.includes('multi-line') ? { borderColor: colour } : { borderRightColor: colour }}
                 key={idx}
             >
                 <input
@@ -238,14 +246,17 @@ export function MultiSelectionField(
                     name={fieldName}
                     type={type}
                     value={item}
-                    className={`hidden h-4 w-4 cursor-pointer bg-gray-100 text-gray-600 focus:ring-none focus:!border-0`}
+                    className={`hidden h-4 w-4 cursor-pointer bg-gray-100 text-gray-600 focus:ring-none focus:!border-[${colour}]`}
+                    style={{ borderColor: colour }}
                     aria-describedby='task-error'
                     onChange={handleSelect}
                 />
                 <label
                     htmlFor={item}
-                    className='flex cursor-pointer items-center gap-1.5 pr-4 text-sm font-regular'
-                    style={{ color: checked ? colour : adjustLightness(colour, 0.6)}}
+                    className={clsx(`flex cursor-pointer items-center gap-1.5 p-2 text-sm font-medium`,
+                        checked && `bg-[${colour}] text-white`
+                    )}
+                    style={checked ? {color: 'white', backgroundColor: colour} : {color: colour}}
                 >
                     {capitalise(item)}
                 </label>
@@ -256,7 +267,11 @@ export function MultiSelectionField(
         <legend className='mb-2 block text-sm font-medium'>
           {prompt}
         </legend>
-        <div className='w-fit rounded-lg bg-white overflow-hidden'>
+        <div className={clsx(
+            className?.includes('multi-line') && 'border-0',
+            `w-fit rounded-lg border bg-white overflow-hidden`
+        )} style={{ borderColor: colour }}
+        >
           <div className={clsx('flex',
             className?.includes('multi-line') && 'flex-wrap gap-2'
           )}>

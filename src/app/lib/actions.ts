@@ -16,7 +16,7 @@ const FormSchema = z.object({
   id: z.string(),
   name: z.string(),
   mindset: z.enum(DEFAULT_MINDSET_LIST, { invalid_type_error: 'Please select a valid mindset.' }),
-  status: z.enum(['toDo', 'inProgress', 'done'], { invalid_type_error: 'Please select a valid status.' }),
+  status: z.enum(['toDo', 'inProgress', 'done'], { invalid_type_error: 'Please select a valid status.' }).nullable(),
   priority: z.enum(['veryHigh', 'high', 'medium', 'low'], { invalid_type_error: 'Please select a valid priority.' }),
   startTime: z.string().nullable(),
   startDate: z.string().nullable(),
@@ -26,6 +26,7 @@ const FormSchema = z.object({
   // duration: z.array(z.number()).nullish(),
   durationHours: z.string().nullable(),
   durationMinutes: z.string().nullable(),
+  deadline: z.string().nullable(),
   repeat: z.coerce.boolean(),
   repeatUnit: z.enum(['sessions', 'minutes'], { invalid_type_error: 'Please select a valid Repeat Unit.' }).nullable(),
   repeatFrequency: z.string().nullable(),
@@ -54,6 +55,7 @@ export type State = {
     startDate?: string[];
     endTime?: string[];
     endDate?: string[];
+    deadline?: number[];
     idealStartTime?: string[];
     durationHours?: number[];
     durationMinutes?: number[];
@@ -89,6 +91,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     idealStartTime: formData.get('idealStartTime'),
     durationHours: formData.get('durationHours'),
     durationMinutes: formData.get('durationMinutes'),
+    deadline: formData.get('deadline'),
     repeat: formData.get('repeat'),
     repeatFrequency: formData.get('repeatFrequency'),
     repeatTimespan: formData.get('repeatTimespan'),
@@ -118,7 +121,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     repeat, repeatTimespanMultiplier, repeatFrequency, repeatTimespan,
     repeatUnit, repeatDurationHours, repeatDurationMinutes,
     preferredTimeOfDay, preferredDayOfWeek,
-    endRepeat, totalDuration, totalRepetitions, endRepeatDate
+    endRepeat, totalDuration, totalRepetitions, endRepeatDate, deadline,
   } = validatedFields.data;
   // Merge start date and time; Also end date and time
   const startDateTime = (startDate && startTime) ? new Date(`${startDate}T${startTime}:00`) :
@@ -145,7 +148,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     await prisma.task.create({
       data: {
         name: name,
-        status: status,
+        status: status || 'toDo',
         mindsetId: matchingMindset.id,
         priority: priority,
         startTime: startDateTime,
@@ -161,7 +164,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         endRepeat: Boolean(endRepeat),
         totalDuration: totalDuration,
         totalRepetitions: totalRepetitions,
-        endRepeatDate: endRepeatDate
+        deadline: deadline !== null ? deadline : endRepeatDate,
       },
     });
   } catch (error) {
