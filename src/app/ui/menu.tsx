@@ -30,10 +30,10 @@ export default function Menu({mindsetColour = 'black', onBlur}: {mindsetColour?:
                     <StatsSVG fill={mindsetColour} height='24' width='24' />
                 </MenuCard>
                 <div className='flex flex-col h-full w-full gap-4'>
-                    <MenuCard title='Logbook' iconURL='../icons/history.svg'>
+                    <MenuCard title='Logbook' iconURL='../icons/history.svg' href='/browser?logbook=true'>
                         <HistorySVG fill={mindsetColour} height='24' width='24' />
                     </MenuCard>
-                    <MenuCard title='Settings' iconURL='../icons/settings.svg'>
+                    <MenuCard title='Settings' iconURL='../icons/settings.svg' subtitle='Coming soon!' className='text-gray-400'>
                         <SettingsSVG fill={mindsetColour} height='24' width='24' />
                     </MenuCard>
                 </div>
@@ -48,7 +48,7 @@ export default function Menu({mindsetColour = 'black', onBlur}: {mindsetColour?:
                 <Link href={'/browser'} className='menu-link'>Tasks & Projects</Link>
                 <Link href={'/'} className='menu-link'>Tests</Link>
                 <Link href={pathname} className='menu-link'>Stats</Link>
-                <Link href={pathname} className='menu-link'>Logbook</Link>
+                <Link href={'/browser?logbook=true'} className='menu-link'>Logbook</Link>
                 <Link href={pathname} className='menu-link'>Settings</Link>
             </div>
         </div>);

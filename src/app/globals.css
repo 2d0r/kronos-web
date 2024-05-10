@@ -76,7 +76,7 @@ rect {
 /* Links */
 
 .menu-link {
-  @apply hover:bg-gray-200 rounded-lg px-2 py-1;
+  @apply hover:bg-white/50 rounded-lg px-2 py-1;
 }
 
 .tiptap:focus-visible {

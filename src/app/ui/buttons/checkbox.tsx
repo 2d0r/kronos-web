@@ -8,12 +8,13 @@ import { CheckboxStatus } from '@/app/lib/definitions';
 
 const Checkbox: FC<{
     type: TaskType,
+    repeat?: boolean,
     status: Status,
     taskId: string,
     fill?: string,
     height?: string, width?: string,
     onTaskStatusUpdated: any//(taskId: string, status: Status) => void
-}> = ({type, status, taskId, fill = 'black', height='24', width='24', onTaskStatusUpdated}) => {
+}> = ({type, status, taskId, fill = 'black', height='24', width='24', onTaskStatusUpdated, repeat}) => {
 
     const [ statusDisplay, setStatusDisplay ] = useState<CheckboxStatus>(status === 'done' ? 'checked' : 'blank');
 
@@ -25,7 +26,7 @@ const Checkbox: FC<{
     }
 
     return (<div className='cursor-pointer' onClick={handleCheckbox}>
-        <CheckboxSVG  fill={fill} width={width} height={height} statusDisplay={statusDisplay} type={type} />
+        <CheckboxSVG  fill={fill} width={width} height={height} statusDisplay={statusDisplay} type={type} repeat={repeat} />
     </div>);
 }
 

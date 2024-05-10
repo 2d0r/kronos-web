@@ -3,18 +3,21 @@
 import { Mindset, Priority, Status, Task, TaskType } from '@prisma/client';
 import { FC, useEffect, useState } from 'react';
 import { Dropdown } from '../tasks/form-fields';
-import { DEFAULT_MINDSET_LIST, TaskWithRelations } from '@/app/lib/definitions';
+import { DEFAULT_MINDSET_LIST, TaskWithRelations, URLSearchParamsKronos } from '@/app/lib/definitions';
 import '@/app/globals.css';
 import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/app/utils/dateUtils';
 import Checkbox from '../buttons/checkbox';
 import { getTaskColour } from '@/app/utils/taskUtils';
 import { adjustLightness } from '@/app/utils/colourUtils';
+import { log } from 'console';
+import { History } from 'lucide-react';
+import Link from 'next/link';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
 const TaskBrowser: FC<{
-    tasks: TaskWithRelations[], mindsets: Mindset[], mindsetColour: string
-}> = ({tasks, mindsets, mindsetColour}) => {
+    tasks: TaskWithRelations[], mindsets: Mindset[], mindsetColour: string, searchParams: URLSearchParamsKronos
+}> = ({tasks, mindsets, mindsetColour, searchParams}) => {
 
     const [ taskCache, setTaskCache ] = useState<TaskWithRelations[]>(tasks);
     const handleTaskStatusUpdated = (taskId: string, status: Status) => {
@@ -31,18 +34,22 @@ const TaskBrowser: FC<{
     const [ taskTypeFilter, setTaskTypeFilter ] = useState<TaskType>('task');
     const [ mindsetFilter, setMindsetFilter ] = useState<string>('All');
     const [ taskDisplay, setTaskDisplay ] = useState<JSX.Element[] | JSX.Element>(<></>);
-    const [tableView, setTableView] = useState<boolean>(false);
-    const [ sort, setSort ] = useState<SortItem>(['Priority', 'Descending']);
+    const [ tableView, setTableView ] = useState<boolean>(false);
+    const [ logbookView, setLogbookView ] = useState<boolean>(searchParams?.logbook);
+    const [ sort, setSort ] = useState<SortItem>(searchParams?.logbook ? ['Date', 'Descending'] : ['Priority', 'Descending']);
 
-    const changeTaskDisplay = (mindsetFilter: string, type: TaskType, tableView: boolean, sort?: SortItem) => {
+    const changeTaskDisplay = (mindsetFilter: string, type: TaskType, tableView: boolean, sort?: SortItem, logbookFilter?: boolean) => {
         const mindsetList = mindsetFilter === 'All' ? DEFAULT_MINDSET_LIST : [mindsetFilter];
         const tasksFilteredByType = taskCache.filter(task => task.type === type);
 
-        // Filter tasks
+        // FILTER TASKS
         let filteredTasks = tasksFilteredByType;
+        // Filter by status (for logbook)
+        filteredTasks = filteredTasks.filter(task => logbookFilter ? task.status === 'done' : task.status !== 'done');
+        // Filter by mindset
         if (mindsetFilter !== 'All') {
             const mindsetId = mindsets.filter(el => el.name === mindsetFilter)[0].id;
-            filteredTasks = tasksFilteredByType?.filter(task => task.mindsetId === mindsetId);
+            filteredTasks = filteredTasks.filter(task => task.mindsetId === mindsetId);
         }
 
         // Sort tasks
@@ -62,30 +69,28 @@ const TaskBrowser: FC<{
         if ( tableView === false ) {
             if ( type === 'task' ) {
                 newTaskDisplay = () => { 
-                    return (
-                        <div className='flex flex-col gap-2 w-full max-w-1/2 items-start justify-start'>
-                            {/* <div className='pb-2'>{camelcaseToTitlecase(mindset)}</div> */}
-                            
-                            {sortedTasks.map(task => {
-                                const taskColour = mindsets.filter(el => el.id === task.mindsetId)[0].colour;
-                                return(
-                                    <div key={task.id} className='flex gap-2 items-center'>
-                                        <Checkbox type={task.type} taskId={task.id} status={task.status} 
-                                            onTaskStatusUpdated={handleTaskStatusUpdated}
-                                            fill={taskColour}
-                                        />
-                                        <span>{task.name}</span>
-                                    </div>
-                                );
-                                
-                            })}
-                        </div>
-                    );
+                    return (<div className='flex flex-col gap-2 w-full max-w-1/2 items-start justify-start py-2'>
+                        {sortedTasks.map(task => {
+                            const taskColour = mindsets.filter(el => el.id === task.mindsetId)[0].colour;
+                            return(
+                                <div key={task.id} className='flex gap-2 items-center'>
+                                    <Checkbox type={task.type} repeat={task.repeat} taskId={task.id} status={task.status} 
+                                        onTaskStatusUpdated={handleTaskStatusUpdated}
+                                        fill={taskColour}
+                                    />
+                                    <span>{task.name}</span>
+                                </div>
+                            );
+                        })}
+                        { sortedTasks.length === 0 &&
+                            <div className='w-full flex justify-center text-gray-400 p-2'>No tasks to display</div>
+                        }
+                    </div>);
                 };
             } else if ( type === 'project' || type === 'goal') {
                 newTaskDisplay = () => {
                     return (
-                        <div className='flex gap-2 w-full items-start justify-start'>
+                        <div className='flex gap-2 w-full items-start justify-center'>
                             {sortedTasks.map((task, idx) => {
                                 const taskColour = getTaskColour(task, mindsets);
                                 return(
@@ -112,6 +117,9 @@ const TaskBrowser: FC<{
                                     </div>
                                 );
                             })}
+                            { sortedTasks.length === 0 &&
+                                <div className='w-full flex justify-center text-gray-400 p-2'>{`No ${type}s to display`}</div>
+                            }
                         </div>
                     )
                 }
@@ -155,15 +163,18 @@ const TaskBrowser: FC<{
         
     }
 
+
+    // Handlers
+
     const handleTaskTypeFilter = (type: TaskType) => {
         setMindsetFilter('All'); // reset bucket when changing tab
         type === 'goal' && setTableView(false);
-        changeTaskDisplay(mindsetFilter, type, type === 'goal' ? false : tableView);
+        changeTaskDisplay(mindsetFilter, type, type === 'goal' ? false : tableView, sort, logbookView);
         setTaskTypeFilter(type);
     }
     const handleMindsetFilter = (event : React.ChangeEvent<HTMLSelectElement>) => {
         const newMindsetFilter = event.target.value ? event.target.value : 'All';
-        changeTaskDisplay(newMindsetFilter, taskTypeFilter, tableView);
+        changeTaskDisplay(newMindsetFilter, taskTypeFilter, tableView, sort, logbookView);
         setMindsetFilter(newMindsetFilter);
     }
     const handleTableToggle = () => {
@@ -172,25 +183,59 @@ const TaskBrowser: FC<{
     }
     const handleSort = (event : React.ChangeEvent<HTMLSelectElement>) => {
         const newSort = [event.target.value, sort[1]] as SortItem;
-        changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView, newSort);
+        changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView, newSort, logbookView);
         setSort(newSort);
     }
     const handleSortDirection = () => {
         const newSort = [sort[0], sort[1] === 'Ascending' ? 'Descending' : 'Ascending'] as SortItem;
-        changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView, newSort);
+        changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView, newSort, logbookView);
         setSort(newSort);
     }
+    const handleLogbookToggle = () => {
+        const newLogbookView = !logbookView;
+        const newSort : SortItem = newLogbookView ? ['Date', 'Descending'] : ['Priority', 'Descending'];
+        changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView, newSort, newLogbookView);
+        setLogbookView(newLogbookView);
+    }
+
 
     // Hooks
 
     useEffect(() => {
-        changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView);
+        changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView, sort, logbookView);
     }, []);
+    // Update states for logbook
+    useEffect(() => {
+        (logbookView) && setSort(['Date', 'Descending']);
+    }, [logbookView])
+    // Update logbookView based on searchaparams
+    useEffect(() => {
+        const newLogbookView = searchParams?.logbook;
+        const newSort : SortItem = newLogbookView ? ['Date', 'Descending'] : ['Priority', 'Descending'];
+        changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView, newSort, newLogbookView);
+        setLogbookView(newLogbookView);
+    }, [searchParams.logbook]);
 
     return(
         <div className='flex flex-col items-center gap-4'>
-            {/* <div className='bg-gray-100 w-full'> */}
+            {/* Tab bar */}
             <div className='flex gap-4 items-center justify-center'>
+                <button 
+                    className='p-2 focus:text-white uppercase text-bold text-sm font-medium'
+                    style={{
+                        color: taskTypeFilter === 'task' ? mindsetColour : adjustLightness(mindsetColour, 0.5) ,
+                        borderColor: mindsetColour,
+                    }}
+                    onClick={() => handleTaskTypeFilter('task')}
+                >Tasks</button>
+                <button 
+                    className='p-2 focus:text-white uppercase text-bold text-sm font-medium'
+                    style={{
+                        color: taskTypeFilter === 'project' ? mindsetColour : adjustLightness(mindsetColour, 0.5) ,
+                        borderColor: mindsetColour,
+                    }}
+                    onClick={() => handleTaskTypeFilter('project')}
+                >Projects</button>
                 <button 
                     className='p-2 focus:text-white uppercase text-sm font-medium'
                     style={{
@@ -199,21 +244,8 @@ const TaskBrowser: FC<{
                     }}
                     onClick={() => handleTaskTypeFilter('goal')}
                 >Goals</button>
-                <button 
-                    className='p-2 focus:text-white uppercase text-bold text-sm font-medium'
-                    style={{
-                        color: taskTypeFilter === 'project' ? mindsetColour : adjustLightness(mindsetColour, 0.5) ,
-                        borderColor: mindsetColour,
-                    }}
-                    onClick={() => handleTaskTypeFilter('project')}>Projects</button>
-                <button 
-                    className='p-2 focus:text-white uppercase text-bold text-sm font-medium'
-                    style={{
-                        color: taskTypeFilter === 'task' ? mindsetColour : adjustLightness(mindsetColour, 0.5) ,
-                        borderColor: mindsetColour,
-                    }}
-                    onClick={() => handleTaskTypeFilter('task')}>Tasks</button>
             </div>
+            {/* Filter and sort bar */}
             { taskTypeFilter !== 'goal' && 
             <div className='flex gap-4 items-center'>
                 <Dropdown 
@@ -224,22 +256,32 @@ const TaskBrowser: FC<{
                     prompt=''
                     colour={mindsetColour}
                 />
+                <div className='border rounded-md flex items-center' style={{ borderColor: mindsetColour }}>
+                    <Dropdown 
+                        fieldName='chooseMindset'
+                        list={['Priority', 'Date', 'Duration']}
+                        defaultValue={sort[0]}
+                        onChange={handleSort}
+                        prompt=''
+                        colour={mindsetColour}
+                        className='!outline-0 border-0'
+                    />
+                    <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleSortDirection()}>
+                        <img src={sort[1] === 'Ascending' ? './icons/sort-desc.svg' : './icons/sort-asc.svg'} />
+                    </div>
+                </div>
+                
                 <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
                     <img src={ tableView === false ? './icons/table-rows.svg' : './icons/list-bulleted.svg'} />
                 </div>
-                <Dropdown 
-                    fieldName='chooseMindset'
-                    list={['Priority', 'Date', 'Duration']}
-                    defaultValue='All'
-                    onChange={handleSort}
-                    prompt=''
-                    colour={mindsetColour}
-                />
-                <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleSortDirection()}>
-                    <img src={sort[1] === 'Ascending' ? './icons/sort-desc.svg' : './icons/sort-asc.svg'} />
-                </div>
+                <Link 
+                    href={logbookView ? '/browser' : '/browser?logbook=true'} 
+                    className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' 
+                    onClick={() => handleLogbookToggle()}
+                >
+                    <History color={logbookView ? 'black' : 'lightgrey'}/>
+                </Link>
             </div>}
-            {/* </div> */}
             <div className='flex h-2/3 w-full items-start justify-center gap-6'>
                 {taskDisplay}
             </div>

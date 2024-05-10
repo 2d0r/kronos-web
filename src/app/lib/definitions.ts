@@ -173,4 +173,5 @@ export interface URLSearchParamsKronos extends URLSearchParams {
     menu: boolean
     addTask: boolean
     eventId: string
+    logbook: boolean
 }

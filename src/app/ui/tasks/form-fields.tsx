@@ -67,7 +67,7 @@ export function InputField(
 }
 
 export function Dropdown ( 
-    { fieldName, list, defaultValue, prompt, onChange = () => {}, label, colour = NEUTRAL_MINDSET_COLOUR } : {
+    { fieldName, list, defaultValue, prompt, onChange = () => {}, label, colour = NEUTRAL_MINDSET_COLOUR, className = '' } : {
         fieldName: string,
         list: string[],
         defaultValue: string,
@@ -75,6 +75,7 @@ export function Dropdown (
         onChange?: any,
         label?: string,
         colour?: string,
+        className?: string,
     }
 ) {
     const [ selection, setSelection ] = useState<string>(defaultValue);
@@ -92,7 +93,7 @@ export function Dropdown (
             <select
                 id={fieldName}
                 name={fieldName}
-                className={`peer block cursor-pointer rounded-lg border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 focus:![${colour}]`}
+                className={`${className} peer block cursor-pointer rounded-lg border py-2 pl-4 text-sm outline-2 placeholder:text-gray-500 focus:![${colour}]`}
                 style={{borderColor: colour}}
                 defaultValue={defaultValue}
                 onChange={handleSelect}

@@ -66,17 +66,17 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
         events: eventsForHf,
         bodyConfig: {
             // enableNewEvents: true,
-            switchDragResizeAction: 'tap',
-            selectAction: 'hold',
+            switchDragResizeAction: 'none',
+            selectAction: 'tap',
             dragResizeStates: ["none","none","none","none"],
             eventConfig: {
               showDescription: true,
-              useRenderEvent(event: HfEvent, columnResourceId: string): boolean {
-                return true;
-              },
-              renderEvent(event: HfEvent, columnResourceId: string): string {
-                return `<Link href='?editTaskId=${event.id}' className='cursor-pointer w-full h-full'>${event.title}</Link>`;
-              }
+            //   useRenderEvent(event: HfEvent, columnResourceId: string): boolean {
+            //     return true;
+            //   },
+            //   renderEvent(event: HfEvent, columnResourceId: string): string {
+            //     return `<Link href='?editTaskId=${event.id}' className='cursor-pointer w-full h-full'>${event.title}</Link>`;
+            //   }
             },
             timeCellWidth: 30,
         },
@@ -93,7 +93,7 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
             showImage: false
         }
     };
-
+    
     function onEventSelected(event: CustomEvent<HfEvent>) {
         console.log('event selected', event);
     }
@@ -110,6 +110,13 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
         timegridConfig.events!.push(newEvent);
         timegridConfig = { ...timegridConfig };
         timegridRef.current!.config = timegridConfig;
+    }
+
+    function onEventDragResizeStateChanged(event: any) {
+        const dragResizeStateChangedEvent = event.detail;
+        const stateIndex = dragResizeStateChangedEvent.stateIndex;
+        const hfEvent = dragResizeStateChangedEvent.event;
+        hfEvent.description = `(${event.dragResizeStates[stateIndex]})`;
     }
 
     async function onShowLoadingChange(event: any) {

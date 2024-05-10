@@ -24,7 +24,7 @@ const TimelineCard: FC<TimelineCardProps> = async ({children, searchParams, back
         backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0)}, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.3)})`
     }}>
         <TopBar searchParams={searchParams} back={back}><SearchBar placeholder='Search events, dates...'/></TopBar>
-        {showMenu && <Menu />}
+        {showMenu && <Menu mindsetColour={mindsetColour}/>}
         {showAddTask && <CreateTask mindsets={mindsets}/>}
         <div className='bg-white max-h-[70vh] rounded-3xl shadow-xl w-fit p-4 flex items-center justify-start'>
             {children}
