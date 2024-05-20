@@ -69,15 +69,39 @@ input:focus, input:focus-visible, select:focus {
   outline: none;
 }
 
+.formKeysColumn {
+  @apply w-1/3 text-left max-w-[100px];
+}
+.formValuesColumn {
+  @apply w-full;
+}
+
+/* Hide number input arrows */
+/* Chrome, Safari, Edge, Opera */
+input.no-arrows::-webkit-outer-spin-button,
+input.no-arrows::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  width: 0;
+}
+/* Firefox */
+input[type=number].no-arrows {
+  -moz-appearance: textfield;
+}
+
 rect {
   fill: cyan;
 }
+
 
 /* Links */
 
 .menu-link {
   @apply hover:bg-white/50 rounded-lg px-2 py-1;
 }
+
+
+/* Tiptap markdown text editor */
 
 .tiptap:focus-visible {
   @apply border-none outline-none;
@@ -147,3 +171,5 @@ rect {
   }
   
 }
+
+

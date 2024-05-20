@@ -34,10 +34,10 @@ const FormSchema = z.object({
   repeatTimespanMultiplier: z.string().nullable(),
   repeatDurationHours: z.string().nullable(),
   repeatDurationMinutes: z.string().nullable(),
-  preferredTimeOfDay: z.array(z.enum(['morning', 'noon', 'afternoon', 'evening', 'night'], { invalid_type_error: 'Please select a valid time of day.' })).nullish(), // z.array(z.string().refine(value => timeOfDayList.includes(value))), // 
+  preferredTimeOfDay: z.array(z.enum(['morning', 'afternoon', 'evening', 'night'], { invalid_type_error: 'Please select a valid time of day.' })).nullish(), // z.array(z.string().refine(value => timeOfDayList.includes(value))), // 
   preferredDayOfWeek: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], { invalid_type_error: 'Please select a valid day of the week.' })).nullish(),
   endRepeat: z.string().nullable(),
-  totalDuration: z.number().nullable(),
+  totalDuration: z.string().nullable(),
   totalRepetitions: z.number().nullable(),
   endRepeatDate: z.string().nullable()
 
@@ -162,7 +162,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         preferredTimeOfDay: preferredTimeOfDay || [],
         preferredDayOfWeek: preferredDayOfWeek || [],
         endRepeat: Boolean(endRepeat),
-        totalDuration: totalDuration,
+        totalDuration: Number(totalDuration),
         totalRepetitions: totalRepetitions,
         deadline: deadline !== null ? deadline : endRepeatDate,
       },

@@ -12,7 +12,7 @@ function capitalise(text: string) {
 }
 
 export function InputField(
-    { fieldName, placeholder, inputType, label, onChange = () => {}, className, tail, colour = NEUTRAL_MINDSET_COLOUR } : { 
+    { fieldName, placeholder, inputType, label, onChange = () => {}, className, tail, colour = NEUTRAL_MINDSET_COLOUR, state } : { 
         fieldName: string, 
         placeholder: string, 
         inputType: string,
@@ -21,6 +21,7 @@ export function InputField(
         className?: string,
         tail?: string,
         colour?: string,
+        state: any,
     }
 ) {
 
@@ -31,43 +32,49 @@ export function InputField(
     }
 
     return (<>
-        <div className={clsx('flex items-baseline', label && 'gap-2')}>
-            <label htmlFor={fieldName} className='mb-2 block text-sm font-medium'>
+        <div className={clsx('flex items-baseline', 
+            label && 'gap-2'
+        )}>
+            <label htmlFor={fieldName} className={clsx('mb-2 block text-sm font-medium',
+                label && 'formKeysColumn'
+            )}>
                 {label}
             </label>
-            <div className='relative'>
-                <input
-                    id={fieldName}
-                    name={fieldName}
-                    type={inputType}
-                    className={clsx(
-                        inputType === 'number' ? 'w-[60px]' : 'w-fit',
-                        'pr-4 cursor-pointer items-baseline text-sm rounded-lg border-0 outline-0 placeholder:text-gray-400 focus:!border-0 placeholder-slate-300',
-                        className,
-                    )}
-                    style={{ backgroundColor: adjustLightness(colour, 0.95) }}
-                    placeholder={placeholder}
-                    onChange={handleInput}
-                    aria-describedby='task-error'
-                    min='0'
-                    step={['repeatTimespanMultiplier', 'repeatFrequency'].includes(fieldName) ? '1' : '5'}
-                />
+            <div className={clsx('flex items-center', label && 'formValuesColumn', tail && 'gap-2')}>
+                <div className={'relative'}>
+                    <input
+                        id={fieldName}
+                        name={fieldName}
+                        type={inputType}
+                        className={clsx(
+                            inputType === 'number' ? 'w-[60px] no-arrows' : 'w-fit',
+                            'pr-4 mr-2 cursor-text items-baseline text-sm rounded-lg border-0 outline-0 placeholder:text-gray-400 focus:!border-0 placeholder-slate-300',
+                            className
+                        )}
+                        style={{ backgroundColor: adjustLightness(colour, 0.95) }}
+                        placeholder={placeholder}
+                        onChange={handleInput}
+                        aria-describedby='task-error'
+                        min='0'
+                        step={['repeatTimespanMultiplier', 'repeatFrequency'].includes(fieldName) ? '1' : '5'}
+                    />
+                </div>
+                <div>{tail}</div>
             </div>
-            <div>{tail}</div>
-            {/* <div id='task-error' aria-live='polite' aria-atomic='true'>
-            {state.errors?.customerId &&
+            <div id='task-error' aria-live='polite' aria-atomic='true'>
+            {state?.errors?.customerId &&
                 state.errors.customerId.map((error: string) => (
                 <p className='mt-2 text-sm text-red-500' key={error}>
                     {error}
                 </p>
             ))}
-            </div> */}
+            </div>
         </div>
     </>);
 }
 
 export function Dropdown ( 
-    { fieldName, list, defaultValue, prompt, onChange = () => {}, label, colour = NEUTRAL_MINDSET_COLOUR, className = '' } : {
+    { fieldName, list, defaultValue, prompt, onChange = () => {}, label, colour = NEUTRAL_MINDSET_COLOUR, className = '', state } : {
         fieldName: string,
         list: string[],
         defaultValue: string,
@@ -76,6 +83,7 @@ export function Dropdown (
         label?: string,
         colour?: string,
         className?: string,
+        state?: any,
     }
 ) {
     const [ selection, setSelection ] = useState<string>(defaultValue);
@@ -85,11 +93,11 @@ export function Dropdown (
     }
 
     return (
-        <div className={clsx(' flex items-baseline', label && 'gap-2')}>
-            <label htmlFor={fieldName} className='mb-2 block text-sm font-medium'>
+        <div className={clsx(' flex items-baseline')}>
+            <label htmlFor={fieldName} className='mb-2 block text-sm font-medium formKeysColumn'>
                 {label}
             </label>
-            <div className='relative'>
+            <div className='relative formValuesColumn'>
             <select
                 id={fieldName}
                 name={fieldName}
@@ -108,19 +116,19 @@ export function Dropdown (
             </select>
             </div>
             <div id='task-error' aria-live='polite' aria-atomic='true'>
-            {/* {state.errors?.customerId &&
+            {state?.errors?.customerId &&
                 state.errors.customerId.map((error: string) => (
                 <p className='mt-2 text-sm text-red-500' key={error}>
                     {error}
                 </p>
-            ))} */}
+            ))}
             </div>
         </div>
-    )
+    );
 }
 
 export function SelectionField( 
-    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], colour = NEUTRAL_MINDSET_COLOUR, collapse = true } : {
+    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], colour = NEUTRAL_MINDSET_COLOUR, collapse = false, state, className } : {
         fieldName: string,
         list: string[],
         prompt: string,
@@ -129,6 +137,8 @@ export function SelectionField(
         defaultSelected?: string[],
         colour?: string,
         collapse?: boolean,
+        state: any,
+        className?: string,
     }
 ) {
     const [ selectedOptions, setSelectedOptions ] = useState<string[]>(defaultSelected);
@@ -176,32 +186,32 @@ export function SelectionField(
     })
 
     return (<div className={clsx(
-        ' flex flex-row items-baseline', 
+        ' flex flex-row items-baseline gap-2', 
         isFocused ? '' : '', 
         prompt && 'gap-2'
     )}>
-        <legend className='mb-2 text-sm font-medium'>
+        <legend className='mb-2 text-sm font-medium formKeysColumn'>
             {prompt}
         </legend>
-        <div className={`relative flex w-fit overflow-hidden`} 
+        <div className={clsx(`relative flex w-fit flex-wrap gap-2 formValuesColumn`)} 
             onMouseOver={handleFocus} onMouseOut={handleBlur}
         >
             {selectionList}
         </div>
         
-        {/* <div id='customer-error' aria-live='polite' aria-atomic='true'>
-          {state.errors?.status &&
+        <div id='task-error' aria-live='polite' aria-atomic='true'>
+          {state?.errors?.status &&
             state.errors.status.map((error: string) => (
               <p className='mt-2 text-sm text-red-500' key={error}>
                 {error}
               </p>
             ))}
-        </div> */}
+        </div>
     </div>);
 }
 
 export function MultiSelectionField( 
-    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], className, colour = NEUTRAL_MINDSET_COLOUR } : {
+    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], className, colour = NEUTRAL_MINDSET_COLOUR, state } : {
         fieldName: string,
         list: string[],
         prompt: string,
@@ -210,6 +220,7 @@ export function MultiSelectionField(
         defaultSelected?: string[],
         className?: string,
         colour?: string,
+        state?: any,
     }
 ) {
     const [ selectedOptions, setSelectedOptions ] = useState<string[]>(defaultSelected);
@@ -229,7 +240,7 @@ export function MultiSelectionField(
             (type === 'checkbox' && selectedOptions.includes(item));
         const hidden = false;// if not selected and field is not in focus
         return (hidden ? <></> :
-            <div className='flex items-center overflow-hidden' 
+            <div className={'flex items-center overflow-hidden'} 
                 style={{ color: colour }}
                 key={idx}
             >
@@ -238,7 +249,7 @@ export function MultiSelectionField(
                     name={fieldName}
                     type={type}
                     value={item}
-                    className={`hidden h-4 w-4 cursor-pointer bg-gray-100 text-gray-600 focus:ring-none focus:!border-0`}
+                    className={'hidden h-4 w-4 cursor-pointer bg-gray-100 text-gray-600 focus:ring-none focus:!border-0'}
                     aria-describedby='task-error'
                     onChange={handleSelect}
                 />
@@ -247,13 +258,15 @@ export function MultiSelectionField(
                     className='flex cursor-pointer items-center gap-1.5 pr-4 text-sm font-regular'
                     style={{ color: checked ? colour : adjustLightness(colour, 0.6)}}
                 >
-                    {capitalise(item)}
+                    {fieldName === 'preferredDayOfWeek' ? capitalise(item.slice(0, 2)) : capitalise(item)}
                 </label>
       </div>);
     })
 
-    return (<fieldset className=''>
-        <legend className='mb-2 block text-sm font-medium'>
+    return (<fieldset>
+        <legend className={clsx('mb-2 block text-sm font-medium formKeysColumn', 
+            className?.includes('w-full-key') && '!w-full !max-w-none'
+        )}>
           {prompt}
         </legend>
         <div className='w-fit rounded-lg bg-white overflow-hidden'>
@@ -263,13 +276,13 @@ export function MultiSelectionField(
             {selectionList}
           </div>
         </div>
-        <div id='customer-error' aria-live='polite' aria-atomic='true'>
-          {/* {state.errors?.status &&
+        <div id='task-error' aria-live='polite' aria-atomic='true'>
+          {state?.errors?.status &&
             state.errors.status.map((error: string) => (
               <p className='mt-2 text-sm text-red-500' key={error}>
                 {error}
               </p>
-            ))} */}
+            ))}
         </div>
     </fieldset>);
 }

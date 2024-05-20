@@ -109,7 +109,6 @@ enum TimeSpan {
 
 enum TimeOfDay {
   morning
-  noon
   afternoon
   evening
   night
