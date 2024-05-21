@@ -12,6 +12,7 @@ import { adjustLightness } from '@/app/utils/colourUtils';
 import { log } from 'console';
 import { History } from 'lucide-react';
 import Link from 'next/link';
+import ToDoItem from '../tasks/to-do-item';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
@@ -73,13 +74,14 @@ const TaskBrowser: FC<{
                         {sortedTasks.map(task => {
                             const taskColour = mindsets.filter(el => el.id === task.mindsetId)[0].colour;
                             return(
-                                <div key={task.id} className='flex gap-2 items-center'>
-                                    <Checkbox type={task.type} repeat={task.repeat} taskId={task.id} status={task.status} 
-                                        onTaskStatusUpdated={handleTaskStatusUpdated}
-                                        fill={taskColour}
-                                    />
-                                    <span>{task.name}</span>
-                                </div>
+                                // <div key={task.id} className='flex gap-2 items-center'>
+                                //     <Checkbox type={task.type} repeat={task.repeat} taskId={task.id} status={task.status} 
+                                //         onTaskStatusUpdated={handleTaskStatusUpdated}
+                                //         fill={task.mindset?.colour}
+                                //     />
+                                //     <span>{task.name}</span>
+                                // </div>
+                                <ToDoItem task={task} onTaskStatusUpdated={handleTaskStatusUpdated}/>
                             );
                         })}
                         { sortedTasks.length === 0 &&

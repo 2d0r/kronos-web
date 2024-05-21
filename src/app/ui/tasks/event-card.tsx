@@ -1,12 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getTaskMindset } from '@/app/lib/data';
 import { Event, Mindset, Task } from '@prisma/client';
 import { dateToDDMMYYYY, dateToHHMM, minutesToDisplayDuration } from '@/app/utils/dateUtils';
 import clsx from 'clsx';
-import { NEUTRAL_MINDSET_COLOUR, TaskWithRelations } from '@/app/lib/definitions';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { NEUTRAL_MINDSET_COLOUR } from '@/app/lib/definitions';
+import { ChevronUp } from 'lucide-react';
 
 interface EventCardProps {
     event: Event;
@@ -32,10 +31,10 @@ export default function EventCard({ event, task, mindset, className, nextTask = 
     
     return (<>
         <div className={clsx(className, 
-            'w-1/3 text-white rounded-2xl flex flex-col justify-between items-center text-center',
+            'text-white rounded-2xl flex flex-col justify-between items-center text-center',
             nextTask && 'absolute top-[90vh] mb-[-45px] bg-gradient-to-br from-gray-400 to-gray-600 opacity-80',
             (expand && !isExpanded) && 'cursor-pointer',
-            isExpanded ? 'h-full w-4/5 p-6' : 'p-4'
+            isExpanded ? 'h-full w-2/3 max-w-500px p-6' : 'p-4 w-[350px]'
         )}
             style = {!isExpanded ? {
                 backgroundColor: mindset.colour || NEUTRAL_MINDSET_COLOUR,
@@ -62,20 +61,20 @@ export default function EventCard({ event, task, mindset, className, nextTask = 
                 </div>
                 <div className='flex gap-4 w-full mt-4'>
                     <div className='flex flex-col gap-2 text-left w-1/3 border-[0.5px] border-white rounded-2xl p-4 overflow-scroll'>
-                        <div className='text-lg'>Notes</div>
+                        {/* <div className='text-lg'>Notes</div> */}
                         <div className='text-sm h-2/3 tiptap' dangerouslySetInnerHTML={{ __html: task.notes || '<p></p>' }} />
                     </div>
                     <div className='flex flex-col gap-2 text-left w-1/3 border-[0.5px] border-white rounded-2xl p-4 overflow-scroll'>
-                        <div className='text-lg'>Checklist</div>
+                        {/* <div className='text-lg'>Checklist</div> */}
                         {/* <div className='text-sm h-2/3'>{task.checklist}</div> */}
                         <div className='text-sm h-2/3 tiptap' dangerouslySetInnerHTML={{ __html: task.checklist || '<p></p>' }} />
                     </div>
-                    <div className='flex flex-col gap-2 text-left w-1/3 border-[0.5px] border-white rounded-2xl p-4 overflow-scroll'>
-                        <div className='text-lg'>Details</div>
+                    <div className='flex flex-col gap-2 text-left w-1/3 p-4 overflow-scroll'>
+                        {/* <div className='text-lg'>Details</div> */}
                         <div className='flex flex-col'>
                             <div className='flex gap-2 pb-2'><div>Mindset</div><div className='font-bold'>{mindset.name}</div></div>
                             <div className='flex gap-2 pb-2'><div>Priority</div><div className='font-bold'>{task.priority}</div></div>
-                            <div className='flex gap-2 pb-2'><div>Duration</div><div className='font-bold'>{task.duration}</div></div>
+                            <div className='flex gap-2 pb-2'><div>Duration</div><div className='font-bold'>{minutesToDisplayDuration(task.duration)}</div></div>
                             { task.startTime && task.fixed &&
                                 <div className='flex gap-2 pb-2'><div className='font-bold'>Start</div><div>{task.startTime.getHours()}</div></div> 
                             }
@@ -102,14 +101,14 @@ export default function EventCard({ event, task, mindset, className, nextTask = 
                                     })
                                 }</div></div> 
                             }
-                            { task.endRepeatDate && 
-                                <div className='flex gap-2 pb-2'><div className='font-bold'>Repeat ends on</div><div>{dateToDDMMYYYY(task.endRepeatDate)}</div></div> 
+                            { task.deadline && 
+                                <div className='flex gap-2 pb-2'><div>Repeat until</div><div className='font-bold'>{dateToDDMMYYYY(task.deadline)}</div></div> 
                             }
                             { task.totalRepetitions && 
-                                <div className='flex gap-2 pb-2'><div className='font-bold'>Repeat for</div><div>{task.totalRepetitions} reps</div></div> 
+                                <div className='flex gap-2 pb-2'><div>Repeat </div><div className='font-bold'>{task.totalRepetitions} times</div></div> 
                             }
                             { task.totalDuration && 
-                                <div className='flex gap-2 pb-2'><div className='font-bold'>Repeat up to</div><div>{task.totalDuration / 60} hours</div></div> 
+                                <div className='flex gap-2 pb-2'><div>Repeat up to</div><div className='font-bold'>{task.totalDuration / 60} hours</div></div> 
                             }
                         </div>
                     </div>

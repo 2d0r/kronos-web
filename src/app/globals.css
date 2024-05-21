@@ -88,6 +88,16 @@ input.no-arrows::-webkit-inner-spin-button {
 input[type=number].no-arrows {
   -moz-appearance: textfield;
 }
+input[type=date]:invalid::-webkit-datetime-edit {
+  color: #999;
+}
+input::placeholder {
+  color: red;
+  opacity: 1; /* Firefox */
+}
+input::-ms-input-placeholder { /* Edge 12 -18 */
+  color: red;
+}
 
 rect {
   fill: cyan;

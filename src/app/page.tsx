@@ -1,10 +1,10 @@
 import { fetchTasks, getEventMindset, getMindsetNames } from './lib/data';
 import { updateTimeScores } from './lib/actions';
 import { handleOrganise } from './lib/organiser-idealFirst';
-import TaskCard from './ui/tasks/task-card';
+import TaskRow from './ui/tasks/task-row';
 import Link from 'next/link';
 import TopBar from './ui/top-bar';
-import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, SearchParamProps, URLSearchParamsKronos } from './lib/definitions';
+import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from './lib/definitions';
 import BottomBar from './ui/bottom-bar';
 import Button from '@/components/button';
 import prisma from './lib/db';
@@ -50,7 +50,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
       <div className='container w-full p-4 flex flex-col gap-2 text-center'>
         {tasks.sort((a, b) => b.priorityScore - a.priorityScore).map((task, idx) => {
           return (
-            <TaskCard task={task} key={idx}/>
+            <TaskRow task={task} key={idx}/>
         )})}
       </div>
       

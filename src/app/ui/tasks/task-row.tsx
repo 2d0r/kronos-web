@@ -8,7 +8,7 @@ interface TaskCardProps {
     task: Task
 }
 
-export default async function TaskCard({ task } : TaskCardProps) {
+export default async function TaskRow({ task } : TaskCardProps) {
     const mindset = await getTaskMindset(task);
     
     return (<>
@@ -48,8 +48,8 @@ export default async function TaskCard({ task } : TaskCardProps) {
                         })
                     }</div></div> 
                 }
-                { task.endRepeatDate && 
-                    <div><div className='font-bold'>Repeat ends on</div><div>{dateToDDMMYYYY(task.endRepeatDate)}</div></div> 
+                { task.deadline && 
+                    <div><div className='font-bold'>Repeat ends on</div><div>{dateToDDMMYYYY(task.deadline)}</div></div> 
                 }
                 { task.totalRepetitions && 
                     <div><div className='font-bold'>Repeat for</div><div>{task.totalRepetitions} reps</div></div> 

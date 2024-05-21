@@ -8,13 +8,14 @@ import CloseIconSVG from '../svg/close-svg';
 import PlaySVG from '../svg/play-svg';
 import AddSVG from '../svg/add-svg';
 import ShuffleSVG from '../svg/shuffle-svg';
+import { Edit, Edit2, Edit3 } from 'lucide-react';
 
 export default function TransportControls ({ eventId, context, className, mindsetColour }: { 
     eventId: string | undefined, context?: string, className?: string, mindsetColour: string
 }) {
 
 
-    return (<div className={clsx('w-1/3 max-w-[400px] flex justify-between items-center', className)}>
+    return (<div className={clsx('w-[350px] flex justify-between items-center', className)}>
         { context === 'taskPage' && <>
             <Link href='/timeline'>
                 <img src='../icons/close.svg' className='h-8 w-8' />
@@ -23,11 +24,13 @@ export default function TransportControls ({ eventId, context, className, mindse
             <img src='../icons/adjust.svg' className='h-8 w-8' />
         </>} { context === 'timeline' && <>
             <ShuffleSVG fill={mindsetColour} />
-            <Link href={`/timeline/task`}>
+            <Link href={'/task'}>
                 {/* <img src='../icons/play.svg' className='h-12 w-12' /> */}
                 <PlaySVG fill={mindsetColour} />
             </Link>
-            <AddSVG fill={mindsetColour} />
+            <Link href={`?editTask=true`}>
+                <Edit2 color={mindsetColour} fill={mindsetColour} />
+            </Link>
         </>}
         
     </div>);

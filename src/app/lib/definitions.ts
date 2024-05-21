@@ -1,22 +1,26 @@
-import { Status, TimeSpan, Priority, TimeOfDay, DayOfWeek, RepeatUnit, Prisma } from '@prisma/client';
+import { Status, TimeSpan, Priority, TimeOfDay, DayOfWeek, RepeatUnit, Prisma, Mindset } from '@prisma/client';
 import { Url } from 'next/dist/shared/lib/router/router';
 import { ReactElement } from 'react';
 
 export const DEFAULT_AVERAGE_SLEEP = 8 * 60; // 8 hours, expressed in minutes
 export const DEFAULT_AVERAGE_MEALS = 3 * 60; // 3 hours, expressed in minutes
-export const DEFAULT_MINDSET = 'maintain';
-export const CLOSEST_MINDSET = 1;
-export const FURTHEST_MINDSET = 6;
 export const MINIMUM_TRANSITION = 0;
 export const MIN_TASK_DURATION = 10;
 export const HOURS_IN_A_WEEK = 168;
 export const MAX_REP_OFFSET = 1/4;
 export const MAX_OFFSET = 120;
 
+
+// Mindsets
+
+export const DEFAULT_MINDSET = 'maintain';
+export const CLOSEST_MINDSET = 1;
+export const FURTHEST_MINDSET = 6;
 export const DEFAULT_MINDSET_LIST = [
     'restReward', 'survive', 'maintain', 'play', 'socialise', 'learn', 'create', 'selfChallenge', 'selfCare', 'achieve'
 ] as [string, ...string[]];
 export const NEUTRAL_MINDSET_COLOUR = '#899499';
+
 
 export const CARD_SCALES = {
     small: 1,
@@ -174,4 +178,5 @@ export interface URLSearchParamsKronos extends URLSearchParams {
     addTask: boolean
     eventId: string
     logbook: boolean
+    editTask: string
 }

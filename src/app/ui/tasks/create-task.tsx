@@ -5,7 +5,7 @@ import { useFormState } from 'react-dom';
 import { createTaskPrisma} from '@/app/lib/actions';
 import Button from '@/components/button';
 import { Dropdown, InputField, MultiSelectionField, SelectionField } from './form-fields';
-import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, statusList, repeatUnitList, DEFAULT_MINDSET_LIST, NEUTRAL_MINDSET_COLOUR } from '@/app/lib/definitions';
+import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, statusList, repeatUnitList, DEFAULT_MINDSET_LIST, NEUTRAL_MINDSET_COLOUR, DEFAULT_MINDSET } from '@/app/lib/definitions';
 import { getMindsetNames } from '@/app/lib/data';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -25,11 +25,11 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
 
     const [taskName, setTaskName] = useState<string | null>(null);
     const [priority, setPriority] = useState<string | null>(null);
-    const [isScheduled, setIsScheduled] = useState<string | null>(null);
+    const [isScheduled, setIsScheduled] = useState<'Scheduled' | 'Flexible'>('Flexible');
     const [repeatFrequency, setRepeatFrequency] = useState<number | null>(null);
     const [timespanList, setTimespanList] = useState<string[]>(timeSpanList);
     const [repeatTimespan, setRepeatTimespan] = useState<string>('');
-    const [repeatToggle, setrepeatToggle] = useState<string | null>(null);
+    const [repeatToggle, setrepeatToggle] = useState<'Repeat' | 'One time' | null>(null);
     const [endRepeat, setEndRepeat] = useState<(string | null)>('No');
     const [repeatUnit, setRepeatUnit] = useState<string | null>('sessions');
     const [selectedMindset, setSelectedMindset] = useState<string | null>(null);
@@ -46,17 +46,28 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
     const handleSetPriority = (event : React.ChangeEvent<HTMLSelectElement>) => {
         setPriority(event.target.value ? event.target.value : null);
     }
-    const handleScheduledToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
-        setIsScheduled(event.target.value);
+    // const handleScheduledToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
+    //     setIsScheduled(event.target.value);
+    // }
+    const handleScheduledToggle = (value : ('Scheduled' | 'Flexible')) => {
+        setIsScheduled(value);
     }
-    const handleRepeatToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
-        setrepeatToggle(event.target.value);
-        if (repeatToggle !== 'Repeat') {
+    // const handleRepeatToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
+    //     setrepeatToggle(event.target.value);
+    //     if (repeatToggle !== 'Repeat') {
+    //         setRepeatTimespan('');
+    //     }
+    // }
+    const handleRepeatToggle = (value: ('Repeat' | 'One time' | null)) => {
+        setrepeatToggle(value);
+        if (value !== 'Repeat') {
             setRepeatTimespan('');
         }
     }
     const handleRepeatFrequency = (event : React.ChangeEvent<HTMLInputElement>) => {
-        setRepeatFrequency(Number(event.target.value));
+        const newRepeatFrequency = Number(event.target.value);
+        setRepeatFrequency(newRepeatFrequency);
+        setTimespanList(newRepeatFrequency !== 1 ? timeSpanList : timeSpanList.map(item => `${item}s`) )
     }
     const handleEndRepeatToggle = (event : React.ChangeEvent<HTMLInputElement>) => {
         setEndRepeat(event.target.value);
@@ -104,25 +115,29 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                     state={state}
                 />
                 {taskName && 
-                    <SelectionField 
+                    // <SelectionField 
+                    //     fieldName='mindset'
+                    //     prompt='Mindset'
+                    //     list={mindsets.map(el => el.name)}
+                    //     onChange={handleMindsetSelect}
+                    //     colour={mindsetColour}
+                    //     type='radio'
+                    //     state={state}
+                    //     className='multi-line'
+                    // />
+                    <Dropdown 
                         fieldName='mindset'
-                        prompt='Mindset'
+                        prompt='Pick a mindset'
+                        label='Mindset'
                         list={mindsets.map(el => el.name)}
                         onChange={handleMindsetSelect}
+                        defaultValue={''}
                         colour={mindsetColour}
-                        type='radio'
                         state={state}
-                        className='multi-line'
-                />}
+                    />
+                }
                 { selectedMindset !== null && (<>
                     {/* <SelectionField 
-                        fieldName='status'
-                        prompt='Status'
-                        list={statusList}
-                        type='radio'
-                        defaultSelected={[statusList[0]]}
-                    /> */}
-                    <SelectionField 
                         fieldName='priority'
                         prompt='Priority'
                         list={priorityList}
@@ -130,20 +145,37 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                         onChange={handleSetPriority}
                         colour={mindsetColour}
                         state={state}
-                    />
-                    {priority && <SelectionField 
-                        fieldName='isScheduled'
-                        prompt=''
-                        list={['Scheduled', 'Flexible']}
-                        type='radio'
-                        onChange={handleScheduledToggle}
+                    /> */}
+                    <Dropdown 
+                        fieldName='priority'
+                        prompt='Pick a priority'
+                        label='Priority'
+                        list={priorityList}
+                        onChange={handleSetPriority}
+                        defaultValue={''}
                         colour={mindsetColour}
-                        collapse={false}
                         state={state}
-                    />}
+                    />
+                    {priority && 
+                    // <SelectionField 
+                    //     fieldName='isScheduled'
+                    //     prompt=''
+                    //     list={['Scheduled', 'Flexible']}
+                    //     type='radio'
+                    //     onChange={handleScheduledToggle}
+                    //     colour={mindsetColour}
+                    //     collapse={false}
+                    //     state={state}
+                    // />
+                    <button 
+                        type='button'
+                        className='w-full flex mb-2 font-medium'
+                        onClick={() => {handleScheduledToggle(isScheduled === 'Scheduled' ? 'Flexible' : 'Scheduled')}}
+                        style={{color: ['Flexible', null].includes(isScheduled) ? 'lightgrey' : 'black'}}
+                    >Scheduled</button>}
                     {isScheduled === 'Scheduled' && (<>
                         <div className='flex items-center gap-2'>
-                        <div className='flex flex-col'>
+                        <div className='flex flex-col gap-2'>
                             <InputField 
                                 fieldName='startTime'
                                 placeholder='Enter start time'
@@ -159,8 +191,8 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                                 state={state}
                             />
                         </div>
-                        {'>'}
-                        <div className='flex flex-col justify-start'>
+                        {'→'}
+                        <div className='flex flex-col justify-start gap-2'>
                         <InputField 
                             fieldName='endTime'
                             placeholder='Enter end time'
@@ -179,12 +211,12 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                         </div>
                     </>)}
 
-                    {isScheduled === 'Flexible' && (<>
+                    {(priority && isScheduled === 'Flexible') && (<>
                         <InputField 
                             fieldName='duration'
                             placeholder='30'
                             inputType='number'
-                            label='Ideal duration'
+                            label='Duration'
                             tail='minutes'
                             colour={mindsetColour}
                             state={state}
@@ -198,9 +230,9 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                             state={state}
                         />
                     </>)}
-                    { isScheduled && <>
+                    { priority && <>
                         <div className={'divider h-[1px] w-full bg-black/20'}></div>
-                        <SelectionField 
+                        {/* <SelectionField 
                             fieldName='repeat'
                             prompt=''
                             list={['One time', 'Repeat']}
@@ -209,60 +241,65 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                             colour={mindsetColour}
                             collapse={false}
                             state={state}
-                        />
-                    </>
-                    }
+                        /> */}
+                        <button 
+                            type='button'
+                            className='w-full flex mb-2 font-medium'
+                            onClick={() => {handleRepeatToggle(repeatToggle === 'Repeat' ? 'One time' : 'Repeat')}}
+                            style={{color: ['One time', null].includes(repeatToggle) ? 'lightgrey' : 'black'}}
+                        >Repeat</button>
+                    </>}
                     
                     {repeatToggle === 'Repeat' && (<div className=''>
-                        <div className='flex mb-2 items-top *:mb-0 overflow-x-scroll'>
-                        {repeatUnit === 'sessions' ? (<>
-                            <InputField 
-                                fieldName='repeatFrequency'
-                                placeholder='1'
-                                inputType='number'
-                                onChange={handleRepeatFrequency}
+                        <div className='flex mb-2 items-top *:mb-0 overflow-x-scroll items-center gap-2'>
+                            {repeatUnit === 'sessions' ? (<>
+                                <InputField 
+                                    fieldName='repeatFrequency'
+                                    placeholder=''
+                                    inputType='number'
+                                    onChange={handleRepeatFrequency}
+                                    colour={mindsetColour}
+                                    state={state}
+                                />
+                            </>) : (<>
+                                <InputField 
+                                    fieldName='repeatDuration'
+                                    placeholder='10'
+                                    inputType='number'
+                                    colour={mindsetColour}
+                                    state={state}
+                                />
+                            </>)}
+                            {/* <Dropdown 
+                                fieldName='repeatUnit'
+                                prompt=''
+                                list={(((repeatUnit && repeatUnit.includes('session') && repeatFrequency && repeatFrequency !== 1) || (repeatUnit && repeatUnit.includes('minute'))) ? repeatUnitList : 
+                                    repeatUnitList.map(item => item.slice(0, item.length - 1))) as [string, ...string[]]}
+                                defaultValue='sessions'
+                                onChange={handleRepeatUnitSelect}
+                                colour={mindsetColour}
+                                state={state}
+                            /> */}
+                            time{repeatFrequency === 1 ? '' : 's'} every
+                            {(repeatFrequency && repeatFrequency === 1) ? 
+                                <InputField 
+                                    fieldName='repeatTimespanMultiplier'
+                                    placeholder=''
+                                    inputType='number'
+                                    onChange={handleTimespanMultiplierInput}
+                                    colour={mindsetColour}
+                                    state={state}
+                                /> : <></>
+                            }
+                            <Dropdown 
+                                fieldName='repeatTimespan'
+                                prompt=''
+                                list={timespanList}
+                                onChange={handleRepeatTimespanToggle}
+                                defaultValue='Day'
                                 colour={mindsetColour}
                                 state={state}
                             />
-                        </>) : (<>
-                            <InputField 
-                                fieldName='repeatDuration'
-                                placeholder='10'
-                                inputType='number'
-                                colour={mindsetColour}
-                                state={state}
-                            />
-                        </>)}
-                        <Dropdown 
-                            fieldName='repeatUnit'
-                            prompt=''
-                            list={(((repeatUnit && repeatUnit.includes('session') && repeatFrequency && repeatFrequency !== 1) || (repeatUnit && repeatUnit.includes('minute'))) ? repeatUnitList : 
-                                repeatUnitList.map(item => item.slice(0, item.length - 1))) as [string, ...string[]]}
-                            defaultValue='sessions'
-                            onChange={handleRepeatUnitSelect}
-                            colour={mindsetColour}
-                            state={state}
-                        />
-                        </div>
-                        <div className='flex mb-4 items-top *:mb-0 overflow-x-scroll'>
-                        <InputField 
-                            fieldName='repeatTimespanMultiplier'
-                            label = 'Every'
-                            placeholder='1'
-                            inputType='number'
-                            onChange={handleTimespanMultiplierInput}
-                            colour={mindsetColour}
-                            state={state}
-                        />
-                        <Dropdown 
-                            fieldName='repeatTimespan'
-                            prompt=''
-                            list={timespanList}
-                            onChange={handleRepeatTimespanToggle}
-                            defaultValue='Day'
-                            colour={mindsetColour}
-                            state={state}
-                        />
                         </div>
                     </div>)}
                     {(repeatToggle && isScheduled !== 'Scheduled' && (repeatTimespan !== '' || repeatToggle !== 'Repeat')) && (<>
@@ -302,13 +339,15 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                                 defaultSelected={['No']}
                                 colour={mindsetColour}
                             /> */}
-                            <button className='w-full flex mb-2'
-                                    onClick={() => {setEndRepeat(endRepeat === 'No' ? 'Yes' : 'No')}}
-                                    style={{color: ['No', null].includes(endRepeat) ? 'lightgrey' : 'black'}}
+                            <button type='button'
+                                className='w-full flex mb-2 font-medium'
+                                onClick={() => {setEndRepeat(endRepeat === 'No' ? 'Yes' : 'No')}}
+                                style={{color: ['No', null].includes(endRepeat) ? 'lightgrey' : 'black'}}
                             >End repeat</button>
                             {(repeatToggle === 'Repeat' && endRepeat !== 'No' && endRepeat !== null) && (<>
                                 <div className='flex h-8 gap-2 items-center pl-2'>
                                     <button 
+                                        type='button'
                                         onClick={() => {setEndRepeat(endRepeat === 'Date' ? 'Yes' : 'Date')}}
                                         style={{color: endRepeat === 'Date' ? 'black' : 'lightgrey'}}
                                     >On a date</button>
@@ -322,16 +361,18 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                                 </div>
                                 <div className='flex h-8 gap-2 items-center text-left pl-2'>
                                     <button 
+                                        type='button'
                                         onClick={() => {setEndRepeat(endRepeat === 'Duration' ? 'Yes' : 'Duration')}}
                                         style={{color: endRepeat === 'Duration' ? 'black' : 'lightgrey'}}
-                                        className='text-left formKeysColumn'
+                                        className='text-left'
                                     >After a total duration</button>
                                     {endRepeat === 'Duration' && <InputField 
                                         fieldName='totalDuration'
-                                        placeholder='Deadline'
+                                        placeholder='Total duration'
                                         inputType='number'
                                         colour={mindsetColour}
                                         state={state}
+                                        className='w-auto'
                                     />}
                                 </div>
                                 <div className='flex h-8 gap-2 items-center pl-2'>
@@ -339,7 +380,7 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
                                         type='button'
                                         onClick={() => {setEndRepeat(endRepeat === 'Repetitions' ? 'Yes' : 'Repetitions')}}
                                         style={{color: endRepeat === 'Repetitions' ? 'black' : 'lightgrey'}}
-                                        className='text-left formKeysColumn'
+                                        className='text-left'
                                     >After a number of repetitions</button>
                                     {endRepeat === 'Repetitions' && <InputField 
                                         fieldName='totalRepetitions'
@@ -375,7 +416,8 @@ export default function CreateTask({mindsets} : {mindsets: Mindset[]}) {
             </div>
             { repeatToggle &&
                 <div className='flex justify-center gap-4 mt-8'>
-                    <Button type='submit' 
+                    <Button 
+                        type='submit' 
                         className={`h-10 hover:bg-[${adjustLightness(mindsetColour, -0.2)}]`} 
                         style={{background: mindsetColour}}>Add</Button>
                 </div>

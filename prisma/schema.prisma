@@ -50,7 +50,7 @@ model Task {
   totalDuration            Int?
   totalRepetitions         Int?
   notes                    String?
-  checklist                String?     
+  checklist                String?
   tasksBefore              Task[]      @relation("TaskCausality")
   tasksAfter               Task[]      @relation("TaskCausality")
   tasksRightBefore         Task[]      @relation("TaskChain")
@@ -64,11 +64,12 @@ model Task {
 }
 
 model Mindset {
-  id          String @id @default(cuid())
-  name        String @unique
-  maslowLevel Int    @default(1)
+  id          String  @id @default(cuid())
+  name        String  @unique
+  display     String?
+  maslowLevel Int     @default(1)
   tasks       Task[]
-  colour      String @default("grey")
+  colour      String  @default("grey")
 
   @@index([name])
   @@map("mindsets")

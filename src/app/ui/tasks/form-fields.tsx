@@ -12,7 +12,7 @@ function capitalise(text: string) {
 }
 
 export function InputField(
-    { fieldName, placeholder, inputType, label, onChange = () => {}, className, tail, colour = NEUTRAL_MINDSET_COLOUR, state } : { 
+    { fieldName, placeholder, inputType, label, onChange = () => {}, className, tail, colour = NEUTRAL_MINDSET_COLOUR, state, value } : { 
         fieldName: string, 
         placeholder: string, 
         inputType: string,
@@ -22,6 +22,7 @@ export function InputField(
         tail?: string,
         colour?: string,
         state: any,
+        value?: string,
     }
 ) {
 
@@ -45,10 +46,11 @@ export function InputField(
                     <input
                         id={fieldName}
                         name={fieldName}
+                        value={value}
                         type={inputType}
                         className={clsx(
-                            inputType === 'number' ? 'w-[60px] no-arrows' : 'w-fit',
-                            'pr-4 mr-2 cursor-text items-baseline text-sm rounded-lg border-0 outline-0 placeholder:text-gray-400 focus:!border-0 placeholder-slate-300',
+                            inputType === 'number' ? 'no-arrows w-[46px]' : 'w-fit',
+                            'pr-4 cursor-text items-baseline text-sm rounded-lg border-0 outline-0 placeholder:text-gray-400 focus:!border-0',
                             className
                         )}
                         style={{ backgroundColor: adjustLightness(colour, 0.95) }}

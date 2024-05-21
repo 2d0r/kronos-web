@@ -43,6 +43,30 @@ export async function fetchTasksWithRelations() {
   }
 }
 
+export async function fetchTaskWithRelations(taskId: string) {
+  try {
+    const task: TaskWithRelations = await prisma.task.findUnique({
+      where: {
+        id: taskId
+      },
+      include: { 
+          tasksBefore: true,
+          tasksAfter: true,
+          tasksRightBefore: true,
+          tasksRightAfter: true,
+          tasksParent: true,
+          tasksChild: true,
+          mindset: true,
+          events: true,
+      } // Include the subtasks relation
+    }) || {} as TaskWithRelations; 
+    return task;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch the latest tasks.');
+  }
+}
+
 export async function getCurrentTask() {
   const now = new Date();
   try {

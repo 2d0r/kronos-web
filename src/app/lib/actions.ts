@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const FormSchema = z.object({
   id: z.string(),
+  date: z.date(),
   name: z.string(),
   mindset: z.enum(DEFAULT_MINDSET_LIST, { invalid_type_error: 'Please select a valid mindset.' }),
   status: z.enum(['toDo', 'inProgress', 'done'], { invalid_type_error: 'Please select a valid status.' }).nullable(),
@@ -23,11 +24,11 @@ const FormSchema = z.object({
   endTime: z.string().nullable(),
   endDate: z.string().nullable(),
   idealStartTime: z.string().nullable(),
-  // duration: z.array(z.number()).nullish(),
+  // duration: z.string(),
   durationHours: z.string().nullable(),
   durationMinutes: z.string().nullable(),
   deadline: z.string().nullable(),
-  repeat: z.coerce.boolean(),
+  // repeat: z.coerce.boolean(),
   repeatUnit: z.enum(['sessions', 'minutes'], { invalid_type_error: 'Please select a valid Repeat Unit.' }).nullable(),
   repeatFrequency: z.string().nullable(),
   repeatTimespan: z.enum(['day', 'week', 'month', 'year'], { invalid_type_error: 'Please select a valid Repeat Timespan.' }).nullable(),
@@ -39,14 +40,12 @@ const FormSchema = z.object({
   endRepeat: z.string().nullable(),
   totalDuration: z.string().nullable(),
   totalRepetitions: z.number().nullable(),
-  endRepeatDate: z.string().nullable()
-
+  endRepeatDate: z.string().nullable(),
 });
-
-const CreateTask = FormSchema.omit({ id: true, date: true });
 
 export type State = {
   errors?: {
+    id?: string[];
     name?: string[];
     mindset?: string[];
     status?: string[];
@@ -59,7 +58,7 @@ export type State = {
     idealStartTime?: string[];
     durationHours?: number[];
     durationMinutes?: number[];
-    repeat?: boolean[];
+    // repeat?: boolean[];
     repeatUnit?: string[];
     repeatFrequency?: number[];
     repeatDurationHours?: number[];
@@ -77,6 +76,9 @@ export type State = {
   message?: string | null;
 };
 
+const CreateTask = FormSchema.omit({ id: true, date: true });
+const EditTask = FormSchema.omit({ date: true })
+
 export async function createTaskPrisma(prevState: State, formData: FormData) {
 
   const validatedFields = CreateTask.safeParse({
@@ -92,7 +94,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     durationHours: formData.get('durationHours'),
     durationMinutes: formData.get('durationMinutes'),
     deadline: formData.get('deadline'),
-    repeat: formData.get('repeat'),
+    // repeat: formData.get('repeat'),
     repeatFrequency: formData.get('repeatFrequency'),
     repeatTimespan: formData.get('repeatTimespan'),
     repeatTimespanMultiplier: formData.get('repeatTimespanMultiplier'),
@@ -118,7 +120,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
 
   const { name, mindset, status, priority, startDate, startTime, endDate, endTime,
     durationHours, durationMinutes, idealStartTime,
-    repeat, repeatTimespanMultiplier, repeatFrequency, repeatTimespan,
+    /* repeat, */ repeatTimespanMultiplier, repeatFrequency, repeatTimespan,
     repeatUnit, repeatDurationHours, repeatDurationMinutes,
     preferredTimeOfDay, preferredDayOfWeek,
     endRepeat, totalDuration, totalRepetitions, endRepeatDate, deadline,
@@ -154,9 +156,9 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         startTime: startDateTime,
         endTime: endDateTime,
         duration: durationInMinutes || MIN_TASK_DURATION,
-        repeat: repeat,
+        repeat: (!!repeatFrequency && !!repeatTimespanMultiplier && !!repeatTimespan),
         repeatUnit: repeatUnit || 'sessions',
-        repeatTimespanMultiplier: Number(repeatTimespanMultiplier) || 1,
+        repeatTimespanMultiplier: (repeatFrequency && Number(repeatFrequency) > 1) ?  Number(repeatTimespanMultiplier) || 1 : 1,
         repeatFrequency: Number(repeatFrequency) || repeatDurationInMinutes,
         repeatTimespan: repeatTimespan,
         preferredTimeOfDay: preferredTimeOfDay || [],
@@ -176,6 +178,111 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
 
   revalidatePath('/');
   redirect('/');
+}
+
+export async function editTaskPrisma(prevState: State, formData: FormData) {
+
+  const validatedFields = EditTask.safeParse({
+    id: formData.get('id'),
+    name: formData.get('name'),
+    mindset: formData.get('mindset'),
+    status: formData.get('status'),
+    priority: formData.get('priority'),
+    startTime: formData.get('startTime'),
+    startDate: formData.get('startDate'),
+    endTime: formData.get('endTime'),
+    endDate: formData.get('endDate'),
+    idealStartTime: formData.get('idealStartTime'),
+    durationHours: formData.get('durationHours'),
+    durationMinutes: formData.get('durationMinutes'),
+    deadline: formData.get('deadline'),
+    // repeat: formData.get('repeat'),
+    repeatFrequency: formData.get('repeatFrequency'),
+    repeatTimespan: formData.get('repeatTimespan'),
+    repeatTimespanMultiplier: formData.get('repeatTimespanMultiplier'),
+    repeatDurationHours: formData.get('repeatDurationHours'),
+    repeatDurationMinutes: formData.get('repeatDurationMinutes'),
+    repeatUnit: formData.get('repeatUnit'),
+    preferredTimeOfDay: formData.getAll('preferredTimeOfDay'),
+    preferredDayOfWeek: formData.getAll('preferredDayOfWeek'),
+    endRepeat: formData.get('endRepeat'),
+    totalDuration: formData.get('totalDuration'),
+    totalRepetitions: formData.get('totalRepetitions'),
+    endRepeatDate: formData.get('endRepeatDate')
+  });
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    console.log('validatedFields', validatedFields, validatedFields.error.flatten().fieldErrors);
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Task.',
+    };
+  }
+
+  const { id, name, mindset, status, priority, startDate, startTime, endDate, endTime,
+    durationHours, durationMinutes, idealStartTime,
+    /* repeat, */ repeatTimespanMultiplier, repeatFrequency, repeatTimespan,
+    repeatUnit, repeatDurationHours, repeatDurationMinutes,
+    preferredTimeOfDay, preferredDayOfWeek,
+    endRepeat, totalDuration, totalRepetitions, endRepeatDate, deadline,
+  } = validatedFields.data;
+  // Merge start date and time; Also end date and time
+  const startDateTime = (startDate && startTime) ? new Date(`${startDate}T${startTime}:00`) :
+    (startTime && !startDate) ? new Date(`00/00/00T${startTime}:00`) : null;
+  const endDateTime = (endDate && endTime) ? new Date(`${endDate}T${endTime}:00`) : null;
+  const durationInMinutes = (durationHours || durationMinutes) ? (Number(durationMinutes) || 0) + (Number(durationHours) || 0) * 60 :
+    (startDateTime && endDateTime) ? endDateTime.getTime() - startDateTime.getTime() : null;
+  const repeatDurationInMinutes = (repeatDurationHours || repeatDurationMinutes) ?
+    (Number(repeatDurationMinutes) || 0) + (Number(repeatDurationHours) || 0) * 60 : null;
+
+  const matchingMindset = await fetchMindsets().then(mindsets =>
+    mindsets.find(el => el.name === mindset)
+  );
+  if (!matchingMindset) {
+    //  Handle error - invalid mindset
+    return { message: 'Invalid mindset selected.' };
+  }
+  // let mindsetId = '';
+  // fetchMindsets().then(mindsets => {
+  //   mindsetId = mindsets.filter(el => el.name === mindset)[0].id;
+  // });
+
+  try {
+    await prisma.task.update({
+      where: {
+        id: id
+      },
+      data: {
+        name: name,
+        status: status || 'toDo',
+        mindsetId: matchingMindset.id,
+        priority: priority,
+        startTime: startDateTime,
+        endTime: endDateTime,
+        duration: durationInMinutes || MIN_TASK_DURATION,
+        repeat: (!!repeatFrequency && !!repeatTimespan),
+        repeatUnit: repeatUnit || 'sessions',
+        repeatTimespanMultiplier: (repeatFrequency && Number(repeatFrequency) > 1) ?  Number(repeatTimespanMultiplier) || 1 : 1,
+        repeatFrequency: Number(repeatFrequency) || repeatDurationInMinutes,
+        repeatTimespan: repeatTimespan,
+        preferredTimeOfDay: preferredTimeOfDay || [],
+        preferredDayOfWeek: preferredDayOfWeek || [],
+        endRepeat: Boolean(endRepeat),
+        totalDuration: Number(totalDuration),
+        totalRepetitions: totalRepetitions,
+        deadline: deadline !== null ? deadline : endRepeatDate,
+      },
+    });
+  } catch (error) {
+    console.log('Failed to create task', error);
+    return {
+      message: 'Database Error: Failed to create task.',
+    };
+  }
+
+  revalidatePath('/');
+  redirect('/timeline');
 }
 
 export async function deleteTask(id: string) {
