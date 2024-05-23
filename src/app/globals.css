@@ -159,12 +159,13 @@ rect {
       cursor: pointer;
       background-color: transparent;
       border-color: white;
+      color: white;
       border-radius: 24px;
     }
     
   }
 
-  .tiptap .is-editor-empty:first-child::before {
+  .is-editor-empty:first-child::before {
     color: #adb5bd;
     content: attr(data-placeholder);
     float: left;
@@ -172,14 +173,36 @@ rect {
     pointer-events: none;
   }
 
-  .tiptap p.is-empty::before {
+  p.is-empty::before {
     color: #adb5bd;
     content: attr(data-placeholder);
     float: left;
     height: 0;
     pointer-events: none;
   }
+
+  
   
 }
 
+.task-card {
+  .tiptap input[type="checkbox"] {
+    cursor: pointer;
+    background-color: transparent;
+    border-color: black!important;
+    color: black!important;
+    border-radius: 24px;
+  }
 
+  .notesEditor-toolbar-button {
+    @apply: !border-black;
+  }
+}
+
+.divider {
+  @apply h-[0.5px] w-full border-b-[0.5px];
+}
+
+.remove-default-focus {
+  @apply: focus-visible:!border-none focus-visible:!outline-none focus:!ring-transparent;
+}

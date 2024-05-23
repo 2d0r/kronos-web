@@ -39,7 +39,7 @@ const FormSchema = z.object({
   preferredDayOfWeek: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], { invalid_type_error: 'Please select a valid day of the week.' })).nullish(),
   endRepeat: z.string().nullable(),
   totalDuration: z.string().nullable(),
-  totalRepetitions: z.number().nullable(),
+  totalRepetitions: z.string().nullable(),
   endRepeatDate: z.string().nullable(),
 });
 
@@ -165,7 +165,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         preferredDayOfWeek: preferredDayOfWeek || [],
         endRepeat: Boolean(endRepeat),
         totalDuration: Number(totalDuration),
-        totalRepetitions: totalRepetitions,
+        totalRepetitions: Number(totalRepetitions),
         deadline: deadline !== null ? deadline : endRepeatDate,
       },
     });
@@ -258,6 +258,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
         status: status || 'toDo',
         mindsetId: matchingMindset.id,
         priority: priority,
+        fixed: !!startDateTime && !!endDateTime,
         startTime: startDateTime,
         endTime: endDateTime,
         duration: durationInMinutes || MIN_TASK_DURATION,
@@ -268,9 +269,9 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
         repeatTimespan: repeatTimespan,
         preferredTimeOfDay: preferredTimeOfDay || [],
         preferredDayOfWeek: preferredDayOfWeek || [],
-        endRepeat: Boolean(endRepeat),
+        endRepeat: !!totalDuration || !!totalRepetitions || !!endRepeatDate,
         totalDuration: Number(totalDuration),
-        totalRepetitions: totalRepetitions,
+        totalRepetitions: Number(totalRepetitions),
         deadline: deadline !== null ? deadline : endRepeatDate,
       },
     });

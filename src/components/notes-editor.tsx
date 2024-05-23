@@ -16,12 +16,16 @@ import Text from '@tiptap/extension-text';
 import TextStyle from '@tiptap/extension-text-style';
 import Toolbar from '@/components/toolbar';
 import Placeholder from '@tiptap/extension-placeholder';
+import clsx from 'clsx';
+import { adjustLightness } from '@/app/utils/colourUtils';
+import { NEUTRAL_MINDSET_COLOUR } from '@/app/lib/definitions';
 
 const NotesEditor: FC<{ 
   notes: string, 
   onChange?: (richText: string) => void,
   taskId: string,
-}> = ({ notes, onChange, taskId }) => {
+  className?: string,
+}> = ({ notes, onChange, taskId, className }) => {
 
   const editor = useEditor({
     extensions: [
@@ -70,20 +74,22 @@ const NotesEditor: FC<{
   });
 
   // Show notes toolbar only when focusing on textarea
-  const [ showToolbar, setShowToolbar ] = useState<boolean>(false);
-  const handleNotesBlur = (event: React.ChangeEvent<HTMLDivElement>) => {
-    setShowToolbar(false);
-    console.log('show toolbar', false);
-  }
-  const handleNotesSelect = (event: React.ChangeEvent<HTMLDivElement>) => {
-    setShowToolbar(true);
-    console.log('show toolbar', true);
-  }
+  // const [ showToolbar, setShowToolbar ] = useState<boolean>(false);
+  // const handleNotesBlur = (event: React.ChangeEvent<HTMLDivElement>) => {
+  //   setShowToolbar(false);
+  // }
+  // const handleNotesSelect = (event: React.ChangeEvent<HTMLDivElement>) => {
+  //   setShowToolbar(true);
+  // }
 
-  return (<div onFocus={handleNotesSelect} onBlur={handleNotesBlur}>
-    <Toolbar editor={editor} />
+  return (<div>
+    <Toolbar editor={editor} className={className} />
     <EditorContent editor={editor} 
-      className='p-4 focus-visible:!border-none focus-visible:!outline-none focus:!ring-transparent text-left'
+      className={clsx('h-1/4 remove-default-focus text-left overflow-auto',
+        className?.includes('task-card') && 'rounded-lg px-4 pb-4',
+        className?.includes('doing-task') && 'max-h-[50vh] overflow-auto p-4',
+      )}
+      // style={{ backgroundColor: className === 'task-card' ? adjustLightness(NEUTRAL_MINDSET_COLOUR, 0.95) : ''}}
     />
   </div>);
 }

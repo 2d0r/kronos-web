@@ -10,8 +10,8 @@ import AddSVG from '../svg/add-svg';
 import ShuffleSVG from '../svg/shuffle-svg';
 import { Edit, Edit2, Edit3 } from 'lucide-react';
 
-export default function TransportControls ({ eventId, context, className, mindsetColour }: { 
-    eventId: string | undefined, context?: string, className?: string, mindsetColour: string
+export default function TransportControls ({ eventId, taskId, context, className, mindsetColour }: { 
+    eventId: string | undefined, taskId: string, context?: string, className?: string, mindsetColour: string
 }) {
 
 
@@ -28,7 +28,7 @@ export default function TransportControls ({ eventId, context, className, mindse
                 {/* <img src='../icons/play.svg' className='h-12 w-12' /> */}
                 <PlaySVG fill={mindsetColour} />
             </Link>
-            <Link href={`?editTask=true`}>
+            <Link href={`?editTask=${taskId}`}>
                 <Edit2 color={mindsetColour} fill={mindsetColour} />
             </Link>
         </>}

@@ -9,6 +9,9 @@ import Text from '@tiptap/extension-text';
 import Placeholder from '@tiptap/extension-placeholder';
 import { EditorContent, useEditor } from '@tiptap/react';
 import React, { FC } from 'react';
+import { adjustLightness } from '@/app/utils/colourUtils';
+import { NEUTRAL_MINDSET_COLOUR } from '@/app/lib/definitions';
+import clsx from 'clsx';
 
 const CustomDocument = Document.extend({
   content: 'taskList',
@@ -22,7 +25,8 @@ const ChecklistEditor: FC<{
     checklist: string, 
     onChange?: (richText: string) => void,
     taskId: string,
-}> = ({ checklist, onChange, taskId }) => {
+    className?: string,
+}> = ({ checklist, onChange, taskId, className }) => {
 
     const placeholder = `
         <ul data-type="taskList">
@@ -41,7 +45,7 @@ const ChecklistEditor: FC<{
         CustomTaskItem,
         Placeholder.configure({
             // Use a placeholder:
-            placeholder: 'Add items',
+            placeholder: placeholder,
         }),
         ],
         content: checklist,
@@ -52,7 +56,12 @@ const ChecklistEditor: FC<{
 
     return (<>
         <EditorContent editor={editor} 
-            className='focus-visible:!border-none focus-visible:!outline-none focus:!ring-transparent text-left'
+            className={clsx('text-left remove-default-focus',
+                className?.includes('task-card') && 'h-full p-4 border-b-[0.5px]',
+                className?.includes('doing-task') && 'py-2 max-h-[50vh] overflow-auto rounded-lg',
+                className,
+            )}
+            // style={{ backgroundColor: className.includes('task-card') ? adjustLightness(NEUTRAL_MINDSET_COLOUR, 0.95) : ''}}
         />
         {/* <style>{css}</style> */}
     </>)

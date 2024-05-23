@@ -6,6 +6,7 @@ import { dateToDDMMYYYY, dateToHHMM, minutesToDisplayDuration } from '@/app/util
 import clsx from 'clsx';
 import { NEUTRAL_MINDSET_COLOUR } from '@/app/lib/definitions';
 import { ChevronUp } from 'lucide-react';
+import TaskCard from './task-card';
 
 interface EventCardProps {
     event: Event;
@@ -53,24 +54,21 @@ export default function EventCard({ event, task, mindset, className, nextTask = 
                     <div>{nextTask ? '' : durationDisplay}</div>
                 </div>
                 <div className='h-4'></div>
-            </> : <>
-                {/* <div className='text-sm w-full flex items-start'>{dateToHHMM(event.startTime)}</div> */}
-                <div>
+            </> 
+            : 
+            <>
+                {/* <div>
                     <div className='text-2xl'>{event.name}</div>
                     <div>{nextTask ? '' : durationDisplay}</div>
                 </div>
                 <div className='flex gap-4 w-full mt-4'>
                     <div className='flex flex-col gap-2 text-left w-1/3 border-[0.5px] border-white rounded-2xl p-4 overflow-scroll'>
-                        {/* <div className='text-lg'>Notes</div> */}
                         <div className='text-sm h-2/3 tiptap' dangerouslySetInnerHTML={{ __html: task.notes || '<p></p>' }} />
                     </div>
                     <div className='flex flex-col gap-2 text-left w-1/3 border-[0.5px] border-white rounded-2xl p-4 overflow-scroll'>
-                        {/* <div className='text-lg'>Checklist</div> */}
-                        {/* <div className='text-sm h-2/3'>{task.checklist}</div> */}
                         <div className='text-sm h-2/3 tiptap' dangerouslySetInnerHTML={{ __html: task.checklist || '<p></p>' }} />
                     </div>
                     <div className='flex flex-col gap-2 text-left w-1/3 p-4 overflow-scroll'>
-                        {/* <div className='text-lg'>Details</div> */}
                         <div className='flex flex-col'>
                             <div className='flex gap-2 pb-2'><div>Mindset</div><div className='font-bold'>{mindset.name}</div></div>
                             <div className='flex gap-2 pb-2'><div>Priority</div><div className='font-bold'>{task.priority}</div></div>
@@ -113,7 +111,7 @@ export default function EventCard({ event, task, mindset, className, nextTask = 
                         </div>
                     </div>
                 </div>
-                <div className='h-4 mt-3 cursor-pointer' onClick={handleExpandCard} ><ChevronUp opacity='0.5' /></div>
+                <div className='h-4 mt-3 cursor-pointer' onClick={handleExpandCard} ><ChevronUp opacity='0.5' /></div> */}
             </>}
             { isExpanded}
             

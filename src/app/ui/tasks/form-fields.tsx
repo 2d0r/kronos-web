@@ -36,7 +36,7 @@ export function InputField(
         <div className={clsx('flex items-baseline', 
             label && 'gap-2'
         )}>
-            <label htmlFor={fieldName} className={clsx('mb-2 block text-sm font-medium',
+            <label htmlFor={fieldName} className={clsx('my-2 block text-sm font-medium',
                 label && 'formKeysColumn'
             )}>
                 {label}
@@ -58,7 +58,7 @@ export function InputField(
                         onChange={handleInput}
                         aria-describedby='task-error'
                         min='0'
-                        step={['repeatTimespanMultiplier', 'repeatFrequency'].includes(fieldName) ? '1' : '5'}
+                        step={inputType === 'time' ? '60' : ['duration', 'totalDuration'].includes(fieldName) ? '5' : '1'}
                     />
                 </div>
                 <div>{tail}</div>
@@ -96,7 +96,7 @@ export function Dropdown (
 
     return (
         <div className={clsx(' flex items-baseline')}>
-            <label htmlFor={fieldName} className='mb-2 block text-sm font-medium formKeysColumn'>
+            <label htmlFor={fieldName} className='my-2 block text-sm font-medium formKeysColumn'>
                 {label}
             </label>
             <div className='relative formValuesColumn'>
@@ -266,7 +266,7 @@ export function MultiSelectionField(
     })
 
     return (<fieldset>
-        <legend className={clsx('mb-2 block text-sm font-medium formKeysColumn', 
+        <legend className={clsx('my-2 block text-sm font-medium formKeysColumn', 
             className?.includes('w-full-key') && '!w-full !max-w-none'
         )}>
           {prompt}

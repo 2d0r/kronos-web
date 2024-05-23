@@ -12,6 +12,8 @@ import { Task } from '@prisma/client';
 import { adjustLightness } from '../utils/colourUtils';
 import SearchBar from '../ui/search';
 import EditTask from '../ui/tasks/edit-task';
+import TaskCard from '../ui/tasks/task-card';
+import Link from 'next/link';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
     const showAddTask = searchParams?.addTask;
@@ -39,15 +41,17 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         <TopBar searchParams={searchParams}>
             <SearchBar placeholder="Search tasks, projects, dates..." />
         </TopBar>
-        { showAddTask && <CreateTask mindsets={mindsets} />}
-        { showEditTask && <EditTask task={currentTask} mindsets={mindsets} />}
+        { showAddTask && <TaskCard mindsets={mindsets} />}
+        { showEditTask && <TaskCard task={currentTask} mindsets={mindsets} />}
         <div className='w-full h-full flex flex-col items-center justify-center'>
             {showMenu && <Menu mindsetColour={mindsetColour} />}
             {eventQueue.length > 0 && 
                 <div className='w-full items-center justify-center flex flex-col gap-4'>
                     {!showMenu && (<>
-                        <EventCard event={eventQueue[0]} task={taskQueue[0]} mindset={mindsetQueue[0]} expand={true} />
-                        <TransportControls eventId={eventQueue[0].id} mindsetColour={mindsetColour} context='timeline'/>
+                        <Link href={`?editTask=${currentTask.id}`} >
+                            <EventCard event={eventQueue[0]} task={taskQueue[0]} mindset={mindsetQueue[0]} />
+                        </Link>
+                        <TransportControls eventId={eventQueue[0].id} taskId={currentTask.id} mindsetColour={mindsetColour} context='timeline'/>
                     </>)}
                 </div>
             }

@@ -39,8 +39,12 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         <div className='w-full h-full content-center justify-center flex flex-row text-center'>
             {/* Left area */}
             <div className='h-full w-1/3 flex flex-col items-end justify-center'>
-                <div className={clsx(wireCard, 'w-5/6 min-h-24 max-h-3/2 my-16 overflow-scroll')}>
-                    <NotesEditor notes={currentTask.notes || ''} taskId={currentTask.id}/>
+                <div className={clsx(wireCard, 'w-5/6 min-h-[16vh] max-h-[50vh] overflow-scroll')}>
+                    <NotesEditor 
+                        notes={currentTask.notes || ''} 
+                        taskId={currentTask.id} 
+                        className='doing-task'
+                    />
                 </div>
             </div>
             {/* Central widget */}
@@ -58,9 +62,9 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             {/* Right area */}
             <div className='h-full w-1/3 flex flex-col items-start justify-center'>
                 <div className={clsx(
-                    wireCard, 'p-4 w-5/6 min-h-24'
+                    wireCard, 'p-4 w-5/6 min-h-[16vh] max-h-[50vh]'
                 )}>
-                    <ChecklistEditor checklist={currentTask.checklist || ''} taskId={currentTask.id} />
+                    <ChecklistEditor checklist={currentTask.checklist || ''} taskId={currentTask.id} className='doing-task' />
                 </div>
             </div>
         </div>

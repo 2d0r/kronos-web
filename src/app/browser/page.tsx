@@ -6,6 +6,7 @@ import TaskBrowser from '../ui/browser/task-browser';
 import { Mindset } from '@prisma/client';
 import EditTask from '../ui/tasks/edit-task';
 import { useSearchParams } from 'next/navigation';
+import TaskCard from '../ui/tasks/task-card';
 
 export default async function Page({searchParams}: {searchParams: URLSearchParamsKronos}) {
 
@@ -26,6 +27,6 @@ export default async function Page({searchParams}: {searchParams: URLSearchParam
                 searchParams={searchParams}
             />
         </TimelineCard>
-        {editTaskId && <EditTask task={editTask} mindsets={mindsets} />}
+        {editTaskId && <TaskCard task={editTask} mindsets={mindsets} />}
     </>);
 }

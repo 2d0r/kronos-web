@@ -15,7 +15,7 @@ export default function AddTaskButton({searchParams, mindsetColour}: {searchPara
 
     return (
         <Link
-            href={showAddTask ? pathname.slice(-1 * '?addTask=true'.length) : `${pathname}?addTask=true`}
+            href={showAddTask ? pathname : `${pathname}?addTask=true`}
             className='bottom-[2vh] right-[2vw] w-10 h-10 text-white rounded-full flex items-center justify-center'
             style={{ background: mindsetColour }}
         >
