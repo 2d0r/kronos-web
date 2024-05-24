@@ -5,7 +5,7 @@ import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import prisma from './db';
-import { Event, RepeatUnit, Task } from '@prisma/client';
+import { Event, RepeatUnit, Task, TaskType } from '@prisma/client';
 import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION, repeatUnitList } from './definitions';
 import { fetchMindsets, fetchTasks } from './data';
 import { calculatePriorityScores } from './priorityScore';
@@ -16,6 +16,7 @@ const FormSchema = z.object({
   id: z.string(),
   date: z.date(),
   name: z.string(),
+  type: z.string(),
   mindset: z.enum(DEFAULT_MINDSET_LIST, { invalid_type_error: 'Please select a valid mindset.' }),
   status: z.enum(['toDo', 'inProgress', 'done'], { invalid_type_error: 'Please select a valid status.' }).nullable(),
   priority: z.enum(['veryHigh', 'high', 'medium', 'low'], { invalid_type_error: 'Please select a valid priority.' }),
@@ -47,6 +48,7 @@ export type State = {
   errors?: {
     id?: string[];
     name?: string[];
+    type?: string[];
     mindset?: string[];
     status?: string[];
     priority?: string[];
@@ -77,12 +79,13 @@ export type State = {
 };
 
 const CreateTask = FormSchema.omit({ id: true, date: true });
-const EditTask = FormSchema.omit({ date: true })
+const EditTask = FormSchema.omit({ date: true });
 
 export async function createTaskPrisma(prevState: State, formData: FormData) {
 
   const validatedFields = CreateTask.safeParse({
     name: formData.get('name'),
+    type: formData.get('type'),
     mindset: formData.get('mindset'),
     status: formData.get('status'),
     priority: formData.get('priority'),
@@ -118,7 +121,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     };
   }
 
-  const { name, mindset, status, priority, startDate, startTime, endDate, endTime,
+  const { name, type, mindset, status, priority, startDate, startTime, endDate, endTime,
     durationHours, durationMinutes, idealStartTime,
     /* repeat, */ repeatTimespanMultiplier, repeatFrequency, repeatTimespan,
     repeatUnit, repeatDurationHours, repeatDurationMinutes,
@@ -129,8 +132,8 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
   const startDateTime = (startDate && startTime) ? new Date(`${startDate}T${startTime}:00`) :
     (startTime && !startDate) ? new Date(`00/00/00T${startTime}:00`) : null;
   const endDateTime = (endDate && endTime) ? new Date(`${endDate}T${endTime}:00`) : null;
-  const durationInMinutes = (durationHours || durationMinutes) ? (Number(durationMinutes) || 0) + (Number(durationHours) || 0) * 60 :
-    (startDateTime && endDateTime) ? endDateTime.getTime() - startDateTime.getTime() : null;
+  const duration = (durationHours || durationMinutes) ? (Number(durationMinutes) || 0) + (Number(durationHours) || 0) * 60 :
+    (startDateTime && endDateTime) ? endDateTime.getTime() - startDateTime.getTime() : MIN_TASK_DURATION;
   const repeatDurationInMinutes = (repeatDurationHours || repeatDurationMinutes) ?
     (Number(repeatDurationMinutes) || 0) + (Number(repeatDurationHours) || 0) * 60 : null;
 
@@ -151,11 +154,12 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
       data: {
         name: name,
         status: status || 'toDo',
+        type: type as TaskType || 'task',
         mindsetId: matchingMindset.id,
         priority: priority,
         startTime: startDateTime,
         endTime: endDateTime,
-        duration: durationInMinutes || MIN_TASK_DURATION,
+        duration: duration,
         repeat: (!!repeatFrequency && !!repeatTimespanMultiplier && !!repeatTimespan),
         repeatUnit: repeatUnit || 'sessions',
         repeatTimespanMultiplier: (repeatFrequency && Number(repeatFrequency) > 1) ?  Number(repeatTimespanMultiplier) || 1 : 1,
@@ -185,6 +189,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
   const validatedFields = EditTask.safeParse({
     id: formData.get('id'),
     name: formData.get('name'),
+    type: formData.get('type'),
     mindset: formData.get('mindset'),
     status: formData.get('status'),
     priority: formData.get('priority'),
@@ -220,7 +225,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
     };
   }
 
-  const { id, name, mindset, status, priority, startDate, startTime, endDate, endTime,
+  const { id, name, type, mindset, status, priority, startDate, startTime, endDate, endTime,
     durationHours, durationMinutes, idealStartTime,
     /* repeat, */ repeatTimespanMultiplier, repeatFrequency, repeatTimespan,
     repeatUnit, repeatDurationHours, repeatDurationMinutes,
@@ -255,6 +260,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
       },
       data: {
         name: name,
+        type: type as TaskType || 'task',
         status: status || 'toDo',
         mindsetId: matchingMindset.id,
         priority: priority,

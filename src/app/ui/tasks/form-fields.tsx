@@ -14,7 +14,7 @@ function capitalise(text: string) {
 export function InputField(
     { fieldName, placeholder, inputType, label, onChange = () => {}, className, tail, colour = NEUTRAL_MINDSET_COLOUR, state, value } : { 
         fieldName: string, 
-        placeholder: string, 
+        placeholder?: string, 
         inputType: string,
         label?: string,
         onChange?: any,
@@ -26,7 +26,7 @@ export function InputField(
     }
 ) {
 
-    const [ input, setInput ] = useState<string>(placeholder);
+    const [ input, setInput ] = useState<string>(placeholder || '');
     const handleInput = (event : React.ChangeEvent<HTMLInputElement>) => {
         setInput(event.target.value);
         onChange(event);
@@ -61,7 +61,7 @@ export function InputField(
                         step={inputType === 'time' ? '60' : ['duration', 'totalDuration'].includes(fieldName) ? '5' : '1'}
                     />
                 </div>
-                <div>{tail}</div>
+                <div className={tail ? 'mr-2' : ''}>{tail}</div>
             </div>
             <div id='task-error' aria-live='polite' aria-atomic='true'>
             {state?.errors?.customerId &&

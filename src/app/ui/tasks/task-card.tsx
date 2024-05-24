@@ -43,6 +43,43 @@ export default function TaskCard({task, mindsets} : {task?: TaskWithRelations, m
         const mindset = mindsets.filter(el => el.name === event.target.value)[0];
         setTaskCache(task => ({...task, mindset: mindset}));
     }
+    const handleTimeChanges = (event: React.ChangeEvent<HTMLSelectElement>, 
+        type: ('startTime' | 'endTime' | 'startDate' | 'endDate')
+    ) => {
+        let dateTime = type.includes('start') ? taskCache.startTime : taskCache.endTime;
+        const value = event.target.value;
+
+        if (dateTime === null) {
+            dateTime = new Date();
+            if (type.includes('Date')) {
+                const [year, month, day] = value.split('-');
+                dateTime.setFullYear(Number(year), Number(month) - 1, Number(day));
+                dateTime.setHours(0, 0, 0, 0); // Set to the nearest hour (midnight)
+            } else {
+                const [hours, minutes] = value.split(':');
+                dateTime.setHours(Number(hours));
+                dateTime.setMinutes(Number(minutes));
+                dateTime.setSeconds(0, 0);
+            }
+        } else {
+            if (type.includes('Date')) {
+                const [year, month, day] = value.split('-');
+                dateTime.setFullYear(Number(year), Number(month) - 1, Number(day));
+            } else {
+                const [hours, minutes] = value.split(':');
+                dateTime.setHours(Number(hours));
+                dateTime.setMinutes(Number(minutes));
+            }
+        }
+
+        if (type.includes('start')) {
+            setTaskCache(task => ({...task, startTime: dateTime}));
+            console.log('Start DateTime:', taskCache.startTime);
+        } else {
+            setTaskCache(task => ({...task, endTime: dateTime}));
+            console.log('End DateTime:', taskCache.endTime);
+        }
+    }
 
     useEffect(() => {
         setMindsetColour(mindsets.filter(el => el.name === taskCache.mindset?.name)[0]?.colour || NEUTRAL_MINDSET_COLOUR);
@@ -56,7 +93,7 @@ export default function TaskCard({task, mindsets} : {task?: TaskWithRelations, m
             taskCache.name
             && taskCache.mindset
             && taskCache.priority
-            && taskCache.duration > 0
+            && (taskCache.duration > 0 || (taskCache.startTime && taskCache.endTime))
         ) ? setTaskIsReady(true) : setTaskIsReady(false);
         console.log('taskIsReady', taskIsReady);
     }, [taskCache]);
@@ -88,7 +125,6 @@ export default function TaskCard({task, mindsets} : {task?: TaskWithRelations, m
         <div className='w-full flex overflow-hidden'>
             {/* Settings panel */}
             <div className='w-[350px] h-[70vh] p-4 border-r-[0.5px] flex flex-col gap-4 overflow-y-scroll'>
-                <input type='hidden' name='id' id='id'  value={taskCache.id} />
                 <Dropdown 
                     fieldName='mindset'
                     prompt='Pick a mindset'
@@ -97,113 +133,130 @@ export default function TaskCard({task, mindsets} : {task?: TaskWithRelations, m
                     onChange={(event: any) => {
                         handleChangeMindset(event);
                     }}
-                    defaultValue={taskCache.mindset?.name || DEFAULT_MINDSET}
+                    defaultValue={taskCache.mindset?.name || ''}
                     colour={mindsetColour}
                     state={state}
                 />
                 <Dropdown 
-                        fieldName='priority'
-                        prompt='Pick a priority'
-                        label='Priority'
-                        list={priorityList}
-                        onChange={(event: any) => handleTaskCacheUpdate('priority', event.target.value)}
-                        defaultValue={taskCache.priority}
+                    fieldName='priority'
+                    prompt='Pick a priority'
+                    label='Priority'
+                    list={priorityList}
+                    onChange={(event: any) => handleTaskCacheUpdate('priority', event.target.value)}
+                    defaultValue={taskCache.priority || ''}
+                    colour={mindsetColour}
+                    state={state}
+                />
+
+                {!taskCache.fixed && (<div className='flex items-center'>
+                    <div className='font-medium block formKeysColumn'>Duration</div>
+                    <InputField 
+                        fieldName='durationHours'
+                        inputType='number'
+                        tail='hrs'
                         colour={mindsetColour}
                         state={state}
+                        value={String(Math.floor(taskCache.duration / 60))}
+                        onChange={(event: any) => {
+                            setTaskCache(taskCache => ({...taskCache, 
+                                duration: (taskCache.duration || 0) % 60 + Number(event.target.value) * 60
+                            }));
+                        }}
                     />
-                {/* <SelectionField 
-                    fieldName='isScheduled'
-                    prompt=''
-                    list={['Scheduled', 'Flexible']}
-                    type='radio'
-                    colour={mindsetColour}
-                    collapse={false}
-                    state={state}
-                    defaultSelected={taskCache.fixed ? ['Scheduled'] : ['Flexible']}
-                /> */}
+                    <InputField 
+                        fieldName='durationMinutes'
+                        inputType='number'
+                        tail='min'
+                        colour={mindsetColour}
+                        state={state}
+                        value={String(taskCache.duration % 60)}
+                        onChange={(event: any) => {
+                            setTaskCache(taskCache => ({...taskCache, 
+                                duration: (taskCache.duration || 0) - (taskCache.duration || 0) % 60 + Number(event.target.value)
+                            }));
+                        }}
+                    />
+                </div>)}
+
+                {/* Scheduled */}
                 <button 
                     type='button'
                     className='w-full flex my-2 font-medium'
                     onClick={() => {
-                        setTaskCache(task => ({ ...task, fixed: !taskCache.fixed }));
+                        setTaskCache(task => ({ ...task, fixed: !taskCache.fixed, 
+                            startTime: !taskCache.fixed ? null : taskCache.startTime, 
+                            endTime: !taskCache.fixed ? null : taskCache.endTime,
+                        }));
                     }}
                     style={{color: taskCache.fixed ? 'black' : 'lightgrey'}}
-                >Scheduled</button>
+                    >Scheduled
+                </button>
                 {taskCache.fixed && (<>
                     <div className='flex items-center gap-2'>
                     <div className='flex flex-col gap-2'>
                         <InputField 
                             fieldName='startTime'
-                            placeholder='Enter start time'
                             inputType='time'
                             colour={mindsetColour}
                             state={state}
                             value={taskCache.startTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            onChange={(event: any) => handleTimeChanges(event, 'startTime')}
                         />
                         <InputField 
                             fieldName='startDate'
-                            placeholder='Enter start date'
                             inputType='date'
                             colour={mindsetColour}
                             state={state}
-                            value={taskCache.startTime?.toISOString().slice(0, 10)}
+                            value={taskCache.startTime?.toISOString().slice(0, 10) || new Date().toISOString().slice(0, 10)}
+                            onChange={(event: any) => handleTimeChanges(event, 'startDate')}
                         />
                     </div>
                     {'→'}
                     <div className='flex flex-col justify-start gap-2'>
                     <InputField 
                         fieldName='endTime'
-                        placeholder='Enter end time'
                         inputType='time'
                         colour={mindsetColour}
                         state={state}
                         value={taskCache.endTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        onChange={(event: any) => handleTimeChanges(event, 'endTime')}
                     />
                     <InputField 
                         fieldName='endDate'
-                        placeholder='Enter end date'
                         inputType='date'
                         colour={mindsetColour}
                         state={state}
-                        value={taskCache.endTime?.toISOString().slice(0, 10)}
+                        value={taskCache.endTime?.toISOString().slice(0, 10) || new Date().toISOString().slice(0, 10)}
+                        onChange={(event: any) => handleTimeChanges(event, 'endDate')}
                     />
                     </div>
                     </div>
                 </>)}
 
-                {!taskCache.fixed && (<>
+
+                {!taskCache.fixed && (
+                <div className='flex gap-4'>
+                    <button 
+                        type='button'
+                        onClick={() => { 
+                            setIdealStart(!idealStart);
+                            setTaskCache(task => ({ ...task, startTime: null }));
+                        }}
+                        style={{color: idealStart || taskCache.startTime ? 'black' : 'lightgrey'}}
+                        className='text-left cursor-pointer font-medium my-2'
+                        >Ideal start
+                    </button>
+                    { (idealStart || taskCache.startTime) ? 
                     <InputField 
-                        fieldName='durationMinutes'
-                        placeholder='30'
-                        inputType='number'
-                        label='Duration'
-                        tail='minutes'
+                        fieldName='idealStartTime'
+                        placeholder='Enter start time'
+                        inputType='time'
+                        label=''
                         colour={mindsetColour}
                         state={state}
-                        value={String(taskCache.duration)}
-                        onChange={(event: any) => handleTaskCacheUpdate('duration', Number(event.target.value))}
-                    />
-                    <div className='flex gap-4'>
-                        <button 
-                            type='button'
-                            onClick={() => { 
-                                setIdealStart(!idealStart);
-                                setTaskCache(task => ({ ...task, startTime: null }));
-                            }}
-                            style={{color: idealStart || taskCache.startTime ? 'black' : 'lightgrey'}}
-                            className='text-left cursor-pointer font-medium'
-                        >Ideal start</button>
-                        { (idealStart || taskCache.startTime) ? <InputField 
-                            fieldName='idealStartTime'
-                            placeholder='Enter start time'
-                            inputType='time'
-                            label=''
-                            colour={mindsetColour}
-                            state={state}
-                            value={taskCache.endTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        /> : <></>}
-                    </div>
-                </>)}
+                        value={taskCache.fixed ? '' : taskCache.startTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    /> : <></>}
+                </div>)}
                 <div className={'divider'}></div>
                 {/* <SelectionField 
                     fieldName='repeat'
@@ -435,6 +488,11 @@ export default function TaskCard({task, mindsets} : {task?: TaskWithRelations, m
                 >{!task ? 'Add task' : 'Save'}
             </Button>
         </div>
+
+        {/* Data to be sent to form without direct input */}
+            <input type='hidden' name='id' id='id'  value={taskCache.id} />
+            <input type='hidden' name='type' id='type'  value={'task'} />
+            {/* task.fixed is sent based on startTime and endTime */}
     </form>
     </div>
     </div>);
