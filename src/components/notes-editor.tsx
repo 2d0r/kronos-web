@@ -11,6 +11,7 @@ import { Color } from '@tiptap/extension-color';
 import BulletList from '@tiptap/extension-bullet-list';
 import Document from '@tiptap/extension-document';
 import ListItem from '@tiptap/extension-list-item';
+import OrderedList from '@tiptap/extension-ordered-list';
 import Paragraph from '@tiptap/extension-paragraph';
 import Text from '@tiptap/extension-text';
 import TextStyle from '@tiptap/extension-text-style';
@@ -33,21 +34,14 @@ const NotesEditor: FC<{
       Color.configure({ types: [TextStyle.name, ListItem.name] }),
       // TextStyle.configure({ types: [ListItem.name] }),
       Text,
-      StarterKit.configure({
-        // bulletList: {
-        //   itemTypeName: 'listItem',
-        //   keepMarks: false,
-        //   keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
-        // },
-        orderedList: {
-          keepMarks: true,
-          keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
-        },
-      }),
       BulletList.configure({
         keepAttributes: false
       }),
       ListItem,
+      OrderedList.configure({
+        keepMarks: true,
+        keepAttributes: false, // TODO : Making this as `false` becase marks are not preserved when I try to preserve attrs, awaiting a bit of help
+      }),
       Strike,
       Heading.configure({
         HTMLAttributes: {
