@@ -15,9 +15,10 @@ import { adjustLightness } from '@/app/utils/colourUtils';
 import NotesEditor from '@/components/notes-editor';
 import ChecklistEditor from '@/components/checklist-editor';
 import CircleTimer from '@/components/circle-timer';
+import TaskCard from '../ui/tasks/task-card';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
-    const showAddTask = searchParams?.addTask;
+    const showAddTask = searchParams?.editTask;
     const showMenu = searchParams?.menu;
 
     const events = await fetchEventsWithRelations();
@@ -34,7 +35,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             backgroundImage: `linear-gradient(to bottom left, ${adjustLightness(eventMindset.colour, 0.2)}, ${adjustLightness(eventMindset.colour, -0.2)})`
         }}>
         <TopBar searchParams={searchParams}/>
-        {showAddTask && <CreateTask mindsets={mindsets}/>}
+        {showAddTask && <TaskCard mindsets={mindsets}/>}
         {showMenu && <Menu />}
         <div className='w-full h-full content-center justify-center flex flex-row text-center'>
             {/* Left area */}

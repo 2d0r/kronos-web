@@ -32,7 +32,7 @@ const FormSchema = z.object({
   // repeat: z.coerce.boolean(),
   repeatUnit: z.enum(['sessions', 'minutes'], { invalid_type_error: 'Please select a valid Repeat Unit.' }).nullable(),
   repeatFrequency: z.string().nullable(),
-  repeatTimespan: z.enum(['day', 'week', 'month', 'year'], { invalid_type_error: 'Please select a valid Repeat Timespan.' }).nullable(),
+  repeatTimespan: z.enum(['hour', 'day', 'week', 'month', 'year'], { invalid_type_error: 'Please select a valid Repeat Timespan.' }).nullable(),
   repeatTimespanMultiplier: z.string().nullable(),
   repeatDurationHours: z.string().nullable(),
   repeatDurationMinutes: z.string().nullable(),
@@ -78,12 +78,13 @@ export type State = {
   message?: string | null;
 };
 
-const CreateTask = FormSchema.omit({ id: true, date: true });
+const CreateTask = FormSchema.omit({ date: true });
 const EditTask = FormSchema.omit({ date: true });
 
 export async function createTaskPrisma(prevState: State, formData: FormData) {
 
   const validatedFields = CreateTask.safeParse({
+    id: formData.get('id'),
     name: formData.get('name'),
     type: formData.get('type'),
     mindset: formData.get('mindset'),
@@ -121,7 +122,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     };
   }
 
-  const { name, type, mindset, status, priority, startDate, startTime, endDate, endTime,
+  const { id, name, type, mindset, status, priority, startDate, startTime, endDate, endTime,
     durationHours, durationMinutes, idealStartTime,
     /* repeat, */ repeatTimespanMultiplier, repeatFrequency, repeatTimespan,
     repeatUnit, repeatDurationHours, repeatDurationMinutes,
@@ -152,6 +153,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
   try {
     await prisma.task.create({
       data: {
+        id: id,
         name: name,
         status: status || 'toDo',
         type: type as TaskType || 'task',
@@ -181,7 +183,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
   }
 
   revalidatePath('/');
-  redirect('/');
+  // redirect('/timeline');
 }
 
 export async function editTaskPrisma(prevState: State, formData: FormData) {
@@ -289,7 +291,11 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
   }
 
   revalidatePath('/');
-  redirect('/timeline');
+  // redirect('/timeline');
+  if (typeof window !== "undefined") {
+    window.history.back();
+  }
+  
 }
 
 export async function deleteTask(id: string) {
@@ -302,23 +308,35 @@ export async function deleteTask(id: string) {
   }
 
   revalidatePath('/');
-  redirect('/');
+  // redirect('/');
 }
 
 export async function deleteTaskPrisma(id: string) {
 
+  console.log('delete task 1');
+
+  const taskEvents = await prisma.event.findMany({
+    where: {
+      taskId: id
+    }
+  });
+
   // Delete related events first
-  try {
-    await prisma.event.deleteMany({
-      where: {
-        taskId: id
-      },
-    });
-  } catch (error) {
-    return {
-      message: 'Database Error: Failed to delete events related to task.'
+  if (taskEvents.length > 0) {
+    try {
+      await prisma.event.deleteMany({
+        where: {
+          taskId: id
+        },
+      });
+    } catch (error) {
+      return {
+        message: 'Database Error: Failed to delete events related to task.'
+      }
     }
   }
+
+  console.log('delete task 2');
 
   try {
     await prisma.task.delete({
@@ -333,7 +351,6 @@ export async function deleteTaskPrisma(id: string) {
   }
 
   revalidatePath('/');
-  redirect('/');
 }
 
 export async function createEventPrisma(event: Event) {

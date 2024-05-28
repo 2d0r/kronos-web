@@ -4,9 +4,10 @@ import { NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from '../lib/definition
 import Menu from '../ui/menu';
 import CreateTask from '../ui/tasks/create-task';
 import { fetchEvents, fetchMindsetsWithRelations, getCurrentMindsetColour } from '../lib/data';
+import TaskCard from '../ui/tasks/task-card';
 
 export default async function Page({searchParams}: {searchParams: URLSearchParamsKronos}) {
-  const showAddTask = searchParams?.addTask;
+  const showAddTask = searchParams?.editTask;
   const events = await fetchEvents();
   const mindsets = await fetchMindsetsWithRelations();
   const eventColours = events.map(event => {
@@ -20,7 +21,7 @@ export default async function Page({searchParams}: {searchParams: URLSearchParam
   return (<>
     <TimelineCard searchParams={searchParams} back={true}>
       <>
-        {showAddTask && <CreateTask mindsets={mindsets}/>}
+        {showAddTask && <TaskCard mindsets={mindsets}/>}
         <div className='h-[60vh] w-[80vw]'>
           <CalendarComponent events={events} eventColours={eventColours} mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}/>
         </div>

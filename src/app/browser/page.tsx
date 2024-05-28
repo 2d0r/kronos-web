@@ -4,19 +4,21 @@ import { NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from
 import { fetchMindsets, fetchTaskWithRelations, fetchTasksWithRelations, getCurrentMindsetColour } from '../lib/data';
 import TaskBrowser from '../ui/browser/task-browser';
 import { Mindset } from '@prisma/client';
-import EditTask from '../ui/tasks/edit-task';
-import { useSearchParams } from 'next/navigation';
 import TaskCard from '../ui/tasks/task-card';
 
 export default async function Page({searchParams}: {searchParams: URLSearchParamsKronos}) {
 
-    const tasks: TaskWithRelations[] = await fetchTasksWithRelations(); 
+    let tasks: TaskWithRelations[] = await fetchTasksWithRelations(); 
     const mindsets: Mindset[] = await fetchMindsets();
     const mindsetColour = await getCurrentMindsetColour();
+    
+    // const showEditTask = !!searchParams.editTask;
+    // const taskToEditId = searchParams.editTask;
+    // const taskToEdit = taskToEditId === 'new' ? {} as TaskWithRelations : await fetchTaskWithRelations(taskToEditId || '');
 
-    // const searchParams2 = useSearchParams();
-    const editTaskId = searchParams.editTask;
-    const editTask = await fetchTaskWithRelations(editTaskId || '');
+    // const handleTasksUpdate = async () => {
+    //     tasks = await fetchTasksWithRelations(); 
+    // }
 
     return (<>
         <TimelineCard searchParams={searchParams} back={true}>
@@ -25,8 +27,8 @@ export default async function Page({searchParams}: {searchParams: URLSearchParam
                 mindsets={mindsets} 
                 mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}
                 searchParams={searchParams}
+                // onTasksUpdate={handleTasksUpdate}
             />
         </TimelineCard>
-        {editTaskId && <TaskCard task={editTask} mindsets={mindsets} />}
     </>);
 }

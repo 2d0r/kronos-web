@@ -44,7 +44,7 @@ export default function EditTask({task, mindsets} : {task: TaskWithRelations, mi
     
 
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-start justify-center overflow-y-scroll bg-black/20 backdrop-blur-sm py-4'>
-    <div className='z-50 absolute top-1/3 rounded-2xl bg-white p-4 md:p-6 w-[350px] overflow-x-hidden shadow-2xl shadow-slate-500 text-sm text-black'>
+    <div className='z-50 absolute top-1/3 rounded-2xl bg-white p-4 md:p-6 w-[350px] overflow-x-hidden shadow-2xl text-sm text-black'>
         <div className='w-full flex justify-between items-center pb-4'>
             <div className='w-8 h-8'></div>
             <div className='text-sm text-slate-400'>Edit task</div>

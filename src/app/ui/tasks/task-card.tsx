@@ -8,30 +8,45 @@ import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDS
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Mindset } from '@prisma/client';
-import { adjustLightness } from '@/app/utils/colourUtils';
 import { useRouter } from 'next/navigation';
-import { editTaskPrisma } from '@/app/lib/actions';
+import { editTaskPrisma, createTaskPrisma, deleteTaskPrisma } from '@/app/lib/actions';
 import { parseISO } from 'date-fns';
 import NotesEditor from '@/components/notes-editor';
 import ChecklistEditor from '@/components/checklist-editor';
+import {v4 as uuidv4} from 'uuid';
 
 
-export default function TaskCard({task, mindsets} : {task?: TaskWithRelations, mindsets: Mindset[]}) {
-    const initialState = { message: null, errors: {} };
-    const editTaskHere : any = editTaskPrisma;
-    const [state, dispatch] = useFormState(editTaskHere, initialState);
+export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, onTaskDelete} : {
+    task?: TaskWithRelations, 
+    mindsets: Mindset[], 
+    onTaskUpdate?: (task: TaskWithRelations) => void, 
+    onTaskCreate?: (task: TaskWithRelations) => void,
+    onTaskDelete?: (taskId: string) => void,
+}) {
 
     const pathname = usePathname();
     const router = useRouter();
+    const searchParams = useSearchParams();
 
-    const [ taskCache, setTaskCache ] = useState<TaskWithRelations>(task || {} as TaskWithRelations);
+    const [ isNewTask, setIsNewTask ] = useState<boolean>(searchParams.get('editTask') === 'new' ? true : false);
+    // const [ isOpen, setIsOpen ] = useState<boolean>(false);
+    const [ taskCache, setTaskCache ] = useState<TaskWithRelations>(!isNewTask && task ? task : {} as TaskWithRelations);
     const [ endRepeat, setEndRepeat ] = useState<(string | null)>('No');
     const [ idealStart, setIdealStart ] = useState<boolean>(false);
     const [repeatUnit, setRepeatUnit] = useState<string | null>('sessions');
-    const [ mindsetColour, setMindsetColour] = useState<string>(taskCache.mindset?.colour || 'green');
+    const [ mindsetColour, setMindsetColour] = useState<string>(taskCache.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
     const [ deadline, setDeadline ] = useState<boolean>(false);
     const [ taskIsEdited, setTaskIsEdited ] = useState<boolean>(false);
     const [ taskIsReady, setTaskIsReady ] = useState<boolean>(false);
+    
+
+    const initialState = { message: null, errors: {} };
+    // Set up to edit task or to create new task
+    const editTaskHere : any = isNewTask ? createTaskPrisma : editTaskPrisma;
+    const [state, dispatch] = useFormState(editTaskHere, initialState);
+
+
+    // Handlers
 
     const handleTaskCacheUpdate = (field: keyof TaskWithRelations, value: any) => {
         setTaskCache(taskCache => ({
@@ -74,13 +89,28 @@ export default function TaskCard({task, mindsets} : {task?: TaskWithRelations, m
 
         if (type.includes('start')) {
             setTaskCache(task => ({...task, startTime: dateTime}));
-            console.log('Start DateTime:', taskCache.startTime);
         } else {
             setTaskCache(task => ({...task, endTime: dateTime}));
-            console.log('End DateTime:', taskCache.endTime);
         }
     }
+    const closeModalAndRefetchTasks = () => {
+        // setIsOpen(false);
+        console.log('newTask is new', isNewTask, taskCache);
+        isNewTask && onTaskCreate ? onTaskCreate(taskCache) : 
+            onTaskUpdate ? onTaskUpdate(taskCache) : ()=>{};
+        router.back();
+    };
+    const handleDeleteTask = (taskId: string) => {
+        onTaskDelete && onTaskDelete(taskId);
+        router.back();
+    }
 
+
+    // Hooks
+
+    useEffect(() => {
+        setMindsetColour(task?.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
+    }, []);
     useEffect(() => {
         setMindsetColour(mindsets.filter(el => el.name === taskCache.mindset?.name)[0]?.colour || NEUTRAL_MINDSET_COLOUR);
     }, [taskCache.mindset]);
@@ -90,20 +120,35 @@ export default function TaskCard({task, mindsets} : {task?: TaskWithRelations, m
         (task && task !== taskCache) ? setTaskIsEdited(true) : setTaskIsEdited(false);
         // Check if new task has enough valid inputs to be added
         (
-            taskCache.name
+            taskCache.name 
+            && taskCache.id
             && taskCache.mindset
             && taskCache.priority
             && (taskCache.duration > 0 || (taskCache.startTime && taskCache.endTime))
         ) ? setTaskIsReady(true) : setTaskIsReady(false);
-        console.log('taskIsReady', taskIsReady);
     }, [taskCache]);
     useEffect(() => {
-        setMindsetColour(task?.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
-    }, []);
-    
+        const isNewTask = searchParams.get('editTask') === 'new' ? true : false;
+        // setIsOpen(searchParams.has('editTask') ? true : false);
+        setIsNewTask(isNewTask);
+        setTaskCache(!isNewTask && task ? task : {} as TaskWithRelations);
+    }, [searchParams]);
+    useEffect(() => {
+        if (isNewTask) {
+            const newId = uuidv4();
+            setTaskCache(prevTaskCache => {
+                const updatedTaskCache = { ...prevTaskCache, id: newId };
+                return updatedTaskCache;
+            });
+        }
+    }, [isNewTask]);
 
+    // if (!isOpen) {
+    //     return <></>;
+    // }
+    
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'>
-    <div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl shadow-slate-500 text-sm text-black overflow-hidden'>
+    <div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl text-sm text-black overflow-hidden'>
     <form action={dispatch}>
         {/* Top bar */}
         <div className='w-full h-16 flex justify-between items-center p-4 border-b-[0.5px]'>
@@ -148,7 +193,7 @@ export default function TaskCard({task, mindsets} : {task?: TaskWithRelations, m
                     state={state}
                 />
 
-                {!taskCache.fixed && (<div className='flex items-center'>
+                <div className='flex items-center'>
                     <div className='font-medium block formKeysColumn'>Duration</div>
                     <InputField 
                         fieldName='durationHours'
@@ -176,7 +221,7 @@ export default function TaskCard({task, mindsets} : {task?: TaskWithRelations, m
                             }));
                         }}
                     />
-                </div>)}
+                </div>
 
                 {/* Scheduled */}
                 <button 
@@ -472,26 +517,40 @@ export default function TaskCard({task, mindsets} : {task?: TaskWithRelations, m
             
         </div>
         {/* Bottom bar */}
-        <div className='flex justify-end items-center gap-4 p-4 h-12 border-t-[0.5px]'>
-            { taskIsEdited ?
-                <button 
-                    type='reset' 
-                    className='text-gray-400'
-                    onClick={() => router.back()}>
-                    Cancel time settings
-                </button> : <></>
-            }
-            <Button type='submit' 
-                className={`task-card h-8 text-black ${taskIsReady ? '' : 'bg-gray-300 cursor-not-allowed'}`}
-                disabled={!taskIsReady}
-                style={{ backgroundColor: taskIsReady ? mindsetColour : '' }}
-                >{!task ? 'Add task' : 'Save'}
-            </Button>
+        <div className='flex justify-between items-center gap-4 p-4 h-12 border-t-[0.5px]'>
+            <button type='button'
+                className='text-gray-400'
+                onClick={() => {
+                    // if(task?.id) deleteTaskPrisma(task.id);
+                    // closeModalAndRefetchTasks();
+                    task?.id && handleDeleteTask(task.id);
+                }}
+                >Delete task
+            </button>
+            <div className='flex gap-4'>
+                { taskIsEdited && !isNewTask ?
+                    <button 
+                        type='reset' 
+                        className='text-gray-400'
+                        onClick={() => setTaskCache(task || {} as TaskWithRelations)}
+                        >
+                        Cancel changes
+                    </button> : <></>
+                }
+                <Button type='submit' 
+                    className={`task-card h-8 text-black ${taskIsReady ? '' : 'bg-gray-300 cursor-not-allowed'}`}
+                    disabled={!taskIsReady}
+                    style={{ backgroundColor: taskIsReady ? mindsetColour : '' }}
+                    onClick={closeModalAndRefetchTasks}
+                    >{isNewTask ? 'Add task' : 'Save'}
+                </Button>
+            </div>
         </div>
 
         {/* Data to be sent to form without direct input */}
             <input type='hidden' name='id' id='id'  value={taskCache.id} />
             <input type='hidden' name='type' id='type'  value={'task'} />
+            <input type='hidden' name='repeat' id='repeat' value={String(taskCache.repeat)} />
             {/* task.fixed is sent based on startTime and endTime */}
     </form>
     </div>

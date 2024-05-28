@@ -1,4 +1,5 @@
-import { $Enums, Mindset, Task } from '@prisma/client';
+import { $Enums, Mindset, Priority, Task } from '@prisma/client';
+import { TaskWithRelations } from '../lib/definitions';
 
 interface Sortable {
     [key: string]: any;
@@ -41,4 +42,3 @@ export function sortTasksByPriority (
 export function getTaskColour(task: Task, mindsets: Mindset[]): string {
     return mindsets.filter(el => el.id === task.mindsetId)[0].colour;
 }
-

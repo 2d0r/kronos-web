@@ -16,7 +16,7 @@ import TaskCard from '../ui/tasks/task-card';
 import Link from 'next/link';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
-    const showAddTask = searchParams?.addTask;
+    const showAddTask = searchParams?.editTask;
     const showMenu = searchParams?.menu;
     const showEditTask = searchParams?.editTask;
 

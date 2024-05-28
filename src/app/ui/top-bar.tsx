@@ -24,8 +24,8 @@ const TopBar: FC<TopBarProps> = ({children, searchParams, back}) => {
     }
 
     useEffect(() => {
-        setShowMenu(searchParams?.menu && !searchParams?.addTask ? true : false);
-    }, [searchParams?.menu, searchParams?.addTask]);
+        setShowMenu(searchParams?.menu && !searchParams?.editTask ? true : false);
+    }, [searchParams?.menu, searchParams?.editTask]);
 
 
     return (<div className='top-0 fixed z-40 w-full flex justify-between items-center px-4 py-2'>

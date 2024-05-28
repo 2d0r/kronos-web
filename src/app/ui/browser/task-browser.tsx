@@ -6,13 +6,14 @@ import { Dropdown } from '../tasks/form-fields';
 import { DEFAULT_MINDSET_LIST, TaskWithRelations, URLSearchParamsKronos } from '@/app/lib/definitions';
 import '@/app/globals.css';
 import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/app/utils/dateUtils';
-import Checkbox from '../buttons/checkbox';
+import Checkbox from './checkbox';
 import { getTaskColour } from '@/app/utils/taskUtils';
 import { adjustLightness } from '@/app/utils/colourUtils';
-import { log } from 'console';
 import { History } from 'lucide-react';
 import Link from 'next/link';
 import ToDoItem from '../tasks/to-do-item';
+import TaskCard from '../tasks/task-card';
+import { fetchTaskWithRelations, fetchTasksWithRelations } from '@/app/lib/data';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
@@ -20,18 +21,7 @@ const TaskBrowser: FC<{
     tasks: TaskWithRelations[], mindsets: Mindset[], mindsetColour: string, searchParams: URLSearchParamsKronos
 }> = ({tasks, mindsets, mindsetColour, searchParams}) => {
 
-    const [ taskCache, setTaskCache ] = useState<TaskWithRelations[]>(tasks);
-    const handleTaskStatusUpdated = (taskId: string, status: Status) => {
-        setTaskCache((taskCache) => {
-            return taskCache.map(task => {
-                if (task.id === taskId) {
-                    return { ...task, status: status }
-                } 
-                return task;
-            });
-        });
-    };
-
+    const [ tasksCache, setTasksCache ] = useState<TaskWithRelations[]>(tasks);
     const [ taskTypeFilter, setTaskTypeFilter ] = useState<TaskType>('task');
     const [ mindsetFilter, setMindsetFilter ] = useState<string>('All');
     const [ taskDisplay, setTaskDisplay ] = useState<JSX.Element[] | JSX.Element>(<></>);
@@ -39,9 +29,23 @@ const TaskBrowser: FC<{
     const [ logbookView, setLogbookView ] = useState<boolean>(searchParams?.logbook);
     const [ sort, setSort ] = useState<SortItem>(searchParams?.logbook ? ['Date', 'Descending'] : ['Priority', 'Descending']);
 
+    const fetchTasks = async () => {
+        console.log('before response');
+        const response = await fetch('/api/task');
+        console.log('response', response);
+        const data = await response.json();
+        console.log('response data', data);
+        setTasksCache(data.tasks);
+    };
+
+    // Get task to edit from search parametres
+    const showEditTask = !!searchParams.editTask;
+    const taskToEditId = searchParams.editTask;
+    const taskToEdit = taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0];
+
     const changeTaskDisplay = (mindsetFilter: string, type: TaskType, tableView: boolean, sort?: SortItem, logbookFilter?: boolean) => {
         const mindsetList = mindsetFilter === 'All' ? DEFAULT_MINDSET_LIST : [mindsetFilter];
-        const tasksFilteredByType = taskCache.filter(task => task.type === type);
+        const tasksFilteredByType = tasksCache.filter(task => task.type === type);
 
         // FILTER TASKS
         let filteredTasks = tasksFilteredByType;
@@ -72,7 +76,7 @@ const TaskBrowser: FC<{
                 newTaskDisplay = () => { 
                     return (<div className='flex flex-col gap-2 w-full max-w-1/2 items-start justify-start py-2'>
                         {sortedTasks.map(task => {
-                            const taskColour = mindsets.filter(el => el.id === task.mindsetId)[0].colour;
+                            // const taskColour = mindsets.filter(el => el.id === task.mindsetId)[0].colour;
                             return(
                                 // <div key={task.id} className='flex gap-2 items-center'>
                                 //     <Checkbox type={task.type} repeat={task.repeat} taskId={task.id} status={task.status} 
@@ -81,7 +85,7 @@ const TaskBrowser: FC<{
                                 //     />
                                 //     <span>{task.name}</span>
                                 // </div>
-                                <ToDoItem task={task} onTaskStatusUpdated={handleTaskStatusUpdated}/>
+                                <ToDoItem key={task.id} task={task} onTaskStatusUpdated={handleTaskStatusUpdated} onTaskDelete={handleTaskDelete}/>
                             );
                         })}
                         { sortedTasks.length === 0 &&
@@ -106,7 +110,7 @@ const TaskBrowser: FC<{
                                         <span className='text-lg'>{task.name}</span>
                                         <span className='text-sm'>{task.notes}</span>
                                         <div className='w-full flex flex-col gap-2 items-start'>
-                                            { taskCache.filter(subtask => subtask.tasksParent.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
+                                            { tasksCache.filter(subtask => subtask.tasksParent.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
                                                 return(<div className={'flex gap-2 items-center text-sm'} key={innerTask.id}>
                                                     <Checkbox taskId={innerTask.id} status={innerTask.status} type={innerTask.type}
                                                         height='20' width='20' fill='white'
@@ -168,6 +172,16 @@ const TaskBrowser: FC<{
 
     // Handlers
 
+    const handleTaskStatusUpdated = (taskId: string, status: Status) => {
+        setTasksCache((tasksCache) => {
+            return tasksCache.map(task => {
+                if (task.id === taskId) {
+                    return { ...task, status: status }
+                } 
+                return task;
+            });
+        });
+    };
     const handleTaskTypeFilter = (type: TaskType) => {
         setMindsetFilter('All'); // reset bucket when changing tab
         type === 'goal' && setTableView(false);
@@ -199,17 +213,44 @@ const TaskBrowser: FC<{
         changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView, newSort, newLogbookView);
         setLogbookView(newLogbookView);
     }
+    const handleTaskUpdate = (newTask: TaskWithRelations) => {
+        // fetchTasks();
+        setTasksCache(tasksCache.map(task => {
+            return task.id === newTask.id ? {...task, ...newTask} : task;
+        }));
+    }
+    const handleTaskCreate = (newTask: TaskWithRelations) => {
+        // fetchTasks();
+        console.log('newTask', newTask);
+        const updatedTasksCache = setTasksCache(prevTaskCache => {
+            const updatedTasksCache = [...prevTaskCache, {
+                ...newTask,
+                status: 'toDo' as Status,
+                type: 'task' as TaskType,
+            }];
+            console.log('newTask - updatedTasksCache', updatedTasksCache);
+            return updatedTasksCache;
+        });
+    }
+    const handleTaskDelete = async (taskId: string) => {
+        await fetch(`/task/${taskId}`, {
+            method: 'DELETE'
+        });
+        setTasksCache(tasksCache.filter(task => task.id !== taskId));
+        // fetchTasks();
+    }
 
 
     // Hooks
 
     useEffect(() => {
+        // fetchTasks();
         changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView, sort, logbookView);
     }, []);
     // Update states for logbook
     useEffect(() => {
         (logbookView) && setSort(['Date', 'Descending']);
-    }, [logbookView])
+    }, [logbookView]);
     // Update logbookView based on searchaparams
     useEffect(() => {
         const newLogbookView = searchParams?.logbook;
@@ -217,9 +258,20 @@ const TaskBrowser: FC<{
         changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView, newSort, newLogbookView);
         setLogbookView(newLogbookView);
     }, [searchParams.logbook]);
+    useEffect(() => {
+        changeTaskDisplay(mindsetFilter, taskTypeFilter, tableView, sort, logbookView);
+    }, [tasksCache]);
 
     return(
         <div className='flex flex-col items-center gap-4'>
+            {showEditTask && 
+            <TaskCard 
+                task={taskToEdit} 
+                mindsets={mindsets} 
+                onTaskUpdate={handleTaskUpdate} 
+                onTaskCreate={handleTaskCreate}
+                onTaskDelete={handleTaskDelete} 
+            />}
             {/* Tab bar */}
             <div className='flex gap-4 items-center justify-center'>
                 <button 
