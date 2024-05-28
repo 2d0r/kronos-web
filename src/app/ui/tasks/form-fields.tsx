@@ -33,12 +33,8 @@ export function InputField(
     }
 
     return (<>
-        <div className={clsx('flex items-baseline', 
-            label && 'gap-2'
-        )}>
-            <label htmlFor={fieldName} className={clsx('my-2 block text-sm font-medium',
-                label && 'formKeysColumn'
-            )}>
+        <div className={clsx('flex items-baseline',  label && 'gap-2')}>
+            <label htmlFor={fieldName} className={clsx('my-2 block text-sm font-medium', label && 'formKeysColumn')}>
                 {label}
             </label>
             <div className={clsx('flex items-center', 
@@ -221,7 +217,7 @@ export function MultiSelectionField(
         list: string[],
         prompt: string,
         type: string,
-        onChange?: (value: string[])=>void,
+        onChange?: any,
         selected?: string[],
         className?: string,
         colour?: string,

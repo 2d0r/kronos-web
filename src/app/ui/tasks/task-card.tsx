@@ -30,7 +30,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
 
     const [ isNewTask, setIsNewTask ] = useState<boolean>(searchParams.get('editTask') === 'new' ? true : false);
     // const [ isOpen, setIsOpen ] = useState<boolean>(false);
-    const [ taskCache, setTaskCache ] = useState<TaskWithRelations>((!isNewTask && task) ? task : {id: ''} as TaskWithRelations);
+    const [ taskCache, setTaskCache ] = useState<TaskWithRelations>((!isNewTask && task) ? task : {id: uuidv4()} as TaskWithRelations);
     const [ endRepeat, setEndRepeat ] = useState<(string | null)>('No');
     const [ idealStart, setIdealStart ] = useState<boolean>(false);
     const [repeatUnit, setRepeatUnit] = useState<string | null>('sessions');
@@ -38,7 +38,6 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     const [ deadline, setDeadline ] = useState<boolean>(false);
     const [ taskIsEdited, setTaskIsEdited ] = useState<boolean>(false);
     const [ taskIsReady, setTaskIsReady ] = useState<boolean>(false);
-    
 
     const initialState = { message: null, errors: {} };
     // Set up to edit task or to create new task
@@ -49,7 +48,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     // Handlers
 
     const handleTaskCacheUpdate = (field: keyof TaskWithRelations, value: any) => {
-        setTaskCache(task => ({ ...task, [field]: value }));
+        setTaskCache(prevTask => ({ ...prevTask, [field]: value }));
     }
     const handleChangeMindset = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const mindset = mindsets.filter(el => el.name === event.target.value)[0];
@@ -104,6 +103,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     // Hooks
 
     // Make sure mindset colour is loaded
+    // Set task cache as task if available
     useEffect(() => {
         setMindsetColour(task?.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
     }, []);
@@ -113,6 +113,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     }, [taskCache.mindset]);
     // Signal task as ready to submit once the compulsory fields are filled
     useEffect(() => {
+        console.log('taskCache', taskCache);
         // Check if task was edited
         (task && task !== taskCache) ? setTaskIsEdited(true) : setTaskIsEdited(false);
         // Check if new task has enough valid inputs to be added
@@ -131,15 +132,15 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
         (!isNewTask && task) && setTaskCache(task);
     }, [searchParams]);
     // Create an empty taskCache if isNewTask is true
-    useEffect(() => {
-        if (isNewTask) {
-            const newId = uuidv4();
-            setTaskCache(prevTaskCache => {
-                const updatedTaskCache = { ...prevTaskCache, id: newId };
-                return updatedTaskCache;
-            });
-        }
-    }, [isNewTask]);
+    // useEffect(() => {
+    //     if (isNewTask) {
+    //         const newId = uuidv4();
+    //         setTaskCache(prevTaskCache => {
+    //             const updatedTaskCache = { ...prevTaskCache, id: newId };
+    //             return updatedTaskCache;
+    //         });
+    //     }
+    // }, [isNewTask]);
     
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'>
     <div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl text-sm text-black overflow-hidden'>
@@ -196,7 +197,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                         tail='hrs'
                         colour={mindsetColour}
                         state={state}
-                        value={String(Math.floor(taskCache.duration / 60) || MIN_TASK_DURATION)}
+                        value={String(Math.floor(taskCache.duration / 60) || 0)}
                         onChange={(event: any) => {
                             setTaskCache(taskCache => ({...taskCache, 
                                 duration: (taskCache.duration || 0) % 60 + Number(event.target.value) * 60
@@ -223,7 +224,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                     type='button'
                     className='w-full flex my-2 font-medium'
                     onClick={() => {
-                        setTaskCache(task => ({ ...task, fixed: !taskCache.fixed, 
+                        setTaskCache(prevTask => ({ ...prevTask, fixed: !taskCache.fixed, 
                             startTime: !taskCache.fixed ? null : taskCache.startTime, 
                             endTime: !taskCache.fixed ? null : taskCache.endTime,
                         }));
@@ -280,7 +281,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                         type='button'
                         onClick={() => { 
                             setIdealStart(!idealStart);
-                            setTaskCache(task => ({ ...task, startTime: null }));
+                            setTaskCache(prevTask => ({ ...prevTask, startTime: null }));
                         }}
                         style={{color: idealStart || taskCache.startTime ? 'black' : 'lightgrey'}}
                         className='text-left cursor-pointer font-medium my-2 formKeysColumn'
@@ -320,8 +321,8 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                                 inputType='number'
                                 colour={mindsetColour}
                                 state={state}
-                                value={String(taskCache.repeatFrequency)}
-                                onChange={(event: any) => handleTaskCacheUpdate('repeatFrequency', Number(event.target.value))}
+                                value={String(taskCache.repeatFrequency || 0)}
+                                onChange={(event: any) => handleTaskCacheUpdate('repeatFrequency', Number(event.target.value) || 0)}
                             />
                         </>) : (<>
                             <InputField 
@@ -404,7 +405,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                             className='w-full flex my-2 font-medium'
                             onClick={() => {
                                 handleTaskCacheUpdate('endRepeat', !taskCache.endRepeat);
-                                setTaskCache(task => ({ ...task, totalDuration: null, totalRepetitions: null, endRepeatDate: null }));
+                                setTaskCache(prevTask => ({ ...prevTask, totalDuration: null, totalRepetitions: null, deadline: null }));
                             }}
                             style={{color: taskCache.endRepeat ? 'black' : 'lightgrey'}}
                         >End repeat</button>
@@ -413,8 +414,11 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                                 <button 
                                     type='button'
                                     onClick={() => {
-                                        setEndRepeat(endRepeat === 'date' ? 'yes' : 'date');
-                                        setTaskCache(task => ({ ...task, totalDuration: null, totalRepetitions: null }));
+                                        const newEndRepeat = endRepeat === 'date' ? 'yes' : 'date';
+                                        setEndRepeat(newEndRepeat);
+                                        setTaskCache(prevTask => ({ ...prevTask, totalDuration: null, totalRepetitions: null,
+                                            deadline: newEndRepeat === 'yes' ? null : prevTask.deadline,
+                                        }));
                                     }}
                                     style={{color: endRepeat === 'date' || taskCache.deadline ? 'black' : 'lightgrey'}}
                                     className='text-left'
@@ -433,8 +437,11 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                                 <button 
                                     type='button'
                                     onClick={() => {
-                                        setEndRepeat(endRepeat === 'duration' ? 'yes' : 'duration');
-                                        setTaskCache(task => ({ ...task, deadline: null, totalRepetitions: null }));
+                                        const newEndRepeat = endRepeat === 'duration' ? 'yes' : 'duration';
+                                        setEndRepeat(newEndRepeat);
+                                        setTaskCache(prevTask => ({ ...prevTask, deadline: null, totalRepetitions: null,
+                                            totalDuration: newEndRepeat === 'yes' ? null : prevTask.totalDuration,
+                                        }));
                                     }}
                                     style={{color: endRepeat === 'duration' || taskCache.totalDuration ? 'black' : 'lightgrey'}}
                                     className='text-left'
@@ -452,8 +459,12 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                             <div className='flex h-8 gap-2 items-center pl-2'>
                                 <button 
                                     type='button'
-                                    onClick={() => {setEndRepeat(endRepeat === 'repetitions' ? 'yes' : 'repetitions');
-                                        setTaskCache(task => ({ ...task, deadline: null, totalDuration: null }));
+                                    onClick={() => {
+                                        const newEndRepeat = endRepeat === 'repetitions' ? 'yes' : 'repetitions';
+                                        setEndRepeat(newEndRepeat);
+                                        setTaskCache(prevTask => ({ ...prevTask, deadline: null, totalDuration: null,
+                                            totalRepetitions: newEndRepeat === 'yes' ? null : prevTask.totalRepetitions,
+                                        }));
                                     }}
                                     style={{color: endRepeat === 'repetitions' || taskCache.totalRepetitions ? 'black' : 'lightgrey'}}
                                     className='text-left'

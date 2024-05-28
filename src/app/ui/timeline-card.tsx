@@ -26,7 +26,7 @@ const TimelineCard: FC<TimelineCardProps> = async ({children, searchParams, back
     }}>
         <TopBar searchParams={searchParams} back={back}><SearchBar placeholder='Search events, dates...'/></TopBar>
         {showMenu && <Menu mindsetColour={mindsetColour}/>}
-        {showTaskCard && <TaskCard mindsets={mindsets}/>}
+        {/* {showTaskCard && <TaskCard mindsets={mindsets}/>} */}
         <div className='bg-white max-h-[70vh] rounded-3xl shadow-xl w-fit p-4 flex items-center justify-start'>
             {children}
         </div>
