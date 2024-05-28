@@ -1,5 +1,5 @@
 import React from 'react';
-import { DeleteTask } from './delete-task';
+import { DeleteTask } from '@/components/task/delete-task';
 import { getTaskMindset } from '@/app/lib/data';
 import { Task } from '@prisma/client';
 import { dateToDDMMYYYY } from '@/app/utils/dateUtils';

@@ -1,10 +1,8 @@
 'use client';
 
-import { Status, Task, TaskType } from '@prisma/client'
-import Image from 'next/image';
+import { Status } from '@prisma/client';
 import { FC, useState } from 'react';
-import CheckboxBlankSVG from '../svg/checkbox-blank';
-import Checkbox from '../browser/checkbox';
+import Checkbox from './checkbox';
 import { TaskWithRelations } from '@/app/lib/definitions';
 import Link from 'next/link';
 

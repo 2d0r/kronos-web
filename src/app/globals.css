@@ -73,7 +73,7 @@ input:focus, input:focus-visible, select:focus {
   @apply w-1/3 text-left max-w-[100px];
 }
 .formValuesColumn {
-  @apply w-full;
+  @apply w-2/3;
 }
 
 /* Hide number input arrows */

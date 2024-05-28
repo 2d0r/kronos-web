@@ -2,7 +2,6 @@
 
 import React, { ComponentPropsWithoutRef } from 'react';
 import clsx from 'clsx';
-import { NEUTRAL_MINDSET_COLOUR } from '@/app/lib/definitions';
 
 type Props = ComponentPropsWithoutRef<'button'> & {
     onClick?: () => Promise<void> | void;

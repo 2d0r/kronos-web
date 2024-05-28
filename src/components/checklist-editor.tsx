@@ -9,8 +9,6 @@ import Text from '@tiptap/extension-text';
 import Placeholder from '@tiptap/extension-placeholder';
 import { EditorContent, useEditor } from '@tiptap/react';
 import React, { FC } from 'react';
-import { adjustLightness } from '@/app/utils/colourUtils';
-import { NEUTRAL_MINDSET_COLOUR } from '@/app/lib/definitions';
 import clsx from 'clsx';
 
 const CustomDocument = Document.extend({

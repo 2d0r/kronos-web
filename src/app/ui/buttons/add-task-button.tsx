@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 export default function AddTaskButton({searchParams, mindsetColour}: {searchParams: URLSearchParamsKronos, mindsetColour?: string}) {
     const pathname = usePathname();
-    const [showAddTask, setShowAddTask] = useState(false);
+    const [showTaskCard, setShowAddTask] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -17,11 +17,11 @@ export default function AddTaskButton({searchParams, mindsetColour}: {searchPara
 
     return (
         <Link
-            href={showAddTask ? pathname : `${pathname}?editTask=new`}
+            href={showTaskCard ? pathname : `${pathname}?editTask=new`}
             className='bottom-[2vh] right-[2vw] w-10 h-10 text-white rounded-full flex items-center justify-center'
             style={{ background: mindsetColour }}
         >
-            <img src={showAddTask ? '../icons/close.svg' : '../icons/add.svg'} 
+            <img src={showTaskCard ? '../icons/close.svg' : '../icons/add.svg'} 
                 className='w-8 h-8'/>
         </Link>
     )

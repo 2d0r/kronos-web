@@ -36,7 +36,7 @@ const FormSchema = z.object({
   repeatTimespanMultiplier: z.string().nullable(),
   repeatDurationHours: z.string().nullable(),
   repeatDurationMinutes: z.string().nullable(),
-  preferredTimeOfDay: z.array(z.enum(['morning', 'afternoon', 'evening', 'night'], { invalid_type_error: 'Please select a valid time of day.' })).nullish(), // z.array(z.string().refine(value => timeOfDayList.includes(value))), // 
+  preferredTimeOfDay: z.array(z.enum(['morning', 'afternoon', 'evening', 'night'], { invalid_type_error: 'Please select a valid time of day.' })).nullable(), // z.array(z.string().refine(value => timeOfDayList.includes(value))), // 
   preferredDayOfWeek: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], { invalid_type_error: 'Please select a valid day of the week.' })).nullish(),
   endRepeat: z.string().nullable(),
   totalDuration: z.string().nullable(),

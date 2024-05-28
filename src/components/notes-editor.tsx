@@ -1,10 +1,9 @@
 'use client';
 
-import { useEditor, EditorContent, type Editor } from '@tiptap/react';
-import { FC, ReactElement, useState } from 'react';
+import { useEditor, EditorContent } from '@tiptap/react';
+import { FC } from 'react';
 import { updateTaskNotes } from '@/app/lib/actions';
 import '@/app/globals.css';
-import StarterKit from '@tiptap/starter-kit';
 import Strike from '@tiptap/extension-strike';
 import Heading from '@tiptap/extension-heading';
 import { Color } from '@tiptap/extension-color';
@@ -18,8 +17,6 @@ import TextStyle from '@tiptap/extension-text-style';
 import Toolbar from '@/components/toolbar';
 import Placeholder from '@tiptap/extension-placeholder';
 import clsx from 'clsx';
-import { adjustLightness } from '@/app/utils/colourUtils';
-import { NEUTRAL_MINDSET_COLOUR } from '@/app/lib/definitions';
 
 const NotesEditor: FC<{ 
   notes: string, 

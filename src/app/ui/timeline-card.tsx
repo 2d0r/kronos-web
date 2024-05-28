@@ -18,7 +18,7 @@ interface TimelineCardProps {
 const TimelineCard: FC<TimelineCardProps> = async ({children, searchParams, back }) => {
     const mindsets = await fetchMindsets();
     const showMenu = searchParams?.menu;
-    const showAddTask = searchParams?.editTask;
+    const showTaskCard = searchParams?.editTask;
     const mindsetColour = await getCurrentMindsetColour();
 
     return (<div className='w-screen h-screen flex flex-col gap-8 items-center justify-start pt-[20vh]' style={{
@@ -26,7 +26,7 @@ const TimelineCard: FC<TimelineCardProps> = async ({children, searchParams, back
     }}>
         <TopBar searchParams={searchParams} back={back}><SearchBar placeholder='Search events, dates...'/></TopBar>
         {showMenu && <Menu mindsetColour={mindsetColour}/>}
-        {showAddTask && <TaskCard mindsets={mindsets}/>}
+        {showTaskCard && <TaskCard mindsets={mindsets}/>}
         <div className='bg-white max-h-[70vh] rounded-3xl shadow-xl w-fit p-4 flex items-center justify-start'>
             {children}
         </div>

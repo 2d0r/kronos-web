@@ -1,12 +1,8 @@
 'use client';
 
-import AddSVG from '@/app/ui/svg/add-svg';
 import PauseSVG from '@/app/ui/svg/pause-svg';
 import PlaySVG from '@/app/ui/svg/play-svg';
-import ShuffleSVG from '@/app/ui/svg/shuffle-svg';
-import { minutesToDisplayDuration, minutesToTimerDisplay } from '@/app/utils/dateUtils';
-import clsx from 'clsx';
-import { Play } from 'lucide-react';
+import { minutesToTimerDisplay } from '@/app/utils/dateUtils';
 import Link from 'next/link';
 import { FC, useState } from 'react';
 import { CountdownCircleTimer } from "react-countdown-circle-timer";

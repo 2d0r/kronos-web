@@ -11,7 +11,7 @@ import { getTaskColour } from '@/app/utils/taskUtils';
 import { adjustLightness } from '@/app/utils/colourUtils';
 import { History } from 'lucide-react';
 import Link from 'next/link';
-import ToDoItem from '../tasks/to-do-item';
+import ToDoItem from './to-do-item';
 import TaskCard from '../tasks/task-card';
 import { fetchTaskWithRelations, fetchTasksWithRelations } from '@/app/lib/data';
 

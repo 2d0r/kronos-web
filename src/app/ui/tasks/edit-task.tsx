@@ -257,7 +257,7 @@ export default function EditTask({task, mindsets} : {task: TaskWithRelations, mi
                             className='multi-line w-full-key'
                             colour={mindsetColour}
                             state={state}
-                            defaultSelected={taskCache.preferredTimeOfDay}
+                            selected={taskCache.preferredTimeOfDay}
                             onChange={(event: any) => handleTaskCacheUpdate('preferredTimeOfDay', Number(event.target.value))}
                         />
                     </>)}
@@ -270,7 +270,7 @@ export default function EditTask({task, mindsets} : {task: TaskWithRelations, mi
                             colour={mindsetColour}
                             state={state}
                             className='w-full-key'
-                            defaultSelected={taskCache.preferredDayOfWeek}
+                            selected={taskCache.preferredDayOfWeek}
                         />
                     </>)}
                 </>)}

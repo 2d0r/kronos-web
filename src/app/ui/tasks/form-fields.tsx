@@ -41,7 +41,10 @@ export function InputField(
             )}>
                 {label}
             </label>
-            <div className={clsx('flex items-center', label && 'formValuesColumn', tail && 'gap-2')}>
+            <div className={clsx('flex items-center', 
+                label && 'formValuesColumn', 
+                tail && 'gap-2',
+            )}>
                 <div className={'relative'}>
                     <input
                         id={fieldName}
@@ -99,7 +102,7 @@ export function Dropdown (
             <label htmlFor={fieldName} className='my-2 block text-sm font-medium formKeysColumn'>
                 {label}
             </label>
-            <div className='relative formValuesColumn'>
+            <div className={label && 'relative formValuesColumn'}>
             <select
                 id={fieldName}
                 name={fieldName}
@@ -213,29 +216,26 @@ export function SelectionField(
 }
 
 export function MultiSelectionField( 
-    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], className, colour = NEUTRAL_MINDSET_COLOUR, state } : {
+    { fieldName, list, prompt, type, onChange = () => {}, selected = [], className, colour = NEUTRAL_MINDSET_COLOUR, state } : {
         fieldName: string,
         list: string[],
         prompt: string,
         type: string,
-        onChange?: any,
-        defaultSelected?: string[],
+        onChange?: (value: string[])=>void,
+        selected?: string[],
         className?: string,
         colour?: string,
         state?: any,
     }
 ) {
-    const [ selectedOptions, setSelectedOptions ] = useState<string[]>(defaultSelected);
+    const [ selectedOptions, setSelectedOptions ] = useState<string[]>(selected);
     const handleSelect = (event : React.ChangeEvent<HTMLInputElement>) => {
         const isChecked = event.target.checked; // If checkbox was toggled
-        setSelectedOptions(prevOptions => {
-            if (isChecked) {
-                return [...prevOptions, event.target.value]; // Add if checked
-            } else {
-                return prevOptions.filter(option => option !== event.target.value); // Remove if unchecked
-            }
-        });
-        onChange(event);
+        const newOptions = isChecked ? 
+            [...selectedOptions, event.target.value] // Add if checked
+            : selectedOptions.filter(option => option !== event.target.value) // Remove if unchecked
+        setSelectedOptions(newOptions);
+        onChange(newOptions);
     }
     const selectionList = list.map((item, idx) => {
         const checked = (type === 'radio' && selectedOptions[selectedOptions.length - 1] === item) ||
@@ -251,7 +251,7 @@ export function MultiSelectionField(
                     name={fieldName}
                     type={type}
                     value={item}
-                    className={'hidden h-4 w-4 cursor-pointer bg-gray-100 text-gray-600 focus:ring-none focus:!border-0'}
+                    className='hidden'
                     aria-describedby='task-error'
                     onChange={handleSelect}
                 />
@@ -262,7 +262,7 @@ export function MultiSelectionField(
                 >
                     {fieldName === 'preferredDayOfWeek' ? capitalise(item.slice(0, 2)) : capitalise(item)}
                 </label>
-      </div>);
+            </div>);
     })
 
     return (<fieldset>

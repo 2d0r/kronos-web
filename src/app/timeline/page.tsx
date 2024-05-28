@@ -16,7 +16,7 @@ import TaskCard from '../ui/tasks/task-card';
 import Link from 'next/link';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
-    const showAddTask = searchParams?.editTask;
+    const showTaskCard = searchParams?.editTask;
     const showMenu = searchParams?.menu;
     const showEditTask = searchParams?.editTask;
 
@@ -41,7 +41,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         <TopBar searchParams={searchParams}>
             <SearchBar placeholder="Search tasks, projects, dates..." />
         </TopBar>
-        { showAddTask && <TaskCard mindsets={mindsets} />}
+        { showTaskCard && <TaskCard mindsets={mindsets} />}
         { showEditTask && <TaskCard task={currentTask} mindsets={mindsets} />}
         <div className='w-full h-full flex flex-col items-center justify-center'>
             {showMenu && <Menu mindsetColour={mindsetColour} />}
