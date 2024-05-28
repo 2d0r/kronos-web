@@ -7,7 +7,7 @@ import { Dropdown, InputField, MultiSelectionField } from './form-fields';
 import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, DEFAULT_MINDSET, URLSearchParamsKronos, MIN_TASK_DURATION } from '@/app/lib/definitions';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { $Enums, DayOfWeek, Mindset, TimeOfDay } from '@prisma/client';
+import { $Enums, DayOfWeek, Mindset, Task, TimeOfDay } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { editTaskPrisma, createTaskPrisma, deleteTaskPrisma } from '@/app/lib/actions';
 import { parseISO } from 'date-fns';
@@ -22,6 +22,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     onTaskUpdate?: (task: TaskWithRelations) => void, 
     onTaskCreate?: (task: TaskWithRelations) => void,
     onTaskDelete?: (taskId: string) => void,
+    // searchParams?: URLSearchParamsKronos,
 }) {
 
     const pathname = usePathname();
@@ -45,14 +46,24 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     const [state, dispatch] = useFormState(editTaskHere, initialState);
 
 
+    // API Routes
+
+    const fetchTaskByIdAndUpdateCache = async (taskId: string) => {
+        const response = await fetch(`/task/${taskId}`);
+        const data = await response.json();
+        setTaskCache(data.task);
+    }
+
+
     // Handlers
 
     const handleTaskCacheUpdate = (field: keyof TaskWithRelations, value: any) => {
-        setTaskCache(prevTask => ({ ...prevTask, [field]: value }));
-    }
-    const handleChangeMindset = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const mindset = mindsets.filter(el => el.name === event.target.value)[0];
-        setTaskCache(task => ({...task, mindset: mindset}));
+        if (field === 'mindset') {
+            const mindset = mindsets.filter(el => el.name === value)[0];
+            setTaskCache(task => ({...task, mindset: mindset}));
+        } else {
+            setTaskCache(prevTask => ({ ...prevTask, [field]: value }));
+        }
     }
     const handleTimeChanges = (event: React.ChangeEvent<HTMLSelectElement>, 
         type: ('startTime' | 'endTime' | 'startDate' | 'endDate')
@@ -103,9 +114,13 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     // Hooks
 
     // Make sure mindset colour is loaded
-    // Set task cache as task if available
+    // Set task cache as task if searchParams available
     useEffect(() => {
         setMindsetColour(task?.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
+        const taskId = searchParams.get('editTask')
+        if (taskId && taskId !== 'new' && !task) {
+            fetchTaskByIdAndUpdateCache(taskId);
+        }
     }, []);
     // Update mindset colour for whole card when mindset is selected
     useEffect(() => {
@@ -113,7 +128,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     }, [taskCache.mindset]);
     // Signal task as ready to submit once the compulsory fields are filled
     useEffect(() => {
-        console.log('taskCache', taskCache);
+        // console.log('taskCache', taskCache);
         // Check if task was edited
         (task && task !== taskCache) ? setTaskIsEdited(true) : setTaskIsEdited(false);
         // Check if new task has enough valid inputs to be added
@@ -131,16 +146,6 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
         setIsNewTask(isNewTask);
         (!isNewTask && task) && setTaskCache(task);
     }, [searchParams]);
-    // Create an empty taskCache if isNewTask is true
-    // useEffect(() => {
-    //     if (isNewTask) {
-    //         const newId = uuidv4();
-    //         setTaskCache(prevTaskCache => {
-    //             const updatedTaskCache = { ...prevTaskCache, id: newId };
-    //             return updatedTaskCache;
-    //         });
-    //     }
-    // }, [isNewTask]);
     
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'>
     <div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl text-sm text-black overflow-hidden'>
@@ -171,7 +176,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                     label='Mindset'
                     list={mindsets.map(el => el.name)}
                     onChange={(event: any) => {
-                        handleChangeMindset(event);
+                        handleTaskCacheUpdate('mindset', event.target.value);
                     }}
                     defaultValue={taskCache.mindset?.name || ''}
                     colour={mindsetColour}
@@ -240,7 +245,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                             inputType='time'
                             colour={mindsetColour}
                             state={state}
-                            value={taskCache.startTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            value={taskCache.startTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || '00:00'}
                             onChange={(event: any) => handleTimeChanges(event, 'startTime')}
                         />
                         <InputField 
@@ -259,7 +264,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                         inputType='time'
                         colour={mindsetColour}
                         state={state}
-                        value={taskCache.endTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        value={taskCache.endTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || '00:00'}
                         onChange={(event: any) => handleTimeChanges(event, 'endTime')}
                     />
                     <InputField 
@@ -295,7 +300,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                         label=''
                         colour={mindsetColour}
                         state={state}
-                        value={taskCache.fixed ? '' : taskCache.startTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        value={taskCache.fixed ? '' : taskCache.startTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || '00:00'}
                     /> : <></>}
                 </div>)}
                 <div className={'divider'}></div>
@@ -331,20 +336,10 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                                 inputType='number'
                                 colour={mindsetColour}
                                 state={state}
-                                value={String(taskCache.repeatFrequency)}
+                                value={String(taskCache.repeatFrequency || 0)}
                                 onChange={(event: any) => handleTaskCacheUpdate('repeatFrequency', Number(event.target.value))}
                             />
                         </>)}
-                        {/* <Dropdown 
-                            fieldName='repeatUnit'
-                            prompt=''
-                            list={(((repeatUnit && repeatUnit.includes('session') && repeatFrequency && repeatFrequency !== 1) || (repeatUnit && repeatUnit.includes('minute'))) ? repeatUnitList : 
-                                repeatUnitList.map(item => item.slice(0, item.length - 1))) as [string, ...string[]]}
-                            defaultValue='sessions'
-                            onChange={handleRepeatUnitSelect}
-                            colour={mindsetColour}
-                            state={state}
-                        /> */}
                         time{taskCache.repeatFrequency === 1 ? '' : 's'} every
                         {(taskCache.repeatFrequency === 1) ? 
                             <InputField 
@@ -429,7 +424,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                                     inputType='date'
                                     colour={mindsetColour}
                                     state={state}
-                                    value={taskCache.deadline?.toISOString().slice(0, 10)}
+                                    value={taskCache.deadline?.toISOString().slice(0, 10) || ''}
                                     onChange={(event: any) => event.target.value && handleTaskCacheUpdate('deadline', parseISO(event.target.value))}
                                 /> : <></>}
                             </div>
@@ -452,7 +447,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                                     inputType='number'
                                     colour={mindsetColour}
                                     state={state}
-                                    value={String(taskCache.totalDuration)}
+                                    value={String(taskCache.totalDuration) || ''}
                                     onChange={(event: any) => handleTaskCacheUpdate('totalDuration', Number(event.target.value))}
                                 /> : <></>}
                             </div>
@@ -475,7 +470,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                                     inputType='number'
                                     colour={mindsetColour}
                                     state={state}
-                                    value={String(taskCache.totalRepetitions)}
+                                    value={String(taskCache.totalRepetitions) || ''}
                                     onChange={(event: any) => handleTaskCacheUpdate('totalRepetitions', Number(event.target.value))}
                                 /> : <></>}
                             </div>
@@ -499,12 +494,13 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                             inputType='date'
                             colour={mindsetColour}
                             state={state}
-                            value={String(taskCache.totalDuration)}
+                            value={String(taskCache.totalDuration) || ''}
                         />}
                     </div>
                 </>)}
                 
             </div>
+
             {/* Notes and checklist panel */}
             <div className='w-[350px] flex flex-col task-card'>
                 <div className='h-[25vh] border-b-[0.5px]'>
@@ -548,9 +544,9 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
         </div>
 
         {/* Data to be sent to form without direct input */}
-            <input type='hidden' name='id' id='id'  value={taskCache.id} />
+            <input type='hidden' name='id' id='id'  value={taskCache.id || ''} />
             <input type='hidden' name='type' id='type'  value={'task'} />
-            <input type='hidden' name='repeat' id='repeat' value={String(taskCache.repeat)} />
+            <input type='hidden' name='repeat' id='repeat' value={String(taskCache.repeat) || 'false'} />
             {/* task.fixed is sent based on startTime and endTime */}
     </form>
     </div>

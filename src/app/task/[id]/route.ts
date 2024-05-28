@@ -4,6 +4,37 @@ type Params = {
     id: string
 }
 
+export async function GET(req: Request, context: { params: Params }) {
+    const id = context.params.id;
+    try {
+        const task = await prisma.task.findUnique({
+            where: {
+                id: id
+            },
+            include: { 
+                tasksBefore: true,
+                tasksAfter: true,
+                tasksRightBefore: true,
+                tasksRightAfter: true,
+                tasksParent: true,
+                tasksChild: true,
+            } // Include the subtasks relation
+        });
+        return Response.json({message: 'OK', task});
+    } catch (error) {
+        console.error('Error fetchings tasks via API routes', error);
+        return Response.json(
+            {
+                message: 'Error fetchings tasks via API routes',
+                error,
+            },
+            {
+                status: 500,
+            }
+        );
+    }
+}
+
 export async function DELETE(req: Request, context: { params: Params }) {
     const id= context.params.id;
     try {

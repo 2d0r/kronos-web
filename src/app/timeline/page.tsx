@@ -1,17 +1,15 @@
 import React from 'react';
-import { fetchMindsets, fetchTaskWithRelations, fetchTasks, fetchTasksWithRelations, getCurrentMindsetColour } from '../lib/data';
+import { fetchMindsets, fetchTaskWithRelations, getCurrentMindsetColour } from '../lib/data';
 import TopBar from '../ui/top-bar';
 import EventCard from '../ui/tasks/event-card';
 import BottomBar from '../ui/bottom-bar';
-import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '../lib/definitions';
+import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from '../lib/definitions';
 import TransportControls from '../ui/tasks/transport-controls';
 import Menu from '../ui/menu';
-import CreateTask from '../ui/tasks/create-task';
 import prisma from '../lib/db';
 import { Task } from '@prisma/client';
 import { adjustLightness } from '../utils/colourUtils';
 import SearchBar from '../ui/search';
-import EditTask from '../ui/tasks/edit-task';
 import TaskCard from '../ui/tasks/task-card';
 import Link from 'next/link';
 

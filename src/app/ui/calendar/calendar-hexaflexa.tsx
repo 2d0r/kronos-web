@@ -1,27 +1,37 @@
 'use client';
 
-import React, { RefObject, useEffect } from 'react';
+import React, { RefObject, useEffect, useState } from 'react';
 import { HfTimegrid, defineCustomElements } from '@hexaflexa/timegrid-react';
 import { HfTimegridConfig, utcDateTimeToString, utcDateToString, HfEvent } from '@hexaflexa/timegrid';
 import './calendar-hexaflexa.css';
-import { Event } from '@prisma/client';
+import { Event, Mindset, Task } from '@prisma/client';
 import { areSameDay } from '@/app/utils/dateUtils';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import TaskCard from '../tasks/task-card';
+import { TaskWithRelations } from '@/app/lib/definitions';
 defineCustomElements();
 
-const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], mindsetColour: string }> = ({ events, eventColours, mindsetColour }) => {
+interface KronosHfEvent extends HfEvent {
+    taskId: string
+}
 
-    useEffect(() => {
-        document.documentElement.style.setProperty('--mindset-colour', mindsetColour);
-    }, []);
+const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], mindsetColour: string, mindsets: Mindset[] }> = ({ 
+    events, eventColours, mindsetColour, mindsets }) => {
+
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const showTaskCard = searchParams.get('editTask');
+    const [ selectedTask, setSelectedTask ] = useState<TaskWithRelations>({} as TaskWithRelations);
 
     const startDate: string = utcDateToString(new Date());
     let eventsForHf = [];
     for (let i = 0; i < events.length; i++) {
         const event = events[i];
-        console.log(event.name, event.startTime, event.endTime);
         if ( areSameDay(event.startTime, event.endTime) ) {
             eventsForHf.push({
                 id: event.id,
+                taskId: event.taskId,
                 title: event.name,
                 resources: ['1'],
                 start: utcDateTimeToString(event.startTime),
@@ -48,10 +58,6 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
             }
         }
     }
-    
-    const handleClickEvent = (event : React.MouseEvent<HTMLInputElement>) => {
-
-    }
 
     let timegridConfig: HfTimegridConfig = {
         daysConfig: {
@@ -68,7 +74,7 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
             // enableNewEvents: true,
             switchDragResizeAction: 'none',
             selectAction: 'tap',
-            dragResizeStates: ["none","none","none","none"],
+            dragResizeStates: ["none","dragResize","none","none"],
             eventConfig: {
               showDescription: true,
             //   useRenderEvent(event: HfEvent, columnResourceId: string): boolean {
@@ -93,15 +99,31 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
             showImage: false
         }
     };
-    
-    function onEventSelected(event: CustomEvent<HfEvent>) {
-        console.log('event selected', event);
+
+    // const fetchTaskByEventId = async (eventId: string) => {
+    //     // console.log('before response');
+    //     const response = await fetch(`/api/task/event/${eventId}`);
+    //     // console.log('response', response);
+    //     const data = await response.json();
+    //     const taskId = data.task.id;
+    // };
+    const fetchTaskByIdAndSetSelectedTask = async (taskId: string) => {
+        const response = await fetch(`/task/${taskId}`);
+        const data = await response.json();
+        setSelectedTask(data.task);
     }
     
+
+    // Handlers 
+
+    function onEventSelected(event: any) {
+        console.log('event selected', event);
+        router.push(`?editTask=${event.detail.taskId}`);
+        fetchTaskByIdAndSetSelectedTask(event.detail.taskId);
+    }
     function onStartDateChanged(event: any) {
         console.log('onStartDateChanged', event);
     }
-    
     function onEventNew(event: any) {
         console.log('onEventNew', event);
         const newEvent = event.detail;
@@ -111,14 +133,12 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
         timegridConfig = { ...timegridConfig };
         timegridRef.current!.config = timegridConfig;
     }
-
     function onEventDragResizeStateChanged(event: any) {
         const dragResizeStateChangedEvent = event.detail;
         const stateIndex = dragResizeStateChangedEvent.stateIndex;
         const hfEvent = dragResizeStateChangedEvent.event;
         hfEvent.description = `(${event.dragResizeStates[stateIndex]})`;
     }
-
     async function onShowLoadingChange(event: any) {
         await customElements.whenDefined('hf-timegrid');
         const timegridElement = document.querySelector('hf-timegrid');
@@ -128,25 +148,36 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
             await timegridElement?.hideLoading();
         }
     }
+
+    // Hooks
+    useEffect(() => {
+        document.documentElement.style.setProperty('--mindset-colour', mindsetColour);
+    }, []);
     
     let timegridRef: RefObject<HTMLHfTimegridElement> = React.createRef();
 
-    return (<HfTimegrid 
-        startDate={startDate} 
-        config={timegridConfig}
-        onStartDateChanged={(event) => onStartDateChanged(event)}
-        onEventNew={(event) => onEventNew(event)}
-        onEventSelected={(event) => onEventSelected(event)}
-        ref={timegridRef}
-        style={{
-            display: 'flex',
-            width: '100%',
-            height: '100%',
-            border: 'none',
-            borderRadius: '10px',
-            position: 'relative'
-        }}
-    />);
+    return (<>
+        <HfTimegrid 
+            startDate={startDate} 
+            config={timegridConfig}
+            onStartDateChanged={(event) => onStartDateChanged(event)}
+            onEventNew={(event) => onEventNew(event)}
+            onEventSelected={(event) => onEventSelected(event)}
+            ref={timegridRef}
+            style={{
+                display: 'flex',
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                borderRadius: '10px',
+                position: 'relative'
+            }}
+        />
+        {showTaskCard && <TaskCard 
+            mindsets={mindsets}
+            task={selectedTask} 
+            />}
+    </>);
 }
 
 export default CalendarComponent;
