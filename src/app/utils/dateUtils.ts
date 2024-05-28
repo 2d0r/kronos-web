@@ -173,3 +173,43 @@ export function areSameDay(date1: Date, date2: Date) {
 
     return date1Copy.getTime() === date2Copy.getTime();
   }
+
+// Convert events from database to HexaFlexa events
+import { utcDateTimeToString } from '@hexaflexa/timegrid';
+export const eventsToHf = (events: Event[], eventColours: string[]) => {
+    let eventsForHf = [];
+    for (let i = 0; i < events.length; i++) {
+        const event = events[i];
+        const [ startTime, endTime ] = [ new Date(event.startTime), new Date(event.endTime) ];
+        if ( areSameDay(startTime, endTime) ) {
+            eventsForHf.push({
+                id: event.id,
+                taskId: event.taskId,
+                title: event.name,
+                resources: ['1'],
+                start: utcDateTimeToString(startTime),
+                end: utcDateTimeToString(endTime),
+                style: {
+                    backgroundColor: eventColours[i]
+                },
+            });
+        } else {
+            const endTimeCopy = new Date(endTime.getTime());
+            const endTimeEndDay = new Date(endTimeCopy.setUTCHours(23,59,0,0));
+            for (let d = new Date(startTime); d <= endTimeEndDay; d.setDate(d.getDate() + 1)) {
+                const dCopy = new Date(d.getTime());
+                eventsForHf.push({
+                    id: event.id,
+                    title: event.name,
+                    resources: ['1'],
+                    start: d.getTime() === startTime.getTime() ? utcDateTimeToString(startTime) : utcDateTimeToString(new Date(dCopy.setUTCHours(0,0,0,0))),
+                    end: d < endTime ? utcDateTimeToString(new Date(dCopy.setUTCHours(23, 59, 0, 0))) : utcDateTimeToString(endTime),
+                    style: {
+                        backgroundColor: eventColours[i]
+                    },
+                });
+            }
+        }
+    }
+    return eventsForHf;
+}

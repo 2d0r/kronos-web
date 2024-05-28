@@ -313,8 +313,6 @@ export async function deleteTask(id: string) {
 
 export async function deleteTaskPrisma(id: string) {
 
-  console.log('delete task 1');
-
   const taskEvents = await prisma.event.findMany({
     where: {
       taskId: id
@@ -336,8 +334,6 @@ export async function deleteTaskPrisma(id: string) {
     }
   }
 
-  console.log('delete task 2');
-
   try {
     await prisma.task.delete({
       where: {
@@ -351,22 +347,6 @@ export async function deleteTaskPrisma(id: string) {
   }
 
   revalidatePath('/');
-}
-
-export async function createEventPrisma(event: Event) {
-  try {
-    await prisma.event.create({
-      data: {
-        ...event
-      },
-    });
-  } catch (error) {
-    console.log('Failed to create event', error);
-    return {
-      message: 'Database Error: Failed to create event.',
-    };
-  }
-
 }
 
 export async function updateTaskField(entryId: string, field: keyof Task, value: any) {
@@ -408,22 +388,38 @@ export async function updateTimeScores() {
   revalidatePath('/');
 }
 
-export async function getMindsetProximity(mindset1: string, mindset2: string) {
+export async function updateTaskNotes(notes: string, taskId: string) {
   try {
-    const mindsets = await prisma.mindset.findMany();
-    const mindsetMaslowLevels = [mindset1, mindset2].map((mindset) => {
-      return mindsets.filter(el => el.name === mindset)[0].maslowLevel;
+    const updateTaskNotes = await prisma.task.update({
+      where: {
+        id: taskId,
+      },
+      data: {
+        notes: notes
+      }
     });
-    return (
-      mindsetMaslowLevels.includes(0) ? 0 :
-        Math.abs(mindsetMaslowLevels[0] - mindsetMaslowLevels[1])
-    );
   } catch (error) {
-    console.error('Error getting mindset proximity. Check mindset names');
+    console.log('Failed to update task notes for task:', taskId);
+  }
+}
+
+
+// EVENTS
+
+export async function createEventPrisma(event: Event) {
+  try {
+    await prisma.event.create({
+      data: {
+        ...event
+      },
+    });
+  } catch (error) {
+    console.log('Failed to create event', error);
     return {
-      message: 'Error getting mindset proximity. Check mindset names',
+      message: 'Database Error: Failed to create event.',
     };
   }
+
 }
 
 export async function scheduleEventForTask(task: Task, startTime: Date, duration?: number) {
@@ -449,17 +445,41 @@ export async function scheduleEventForTask(task: Task, startTime: Date, duration
   return eventToSchedule as Event;
 }
 
-export async function updateTaskNotes(notes: string, taskId: string) {
+export async function updateEventField(eventId: string, field: keyof Event, value: any) {
   try {
-    const updateTaskNotes = await prisma.task.update({
+    await prisma.event.update({
       where: {
-        id: taskId,
+        id: eventId,
       },
       data: {
-        notes: notes
+        [field]: value,
       }
     });
   } catch (error) {
-    console.log('Failed to update task notes for task:', taskId);
+    console.log(`Failed to update event ${field} with value ${value}`, error);
+    return {
+      message: `Database Error: Failed to update event ${field} with value ${value}`,
+    };
+  }
+}
+
+
+// MINDSETS
+
+export async function getMindsetProximity(mindset1: string, mindset2: string) {
+  try {
+    const mindsets = await prisma.mindset.findMany();
+    const mindsetMaslowLevels = [mindset1, mindset2].map((mindset) => {
+      return mindsets.filter(el => el.name === mindset)[0].maslowLevel;
+    });
+    return (
+      mindsetMaslowLevels.includes(0) ? 0 :
+        Math.abs(mindsetMaslowLevels[0] - mindsetMaslowLevels[1])
+    );
+  } catch (error) {
+    console.error('Error getting mindset proximity. Check mindset names');
+    return {
+      message: 'Error getting mindset proximity. Check mindset names',
+    };
   }
 }

@@ -30,11 +30,8 @@ const TaskBrowser: FC<{
     const [ sort, setSort ] = useState<SortItem>(searchParams?.logbook ? ['Date', 'Descending'] : ['Priority', 'Descending']);
 
     const fetchTasks = async () => {
-        console.log('before response');
         const response = await fetch('/api/task');
-        console.log('response', response);
         const data = await response.json();
-        console.log('response data', data);
         setTasksCache(data.tasks);
     };
 

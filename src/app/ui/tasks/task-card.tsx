@@ -14,6 +14,7 @@ import { parseISO } from 'date-fns';
 import NotesEditor from '@/components/notes-editor';
 import ChecklistEditor from '@/components/checklist-editor';
 import {v4 as uuidv4} from 'uuid';
+import { reorganiseTask } from '@/app/lib/reorganiseTask';
 
 
 export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, onTaskDelete} : {
@@ -29,6 +30,9 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     const router = useRouter();
     const searchParams = useSearchParams();
 
+
+    // STATES
+
     const [ isNewTask, setIsNewTask ] = useState<boolean>(searchParams.get('editTask') === 'new' ? true : false);
     // const [ isOpen, setIsOpen ] = useState<boolean>(false);
     const [ taskCache, setTaskCache ] = useState<TaskWithRelations>((!isNewTask && task) ? task : {id: uuidv4()} as TaskWithRelations);
@@ -40,13 +44,16 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     const [ taskIsEdited, setTaskIsEdited ] = useState<boolean>(false);
     const [ taskIsReady, setTaskIsReady ] = useState<boolean>(false);
 
+
+    // SET UP FORM
+
     const initialState = { message: null, errors: {} };
     // Set up to edit task or to create new task
     const editTaskHere : any = isNewTask ? createTaskPrisma : editTaskPrisma;
     const [state, dispatch] = useFormState(editTaskHere, initialState);
 
 
-    // API Routes
+    // API ROUTES
 
     const fetchTaskByIdAndUpdateCache = async (taskId: string) => {
         const response = await fetch(`/task/${taskId}`);
@@ -55,7 +62,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     }
 
 
-    // Handlers
+    // HANDLERS
 
     const handleTaskCacheUpdate = (field: keyof TaskWithRelations, value: any) => {
         if (field === 'mindset') {
@@ -103,6 +110,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     const closeModalAndRefetchTasks = () => {
         isNewTask && onTaskCreate ? onTaskCreate(taskCache) : 
             onTaskUpdate ? onTaskUpdate(taskCache) : ()=>{};
+        if (!isNewTask) reorganiseTask(taskCache.id);
         router.back();
     };
     const handleDeleteTask = (taskId: string) => {
@@ -111,7 +119,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     }
 
 
-    // Hooks
+    // HOOKS
 
     // Make sure mindset colour is loaded
     // Set task cache as task if searchParams available
@@ -202,7 +210,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                         tail='hrs'
                         colour={mindsetColour}
                         state={state}
-                        value={String(Math.floor(taskCache.duration / 60) || 0)}
+                        value={String(Math.floor(taskCache.duration / 60)) || ''}
                         onChange={(event: any) => {
                             setTaskCache(taskCache => ({...taskCache, 
                                 duration: (taskCache.duration || 0) % 60 + Number(event.target.value) * 60
@@ -215,7 +223,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                         tail='min'
                         colour={mindsetColour}
                         state={state}
-                        value={String(taskCache.duration % 60 || MIN_TASK_DURATION)}
+                        value={String(taskCache.duration % 60) || ''}
                         onChange={(event: any) => {
                             setTaskCache(taskCache => ({...taskCache, 
                                 duration: (taskCache.duration || 0) - (taskCache.duration || 0) % 60 + Number(event.target.value)
@@ -332,7 +340,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                         </>) : (<>
                             <InputField 
                                 fieldName='repeatDuration'
-                                placeholder='10'
+                                placeholder=''
                                 inputType='number'
                                 colour={mindsetColour}
                                 state={state}
@@ -503,7 +511,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
 
             {/* Notes and checklist panel */}
             <div className='w-[350px] flex flex-col task-card'>
-                <div className='h-[25vh] border-b-[0.5px]'>
+                <div className='h-[25vh] border-b-[0.5px] overflow-y-scroll'>
                     <NotesEditor notes={taskCache.notes || ''} taskId={taskCache.id} className={'task-card'} />
                 </div>
                 <div className='h-[25vh]'>

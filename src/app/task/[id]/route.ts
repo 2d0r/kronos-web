@@ -12,6 +12,8 @@ export async function GET(req: Request, context: { params: Params }) {
                 id: id
             },
             include: { 
+                events: true,
+                mindset: true,
                 tasksBefore: true,
                 tasksAfter: true,
                 tasksRightBefore: true,
