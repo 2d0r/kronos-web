@@ -33,7 +33,7 @@ export default function EventCard({ event, task, mindset, className, nextTask = 
     return (<>
         <div className={clsx(className, 
             'text-white rounded-2xl flex flex-col justify-between items-center text-center',
-            nextTask && 'absolute top-[90vh] mb-[-45px] bg-gradient-to-br from-gray-400 to-gray-600 opacity-80',
+            nextTask && 'absolute bottom-0 mb-[-25px] bg-gradient-to-br from-gray-400 to-gray-600 opacity-80',
             (expand && !isExpanded) && 'cursor-pointer',
             isExpanded ? 'h-full w-2/3 max-w-500px p-6' : 'p-4 w-[350px]'
         )}

@@ -15,7 +15,7 @@ import '@/app/globals.css';
 export default function Menu({mindsetColour = 'black', onBlur}: {mindsetColour?: string, onBlur?: () => void}) {
     const pathname = usePathname();
 
-    if (pathname.endsWith('/timeline')) {
+    if (pathname.endsWith('/')) {
 
         return (<>
             <div className='w-full flex items-center justify-center'></div>
@@ -43,10 +43,10 @@ export default function Menu({mindsetColour = 'black', onBlur}: {mindsetColour?:
         return (<div className='absolute w-screen h-screen top-0 left-0'>
             <div className='absolute z-50 right-10 top-10 w-auto h-auto p-3 gap-1 flex flex-col text-black border-[0.5px] border-white rounded-3xl 
                 bg-gradient-to-br from-white to-white/50 backdrop-blur-lg shadow-lg' onBlur={onBlur} tabIndex={0}>
-                { !pathname.includes('/task') && <Link href={'/timeline'} className='menu-link'>Timeline</Link>}
+                { !pathname.includes('/task') && <Link href={'/'} className='menu-link'>Timeline</Link>}
                 <Link href={'/calendar'} className='menu-link'>Calendar</Link>
                 <Link href={'/browser'} className='menu-link'>Tasks & Projects</Link>
-                <Link href={'/'} className='menu-link'>Tests</Link>
+                <Link href={'/tests'} className='menu-link'>Tests</Link>
                 <Link href={pathname} className='menu-link'>Stats</Link>
                 <Link href={'/browser?logbook=true'} className='menu-link'>Logbook</Link>
                 <Link href={pathname} className='menu-link'>Settings</Link>

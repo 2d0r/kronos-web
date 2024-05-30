@@ -14,7 +14,7 @@ export default function TransportControls ({ eventId, taskId, context, className
 
     return (<div className={clsx('w-[350px] flex justify-between items-center', className)}>
         { context === 'taskPage' && <>
-            <Link href='/timeline'>
+            <Link href='/'>
                 <img src='../icons/close.svg' className='h-8 w-8' />
             </Link>
             <img src='../icons/pause.svg' className='h-12 w-12' />
