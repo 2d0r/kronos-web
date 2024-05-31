@@ -138,6 +138,21 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
   const repeatDurationInMinutes = (repeatDurationHours || repeatDurationMinutes) ?
     (Number(repeatDurationMinutes) || 0) + (Number(repeatDurationHours) || 0) * 60 : null;
 
+  // Calculate timeScore
+  const mockTask = {
+    duration: duration,
+    repeat: (!!repeatFrequency && !!repeatTimespanMultiplier && !!repeatTimespan),
+    deadline: endRepeatDate ? endRepeatDate : deadline,
+    completion: 0,
+    repeatUnit: repeatUnit || 'sessions',
+    repeatFrequency: Number(repeatFrequency) || repeatDurationInMinutes,
+    repeatTimespanMultiplier: (repeatFrequency && Number(repeatFrequency) > 1) ?  Number(repeatTimespanMultiplier) || 1 : 1,
+    repeatTimespan: repeatTimespan,
+    repetitionsDone: 0,
+  } as Task;
+  const timeScore = calculateTimeScore(mockTask);
+
+  // Get mindset id from mindset name (input)
   const matchingMindset = await fetchMindsets().then(mindsets =>
     mindsets.find(el => el.name === mindset)
   );
@@ -159,6 +174,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         type: type as TaskType || 'task',
         mindsetId: matchingMindset.id,
         priority: priority,
+        timeScore: timeScore,
         startTime: startDateTime,
         endTime: endDateTime,
         duration: duration,
@@ -172,7 +188,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         endRepeat: Boolean(endRepeat),
         totalDuration: Number(totalDuration),
         totalRepetitions: Number(totalRepetitions),
-        deadline: deadline !== null ? deadline : endRepeatDate,
+        deadline: endRepeatDate ? endRepeatDate : deadline,
       },
     });
   } catch (error) {
@@ -250,10 +266,20 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
     //  Handle error - invalid mindset
     return { message: 'Invalid mindset selected.' };
   }
-  // let mindsetId = '';
-  // fetchMindsets().then(mindsets => {
-  //   mindsetId = mindsets.filter(el => el.name === mindset)[0].id;
-  // });
+
+  // Calculate timeScore
+  const mockTask = {
+    duration: durationInMinutes,
+    repeat: (!!repeatFrequency && !!repeatTimespanMultiplier && !!repeatTimespan),
+    deadline: endRepeatDate ? endRepeatDate : deadline,
+    completion: 0,
+    repeatUnit: repeatUnit || 'sessions',
+    repeatFrequency: Number(repeatFrequency) || repeatDurationInMinutes,
+    repeatTimespanMultiplier: (repeatFrequency && Number(repeatFrequency) > 1) ?  Number(repeatTimespanMultiplier) || 1 : 1,
+    repeatTimespan: repeatTimespan,
+    repetitionsDone: 0,
+  } as Task;
+  const timeScore = calculateTimeScore(mockTask);
 
   try {
     await prisma.task.update({
@@ -266,6 +292,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
         status: status || 'toDo',
         mindsetId: matchingMindset.id,
         priority: priority,
+        timeScore: timeScore,
         fixed: !!startDateTime && !!endDateTime,
         startTime: startDateTime,
         endTime: endDateTime,

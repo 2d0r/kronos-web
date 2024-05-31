@@ -1,27 +1,38 @@
 'use client';
 
-import React, { RefObject, useEffect, useState } from 'react';
+import React, { RefObject, use, useEffect, useState } from 'react';
 import { HfTimegrid, defineCustomElements } from '@hexaflexa/timegrid-react';
 import { HfTimegridConfig, utcDateTimeToString, utcDateToString, HfEvent } from '@hexaflexa/timegrid';
 import './calendar-hexaflexa.css';
 import { Event, Mindset, Task } from '@prisma/client';
 import { areSameDay, eventsToHf } from '@/app/utils/dateUtils';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import TaskCard from '../tasks/task-card';
-import { TaskWithRelations } from '@/app/lib/definitions';
+import { MindsetWithRelations, TaskWithRelations } from '@/app/lib/definitions';
 defineCustomElements();
 
-interface KronosHfEvent extends HfEvent {
-    taskId: string
-}
-
-const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], mindsetColour: string, mindsets: Mindset[] }> = ({ 
-    events, eventColours, mindsetColour, mindsets }) => {
+const CalendarComponent: React.FC<{ 
+    events: Event[], 
+    mindsetColour: string, 
+    mindsets: MindsetWithRelations[],
+    startWeekToday?: boolean,
+    onEventsUpdate?: (events: Event[]) => void,
+    parentName?: string,
+}> = ({ 
+    events, mindsetColour, mindsets, startWeekToday = false, onEventsUpdate, parentName }) => {
 
     const searchParams = useSearchParams();
     const router = useRouter();
+    const pathname = usePathname();
     const showTaskCard = searchParams.get('editTask');
+
+    const eventColours = events.map(event => {
+        const eventMindset = mindsets.filter(mindset => mindset.tasks.some(task => {
+        return Object.values(task).includes(event.taskId);
+        }));
+        return eventMindset[0].colour;
+    });
     const [ selectedTask, setSelectedTask ] = useState<TaskWithRelations>({} as TaskWithRelations);
     const [ eventsCache, setEventsCache ] = useState<Event[]>(events);
     const [ eventsForHf, setEventsForHf ] = useState<any>(eventsToHf(eventsCache, eventColours));
@@ -30,7 +41,7 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
         return ({
             daysConfig: {
                 daysCount: 7,
-                fullWeek: true,
+                fullWeek: !startWeekToday,
             },
             timeFormat: 'h:mm a',
             firstDayOfWeek: 1,
@@ -88,7 +99,6 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
         fetchTaskAndSetSelectedTaskId(event.detail.taskId);
     }
     function onStartDateChanged(event: any) {
-        console.log('onStartDateChanged', event);
     }
     function onEventNew(event: any) {
         const newEvent = event.detail;
@@ -126,14 +136,19 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
             const newEventsForHf = eventsToHf(data.events, eventColours);
             setEventsForHf(newEventsForHf);
             setTimegridConfig(getTimegridConfig(newEventsForHf));
+            onEventsUpdate && onEventsUpdate(newEvents);
         }, 1000);
-        
     }
 
     // HOOKS
     useEffect(() => {
         document.documentElement.style.setProperty('--mindset-colour', mindsetColour);
     }, []);
+    useEffect(() => {
+        const newEventsForHf = eventsToHf(events, eventColours);
+        setEventsForHf(newEventsForHf);
+        setTimegridConfig(getTimegridConfig(newEventsForHf));
+    }, [events])
     
     let timegridRef: RefObject<HTMLHfTimegridElement> = React.createRef();
 
@@ -154,7 +169,7 @@ const CalendarComponent: React.FC<{ events: Event[], eventColours: string[], min
                 position: 'relative'
             }}
         />
-        {showTaskCard && <TaskCard mindsets={mindsets} task={selectedTask} onTaskUpdate={handleTaskUpdate} />}
+        {(showTaskCard && parentName !== 'TestView') && <TaskCard mindsets={mindsets} task={selectedTask} onTaskUpdate={handleTaskUpdate} />}
     </>);
 }
 

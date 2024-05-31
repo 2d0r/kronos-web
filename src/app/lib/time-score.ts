@@ -2,7 +2,7 @@ import { Task } from '@prisma/client';
 import { calcRepeatIntervalInMinutes, hoursBetweenDates } from '../utils/dateUtils';
 import { HOURS_IN_A_WEEK } from './definitions';
 
-// Represented in hours, relative to a week - how many hours in a week would this task take?
+// A score relative to a week - how much time in a week this task takes up
 
 export const calculateTimeScore = (task: Task) => {
     const now = new Date();

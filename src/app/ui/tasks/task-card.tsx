@@ -45,7 +45,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     const [ taskIsReady, setTaskIsReady ] = useState<boolean>(false);
 
 
-    // SET UP FORM
+    // FORM
 
     const initialState = { message: null, errors: {} };
     // Set up to edit task or to create new task

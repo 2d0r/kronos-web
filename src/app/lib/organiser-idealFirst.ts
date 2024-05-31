@@ -1,6 +1,6 @@
 'use server';
 
-import React from 'react';
+import React, { MouseEventHandler } from 'react';
 import prisma from './db';
 import { addDaysToDate, addMinutesToDate, calcRepeatIntervalInMinutes, hourRangeXDate, findNearestDate, hourRangesXDates, minutesBetweenDates, updateTimeGaps, startOfDay } from '../utils/dateUtils';
 import { fetchEvents, fetchMindsets } from './data';
@@ -373,8 +373,8 @@ export async function organiseIdealFirst(timespan: [Date, Date]) {
     });
 }
 
-export async function handleOrganise () {
+export async function handleOrganise (daysAhead: number = 30) {
     const currentTime = new Date();
-    const sevenDaysFromNow = addDaysToDate(currentTime, 7);
-    organiseIdealFirst([currentTime, sevenDaysFromNow]);
+    const xDaysFromNow = addDaysToDate(currentTime, daysAhead);
+    organiseIdealFirst([currentTime, xDaysFromNow]);
 }

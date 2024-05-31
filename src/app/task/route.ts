@@ -8,6 +8,8 @@ export async function GET(req: Request) {
     try {
         const tasks = await prisma.task.findMany({
             include: { 
+                events: true,
+                mindset: true,
                 tasksBefore: true,
                 tasksAfter: true,
                 tasksRightBefore: true,
