@@ -20,3 +20,21 @@ export async function GET(req: Request) {
         );
     }
 }
+
+export async function DELETE(req: Request) {
+    try {
+        await prisma.event.deleteMany();
+        return Response.json({message: 'Deleted all events'});
+    } catch (error) {
+        console.error('Error deleting all events', error);
+        return Response.json(
+            {
+                message: 'Error deleting all events',
+                error,
+            },
+            {
+                status: 500,
+            }
+        );
+    }
+}

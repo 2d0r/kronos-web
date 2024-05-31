@@ -14,6 +14,11 @@ import CalendarComponent from '@/app/ui/calendar/calendar-hexaflexa';
 import TaskBrowser from '@/app/ui/browser/task-browser';
 import OrganiseButton from './organiseButton';
 import { MindsetWithRelations } from '@/app/lib/definitions';
+import Button from './button';
+import { deleteAllEvents } from '@/app/lib/actions';
+import { addDaysToDate } from '@/app/utils/dateUtils';
+import { organiseIdealFirst } from '@/app/lib/organiser-idealFirst';
+import { fetchEvents, fetchEventsWithRelations } from '@/app/lib/data';
 
 interface TestViewProps {
     children?: JSX.Element | JSX.Element[];
@@ -32,16 +37,28 @@ const TestView: FC<TestViewProps> = ({
     const [ tasksCache, setTasksCache ] = useState<TaskWithRelations[]>(tasks);
     const [ eventsCache, setEventsCache ] = useState<Event[]>(events);
 
-    // Modals
+
+    // MODALS
+
     const showMenu = searchParams?.menu;
     const showTaskCard = !!searchParams.editTask;
     const taskToEditId = searchParams.editTask;
     const taskToEdit = taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0];
 
 
+    // DATA FETCH
+
+    const fetchEvents = async () => {
+        const response = await fetch('/event');
+        const data = await response.json();
+        const newEvents = data.events;
+        return newEvents;
+    }
+
+
     // HANDLERS
 
-    const handleEventsUpdate = (taskId: string) => {
+    const handleEventUpdate = (taskId: string) => {
         setTimeout(async () => {
             const response = await fetch(`/event/${taskId}`);
             const data = await response.json();
@@ -54,7 +71,7 @@ const TestView: FC<TestViewProps> = ({
             return task.id === newTask.id ? {...task, ...newTask} : task;
         });
         setTasksCache(newTasksCache);
-        handleEventsUpdate(newTask.id);
+        handleEventUpdate(newTask.id);
     }
     const handleTaskCreate = (newTask: TaskWithRelations) => {
         const newTasksCache = [...tasksCache, {
@@ -63,7 +80,7 @@ const TestView: FC<TestViewProps> = ({
             type: 'task' as TaskType,
         }];
         setTasksCache(newTasksCache);
-        handleEventsUpdate(newTask.id);
+        handleEventUpdate(newTask.id);
     }
     const handleTaskDelete = async (taskId: string) => {
         await fetch(`/task/${taskId}`, {
@@ -71,8 +88,25 @@ const TestView: FC<TestViewProps> = ({
         });
         const newTasksCache = tasksCache.filter(task => task.id !== taskId);
         setTasksCache(newTasksCache);
-        handleEventsUpdate(taskId);
+        handleEventUpdate(taskId);
     }
+    const handleDeleteAllEvents = async () => {
+        await deleteAllEvents();
+        const newEvents = await fetchEvents();
+        setEventsCache(newEvents);
+    }
+    const handleOrganise = async (daysAhead: number = 30) => {
+        const currentTime = new Date();
+        const xDaysFromNow = addDaysToDate(currentTime, daysAhead);
+        organiseIdealFirst([currentTime, xDaysFromNow]);
+        setTimeout(async () => {
+            const newEvents = await fetchEvents();
+            setEventsCache(newEvents);
+        }, 1000)
+    }
+
+
+    // HOOKS
 
     useEffect(() => {
         console.log('testView - tasksCache', tasksCache);
@@ -106,7 +140,16 @@ const TestView: FC<TestViewProps> = ({
                 parentName='TestView'
             />
             <div className='container w-full flex flex-row gap-8 p-4 justify-center'>
-                <OrganiseButton name='Organise this week' daysAhead={7} />
+                <Button 
+                    className='rounded-md bg-gray-400 from-neutral-950 p-6 w-1/4' 
+                    onClick={() => handleOrganise(7)}
+                    >Organise this week
+                </Button>
+                <Button 
+                    className='rounded-md bg-gray-400 from-neutral-950 p-6 w-1/4' 
+                    onClick={handleDeleteAllEvents}
+                    >Delete all events
+                </Button>
                 {/* <Button className='rounded-md bg-gray-400 from-neutral-950 p-6 w-1/4' onClick={() => handleOrganise(7)}>Organise for 7 days</Button> */}
             </div>
         </div>

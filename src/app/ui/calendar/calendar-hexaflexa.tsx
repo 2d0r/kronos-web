@@ -140,7 +140,9 @@ const CalendarComponent: React.FC<{
         }, 1000);
     }
 
+
     // HOOKS
+    
     useEffect(() => {
         document.documentElement.style.setProperty('--mindset-colour', mindsetColour);
     }, []);

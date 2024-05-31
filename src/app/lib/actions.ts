@@ -490,6 +490,17 @@ export async function updateEventField(eventId: string, field: keyof Event, valu
   }
 }
 
+export async function deleteAllEvents() {
+  try {
+    await prisma.event.deleteMany();
+  } catch (error) {
+    console.log(`Failed to delete all events`, error);
+    return {
+      message: `Database Error: Failed to delete all events`,
+    };
+  }
+}
+
 
 // MINDSETS
 
