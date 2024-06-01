@@ -104,10 +104,7 @@ const TaskBrowser: FC<{
     // HOOKS
 
     useEffect(() => {
-        console.log('taskBrowser - tasksCache', tasksCache)
-        // setTimeout(() => {
-            setTasksCache(tasks);
-        // }, 1000);
+        setTasksCache(tasks);
     }, [tasks]);
     // Update states for logbook
     useEffect(() => {

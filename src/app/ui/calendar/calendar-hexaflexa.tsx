@@ -27,6 +27,8 @@ const CalendarComponent: React.FC<{
     const pathname = usePathname();
     const showTaskCard = searchParams.get('editTask');
 
+    const timezone = 'Europe/Bucharest' // Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     const eventColours = events.map(event => {
         const eventMindset = mindsets.filter(mindset => mindset.tasks.some(task => {
         return Object.values(task).includes(event.taskId);
@@ -35,7 +37,7 @@ const CalendarComponent: React.FC<{
     });
     const [ selectedTask, setSelectedTask ] = useState<TaskWithRelations>({} as TaskWithRelations);
     const [ eventsCache, setEventsCache ] = useState<Event[]>(events);
-    const [ eventsForHf, setEventsForHf ] = useState<any>(eventsToHf(eventsCache, eventColours));
+    const [ eventsForHf, setEventsForHf ] = useState<any>(eventsToHf(eventsCache, eventColours, timezone));
 
     const getTimegridConfig = (eventsForHf: HfEvent[]): HfTimegridConfig => {
         return ({
@@ -133,7 +135,7 @@ const CalendarComponent: React.FC<{
             const data = await response.json();
             const newEvents = data.events;
             setEventsCache(prevEvents => [...prevEvents, ...newEvents]);
-            const newEventsForHf = eventsToHf(data.events, eventColours);
+            const newEventsForHf = eventsToHf(data.events, eventColours, timezone);
             setEventsForHf(newEventsForHf);
             setTimegridConfig(getTimegridConfig(newEventsForHf));
             onEventsUpdate && onEventsUpdate(newEvents);
@@ -147,7 +149,7 @@ const CalendarComponent: React.FC<{
         document.documentElement.style.setProperty('--mindset-colour', mindsetColour);
     }, []);
     useEffect(() => {
-        const newEventsForHf = eventsToHf(events, eventColours);
+        const newEventsForHf = eventsToHf(events, eventColours, timezone);
         setEventsForHf(newEventsForHf);
         setTimegridConfig(getTimegridConfig(newEventsForHf));
     }, [events])

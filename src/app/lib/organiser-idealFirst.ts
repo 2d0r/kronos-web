@@ -1,128 +1,28 @@
 'use server';
 
-import React, { MouseEventHandler } from 'react';
 import prisma from './db';
-import { addDaysToDate, addMinutesToDate, calcRepeatIntervalInMinutes, hourRangeXDate, findNearestDate, hourRangesXDates, minutesBetweenDates, updateTimeGaps, startOfDay } from '../utils/dateUtils';
-import { fetchEvents, fetchMindsets } from './data';
-import { Task, Event, TimeOfDay, $Enums } from '@prisma/client';
-import { createEventPrisma, scheduleEventForTask } from './actions';
-import { DAYS_OF_WEEK_DICT, DEFAULT_TIMES_OF_DAY, MAX_OFFSET, MAX_REP_OFFSET, dayOfWeekList, priorityList } from './definitions';
+import { addMinutesToDate, calcRepeatIntervalInMinutes, hourRangeXDate, findNearestDate, hourRangesXDates, minutesBetweenDates, updateTimeGaps, startOfDay } from '../utils/dateUtils';
+import { fetchEvents } from './data';
+import { TimeOfDay } from '@prisma/client';
+import { scheduleEventForTask } from './actions';
+import { DEFAULT_TIMES_OF_DAY, priorityList } from './definitions';
 import { sortByCustomOrder } from '../utils/taskUtils';
+import { toZonedTime } from 'date-fns-tz';
+import { getIdealReps, idealDaysXIdealReps, idealTimesOfDayXIdealReps } from '../utils/organiser-utils';
 
-// This organiser places all tasks in their ideal places initially, and deals with overalps later
+/**
+ * Organiser by ideal time first:
+ *  1. Loop through tasks by user-set priority, then by 
+ *  2. Schedule tasks in their ideal times, based on user input
+ *  3. If there is no ideal gap left, find secondary ideal times (to serve fewer of the preferences)
+ *  4. If there is no secondary gap left, find the nearest gap the follows the mindset map
+ *  5. If there are no mindset gaps, schedule as soon as possible
+ *  6. If there is no time left, throw an alert; Recommend events to replace - by inverse priority
+ *      - Save the best events to replace while searching for gaps
+ */
 
-// If repeating: Go to its next occurrence -> go to a time that divides perfectly by timespan
-// Can only calculate for tasks that had their first session already scheduled
-const getIdealReps = (task: Task, timespan: [Date, Date], idealFirstRepTime?: Date): Date[] => {
-    let idealReps = [];
-    if (task.repeat && task.repeatUnit === 'sessions' && task.repeatFrequency && task.repeatTimespanMultiplier && task.repeatTimespan) {
-        const repInterval = calcRepeatIntervalInMinutes(task);
-        if (task.firstSessionStartTime && task.repetitionsDone) {
-            let idealRep = new Date(task.firstSessionStartTime.getTime() + (task.repetitionsDone + 1) * repInterval * 60 * 1000);
-            while (idealRep > timespan[0] && idealRep < timespan[1]) {
-                idealReps.push(idealRep);
-                idealRep = new Date(idealRep.getTime() + repInterval * 60 * 1000);
-            }
-        } else if (idealFirstRepTime) {
-            let idealRep = idealFirstRepTime;
-            while (timespan[0] <= idealRep && idealRep < timespan[1]) {
-                idealReps.push(idealRep);
-                idealRep = new Date(idealRep.getTime() + repInterval * 60 * 1000);
-            }
-        }
-    } else {
-        console.error(`Task ${task.name} does not have enough repetition data`);
-    }
-    return idealReps;
-}
-
-const idealDaysXIdealReps = (
-    task: Task, idealDays: Date[], timespan: [Date, Date]
-): Date[] => {
-    let newIdealDays: Date[] = [];
-    const prefDatesSorted = idealDays.sort();
-    // TO DO: move getting ideal reps into main function
-    const idealReps = getIdealReps(task, timespan);
-    idealReps.forEach(rep => {
-        const repDay = new Date(rep.setUTCHours(0,0,0,0));
-        if (idealDays.includes(repDay)) {
-            newIdealDays.push(repDay);
-        } else {
-            const repIntervalMinutes = calcRepeatIntervalInMinutes(task);
-            const impreciseRepSpan = [
-                new Date(repDay.getTime() - (repIntervalMinutes * MAX_REP_OFFSET)),
-                new Date(repDay.getTime() + (repIntervalMinutes * MAX_REP_OFFSET))
-            ];
-            // find the nearest prefDate to our repetitionDay
-            for ( let i = 0; i <= idealDays.length; i++) {
-                const prefDate = prefDatesSorted[i];
-                if ( prefDate > impreciseRepSpan[0] && prefDate < impreciseRepSpan[1]) {
-                    newIdealDays.push(prefDate);
-                } else {
-                    // Find to which imprecise timespan limit the prefDate is closer => use that limit
-                    if (Math.abs(prefDate.getTime() - impreciseRepSpan[0].getTime()) < Math.abs(prefDate.getTime() - impreciseRepSpan[1].getTime())) {
-                        newIdealDays.push(impreciseRepSpan[0]);
-                    } else {
-                        newIdealDays.push(impreciseRepSpan[1]);
-                    }
-                }
-            }
-
-        }
-    });
-    return newIdealDays;
-}
-
-const idealTimesOfDayXIdealReps = (
-    task: Task, idealTimesOfDay: [Date, Date][], idealReps: Date[]
-): [Date, Date][] => {
-    const idealTimesSorted = idealTimesOfDay.sort((a, b) => (a[0].getTime() - b[0].getTime()));
-    console.log('idealReps:', idealReps);
-    let newIdealTimes: [Date, Date][] = [];
-    let idealTimeIdx = 0;
-    idealReps.forEach(rep => {
-
-        // Calculate max repetition offset
-        const repIntervalMinutes = calcRepeatIntervalInMinutes(task);
-        const impreciseRepSpan = [
-            new Date(rep.getTime() - (repIntervalMinutes * 60 * 1000 * MAX_REP_OFFSET)),
-            new Date(rep.getTime() + (repIntervalMinutes * 60 * 1000 * MAX_REP_OFFSET))
-        ];
-        for ( let i = idealTimeIdx; i < idealTimesSorted.length; i++) {
-            const idealTimeOfDay = idealTimesSorted[i];
-            console.log('idealRep vs idealTime', rep, idealTimeOfDay)
-            if ( idealTimeOfDay[0] <= rep && rep <= idealTimeOfDay[1] ) {
-                newIdealTimes.push(idealTimeOfDay);
-                idealTimeIdx += 1;
-                break;
-            } else if ( impreciseRepSpan[0] < idealTimeOfDay[0] && idealTimeOfDay[0] < impreciseRepSpan[1]) {
-                newIdealTimes.push(idealTimeOfDay);
-                idealTimeIdx += 1;
-                break;
-            } else {
-                // Find to which imprecise timespan limit the prefDate is closer => use that limit
-                const idealTimeDuration = (idealTimeOfDay[1].getTime() - idealTimeOfDay[0].getTime()) / 1000 / 60;
-                if (Math.abs(idealTimeOfDay[0].getTime() - impreciseRepSpan[0].getTime()) < Math.abs(idealTimeOfDay[0].getTime() - impreciseRepSpan[1].getTime())) {
-                    newIdealTimes.push([impreciseRepSpan[0], addMinutesToDate(impreciseRepSpan[0], idealTimeDuration)]);
-                } else {
-                    newIdealTimes.push([addMinutesToDate(impreciseRepSpan[1], -1 * idealTimeDuration), impreciseRepSpan[1]]);
-                }
-                idealTimeIdx += 1;
-                break;
-            }
-        }
-        if (idealTimesOfDay.length === 0) {
-            // If idealTimes are solely based on repetition, use idealReps as idealTimes
-            newIdealTimes.push([rep, addMinutesToDate(rep, calcRepeatIntervalInMinutes(task) * MAX_REP_OFFSET)]); // the length of the ideal time is the maximum offset of a repeating task
-        }
-        
-    });
-    return newIdealTimes;
-}
-
-
-export async function organiseIdealFirst(timespan: [Date, Date]) {
-
+export async function organiseByIdealTimeFirst(timespan: [Date, Date]) {
+    console.log('organiser - 2. timespan', timespan);
     const timespanInMinutes = minutesBetweenDates(timespan[0], timespan[1]);
     const events = await fetchEvents();
     let tasksToSchedule = await prisma.task.findMany({
@@ -170,7 +70,7 @@ export async function organiseIdealFirst(timespan: [Date, Date]) {
         }
     });
 
-    console.log('eventsToScheduleDict:', eventsToScheduleDict); 
+    // console.log('eventsToScheduleDict:', eventsToScheduleDict); 
 
     // FIND TIME GAPS IN TIMESPAN
     // Get fixed events in the timespan
@@ -234,16 +134,16 @@ export async function organiseIdealFirst(timespan: [Date, Date]) {
                     }
                 })
             }
-            if (task.repeat && task.repeatTimespan !== 'hour') {
+            if (task?.repeat && task?.repeatTimespan !== 'hour') {
                 idealDays = idealDaysXIdealReps(task, prefDates, timespan);
             } else if (prefDates.length) {
                 idealDays = prefDates;
             }
 
-            console.log('idealDays:', idealDays);
+            // console.log('idealDays:', idealDays);
 
             // GET IDEAL TIMES - if we have prefTimesOfDay or hourly repetition
-            // Get prefTimesOfDay in [Date, Date] format
+            // Get prefTimesOfDay in [hours, hours] format
             if (task.preferredTimeOfDay.length) {
                 let prefTimesOfDay: [number, number][] = [];
                 if (task.preferredTimeOfDay) {
@@ -252,35 +152,42 @@ export async function organiseIdealFirst(timespan: [Date, Date]) {
                     })
                 }
 
-                console.log('prefTimesOfDay:', prefTimesOfDay);
+                // console.log('prefTimesOfDay:', prefTimesOfDay);
 
                 // Intersect idealDays and prefTimesOfDay
                 if (prefTimesOfDay.length && idealDays.length) {
                     idealTimes = hourRangesXDates(prefTimesOfDay, idealDays);
                 } else if (prefTimesOfDay.length) {
                     // add prefTime for each day of the timespan
-                    let [startDate, endDate] = timespan;
-                    [startDate, endDate] = [new Date(startDate.setUTCHours(0,0,0,0)), new Date(endDate.setUTCHours(0,0,0,0))]
+                    let [timespanStart, timespanEnd] = timespan;
+                    [timespanStart, timespanEnd] = [toZonedTime(new Date(timespanStart), 'Europe/Bucharest'), toZonedTime(new Date(timespanEnd.setUTCHours(24,0,0,0)), 'Europe/Bucharest')]
                     // Ensure startDate is before endDate
-                    if (startDate > endDate) {
-                        [startDate, endDate] = [endDate, startDate]; 
+                    if (timespanStart > timespanEnd) {
+                        [timespanStart, timespanEnd] = [timespanEnd, timespanStart]; 
                     }
-                    const currentDate = new Date(startDate); // Create a date iterator
+                    const dateCursor = toZonedTime(new Date(timespanStart), 'Europe/Bucharest');
                     // Loop through each day of the timespan
-                    while (currentDate <= endDate) {
+                    while (dateCursor <= timespanEnd) {
                         // Process the current day
-                        console.log('currentDate:', currentDate);
+                        // console.log('currentDate:', dateCursor);
                         for (let i = 0; i < prefTimesOfDay.length; i++ ) {
-                            idealTimes.push(hourRangeXDate(prefTimesOfDay[i], currentDate));
+                            // Make sure no task is scheduled before present moment
+                            if (prefTimesOfDay[i][1] < timespan[0].getHours()) {
+                                break;
+                            } else if (prefTimesOfDay[i][0] < timespan[0].getHours()) {
+                                idealTimes.push(hourRangeXDate([timespan[0].getHours(), prefTimesOfDay[i][1]], dateCursor));
+                            } else {
+                                idealTimes.push(hourRangeXDate(prefTimesOfDay[i], dateCursor));
+                            }
                         }
                         // Move to the next day
-                        currentDate.setDate(currentDate.getDate() + 0.5);
+                        dateCursor.setDate(dateCursor.getDate() + 1);
                     }
                 }
                 // TO DO: Add idealTime as a task property
             }
 
-            console.log('idealTimes for non-repeating:', idealTimes);
+            // console.log('idealTimes for non-repeating:', idealTimes);
 
             // Intersect idealTimes with idealRepetitions if repetition is hourly
             if (
@@ -294,7 +201,7 @@ export async function organiseIdealFirst(timespan: [Date, Date]) {
                 idealTimes = idealTimesOfDayXIdealReps(task, idealTimes, idealReps);
             }
 
-            console.log('idealTimes:', idealTimes);
+            // console.log('idealTimes:', idealTimes);
 
 
             // FIND MATCHING GAPS
@@ -303,7 +210,7 @@ export async function organiseIdealFirst(timespan: [Date, Date]) {
                     const idealTime = idealTimes[i];
                     const idealEndOfTask = addMinutesToDate(idealTime[0], task.duration);
                     const matchingGaps = timeGaps.filter(gap => (gap[0] <= idealTime[0] && idealEndOfTask <= gap[1]));
-                    console.log('matchingGaps:', matchingGaps[0], matchingGaps[1]);
+                    // console.log('matchingGaps:', matchingGaps[0], matchingGaps[1]);
                     if (matchingGaps.length > 0) {
                         // Schedule task there
                         scheduleEventForTask(task, idealTime[0]);
@@ -371,10 +278,4 @@ export async function organiseIdealFirst(timespan: [Date, Date]) {
 
         
     });
-}
-
-export async function handleOrganise (daysAhead: number = 30) {
-    const currentTime = new Date();
-    const xDaysFromNow = addDaysToDate(currentTime, daysAhead);
-    organiseIdealFirst([currentTime, xDaysFromNow]);
 }

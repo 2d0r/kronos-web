@@ -12,13 +12,11 @@ import clsx from 'clsx';
 import { Event, Status, TaskType } from '@prisma/client';
 import CalendarComponent from '@/app/ui/calendar/calendar-hexaflexa';
 import TaskBrowser from '@/app/ui/browser/task-browser';
-import OrganiseButton from './organiseButton';
 import { MindsetWithRelations } from '@/app/lib/definitions';
 import Button from './button';
 import { deleteAllEvents } from '@/app/lib/actions';
-import { addDaysToDate } from '@/app/utils/dateUtils';
-import { organiseIdealFirst } from '@/app/lib/organiser-idealFirst';
-import { fetchEvents, fetchEventsWithRelations } from '@/app/lib/data';
+import { addDaysToDate, getZonedNow } from '@/app/utils/dateUtils';
+import { organiseByIdealTimeFirst } from '@/app/lib/organiser-idealFirst';
 
 interface TestViewProps {
     children?: JSX.Element | JSX.Element[];
@@ -96,9 +94,10 @@ const TestView: FC<TestViewProps> = ({
         setEventsCache(newEvents);
     }
     const handleOrganise = async (daysAhead: number = 30) => {
-        const currentTime = new Date();
+        const currentTime = getZonedNow('Europe/Bucharest');
+        console.log('organiser - 1. timespanStart', currentTime);
         const xDaysFromNow = addDaysToDate(currentTime, daysAhead);
-        organiseIdealFirst([currentTime, xDaysFromNow]);
+        await organiseByIdealTimeFirst([currentTime, xDaysFromNow]);
         setTimeout(async () => {
             const newEvents = await fetchEvents();
             setEventsCache(newEvents);
@@ -108,12 +107,12 @@ const TestView: FC<TestViewProps> = ({
 
     // HOOKS
 
-    useEffect(() => {
-        console.log('testView - tasksCache', tasksCache);
-    }, [tasksCache])
-    useEffect(() => {
-        console.log('testView - eventsCache', eventsCache);
-    }, [eventsCache])
+    // useEffect(() => {
+    //     console.log('testView - tasksCache', tasksCache);
+    // }, [tasksCache])
+    // useEffect(() => {
+    //     console.log('testView - eventsCache', eventsCache);
+    // }, [eventsCache])
 
 
     return (<div className={clsx('pt-[10vh] pb-[10vh] overflow-scroll w-screen h-screen flex flex-col gap-8 items-center justify-start')} style={{

@@ -33,7 +33,7 @@ export const DEFAULT_TIMES_OF_DAY : { [key: string]: [number, number]} = {
     'morning': [6, 12],
     'afternoon': [12, 18],
     'evening': [18, 22],
-    'noon': [12, 12],
+    'noon': [12, 13],
     'night': [22, 6]
     // TO DO: add late night and noon ?
 };

@@ -175,20 +175,22 @@ export function areSameDay(date1: Date, date2: Date) {
   }
 
 // Convert events from database to HexaFlexa events
-import { utcDateTimeToString } from '@hexaflexa/timegrid';
-export const eventsToHf = (events: Event[], eventColours: string[]) => {
+import { utcDateTimeToString, localDateTimeToString } from '@hexaflexa/timegrid';
+import { toZonedTime } from 'date-fns-tz';
+export const eventsToHf = (events: Event[], eventColours: string[], timezone: string) => {
     let eventsForHf = [];
     for (let i = 0; i < events.length; i++) {
         const event = events[i];
         const [ startTime, endTime ] = [ new Date(event.startTime), new Date(event.endTime) ];
+        console.log('2. organiser - event for hf', event.name, startTime, endTime)
         if ( areSameDay(startTime, endTime) ) {
             eventsForHf.push({
                 id: event.id,
                 taskId: event.taskId,
                 title: event.name,
                 resources: ['1'],
-                start: utcDateTimeToString(startTime),
-                end: utcDateTimeToString(endTime),
+                start: localDateTimeToString(startTime),
+                end: localDateTimeToString(endTime),
                 style: {
                     backgroundColor: eventColours[i]
                 },
@@ -212,4 +214,8 @@ export const eventsToHf = (events: Event[], eventColours: string[]) => {
         }
     }
     return eventsForHf;
+}
+
+export const getZonedNow = (timezone: string = 'Europe/London') => {
+    return new Date(toZonedTime(new Date(), timezone));
 }
