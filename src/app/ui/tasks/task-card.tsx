@@ -7,7 +7,7 @@ import { Dropdown, InputField, MultiSelectionField } from './form-fields';
 import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, DEFAULT_MINDSET, URLSearchParamsKronos, MIN_TASK_DURATION } from '@/app/lib/definitions';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { $Enums, DayOfWeek, Mindset, Task, TimeOfDay } from '@prisma/client';
+import { $Enums, DayOfWeek, Event, Mindset, Task, TimeOfDay } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { editTaskPrisma, createTaskPrisma, deleteTaskPrisma } from '@/app/lib/actions';
 import { parseISO } from 'date-fns';
@@ -15,6 +15,7 @@ import NotesEditor from '@/components/notes-editor';
 import ChecklistEditor from '@/components/checklist-editor';
 import {v4 as uuidv4} from 'uuid';
 import { reorganiseTask } from '@/app/lib/organise-task';
+import EventSection from './event-section';
 
 
 export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, onTaskDelete} : {
@@ -33,7 +34,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
 
     // STATES
 
-    const [ isNewTask, setIsNewTask ] = useState<boolean>(searchParams.get('editTask') === 'new' ? true : false);
+    const [ isNewTask, setIsNewTask ] = useState<boolean>(searchParams.get('task') === 'new' ? true : false);
     // const [ isOpen, setIsOpen ] = useState<boolean>(false);
     const [ taskCache, setTaskCache ] = useState<TaskWithRelations>((!isNewTask && task) ? task : {id: uuidv4()} as TaskWithRelations);
     const [ endRepeat, setEndRepeat ] = useState<(string | null)>('No');
@@ -43,6 +44,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     const [ deadline, setDeadline ] = useState<boolean>(false);
     const [ taskIsEdited, setTaskIsEdited ] = useState<boolean>(false);
     const [ taskIsReady, setTaskIsReady ] = useState<boolean>(false);
+    const [ eventId, setEventId ] = useState<string>(searchParams.get('event') || '');
 
 
     // FORM
@@ -125,7 +127,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     // Set task cache as task if searchParams available
     useEffect(() => {
         setMindsetColour(task?.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
-        const taskId = searchParams.get('editTask')
+        const taskId = searchParams.get('task')
         if (taskId && taskId !== 'new' && !task) {
             fetchTaskByIdAndUpdateCache(taskId);
         }
@@ -150,7 +152,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     }, [taskCache]);
     // Toggle between adding and editing a task, based on search parameters
     useEffect(() => {
-        const isNewTask = searchParams.get('editTask') === 'new' ? true : false;
+        const isNewTask = searchParams.get('task') === 'new' ? true : false;
         setIsNewTask(isNewTask);
         (!isNewTask && task) && setTaskCache(task);
     }, [searchParams]);
@@ -511,6 +513,9 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
 
             {/* Notes and checklist panel */}
             <div className='w-[350px] flex flex-col task-card'>
+                <div className=''>
+                    <EventSection event={task?.events.filter(el => el.id === eventId)[0] || {} as Event} mindsetColour={mindsetColour} />
+                </div>
                 <div className='h-[25vh] border-b-[0.5px] overflow-y-scroll'>
                     <NotesEditor notes={taskCache?.notes || ''} taskId={taskCache?.id} className={'task-card'} />
                 </div>

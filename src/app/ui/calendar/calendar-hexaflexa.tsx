@@ -27,7 +27,7 @@ const CalendarComponent: React.FC<{
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
-    const showTaskCard = searchParams.get('editTask');
+    const showTaskCard = searchParams.get('task');
 
     const timezone = 'Europe/Bucharest' // Intl.DateTimeFormat().resolvedOptions().timeZone;
 
@@ -99,7 +99,7 @@ const CalendarComponent: React.FC<{
     // HANDLERS 
 
     function onEventSelected(event: any) {
-        router.push(`?editTask=${event.detail.taskId}`);
+        router.push(`?task=${event.detail.taskId}&event=${event.detail.id}`);
         fetchTaskAndSetSelectedTaskId(event.detail.taskId);
     }
     function onStartDateChanged(event: any) {

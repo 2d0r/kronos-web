@@ -39,8 +39,8 @@ const TestView: FC<TestViewProps> = ({
     // MODALS
 
     const showMenu = searchParams?.menu;
-    const showTaskCard = !!searchParams.editTask;
-    const taskToEditId = searchParams.editTask;
+    const showTaskCard = !!searchParams.task;
+    const taskToEditId = searchParams.task;
     const taskToEdit = taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0];
 
 

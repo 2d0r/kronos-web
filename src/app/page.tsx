@@ -4,7 +4,7 @@ import TopBar from './ui/top-bar';
 import EventCard from './ui/tasks/event-card';
 import BottomBar from './ui/bottom-bar';
 import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from './lib/definitions';
-import TransportControls from './ui/tasks/transport-controls';
+import TransportControls from './ui/buttons/transport-controls';
 import Menu from './ui/menu';
 import prisma from './lib/db';
 import { Task } from '@prisma/client';
@@ -14,7 +14,7 @@ import TaskCard from './ui/tasks/task-card';
 import Link from 'next/link';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
-    const showTaskCard = searchParams?.editTask;
+    const showTaskCard = searchParams?.task;
     const showMenu = searchParams?.menu;
 
     const mindsets = await fetchMindsets();
@@ -46,7 +46,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             {eventQueue.length > 0 && 
                 <div className='w-full items-center justify-center flex flex-col gap-4'>
                     {!showMenu && (<>
-                        <Link href={`?editTask=${currentTask.id}`} >
+                        <Link href={`?task=${currentTask.id}`} >
                             <EventCard event={eventQueue[0]} task={taskQueue[0]} mindset={mindsetQueue[0]} />
                         </Link>
                         <TransportControls eventId={eventQueue[0].id} taskId={currentTask.id} mindsetColour={mindsetColour} context='timeline'/>

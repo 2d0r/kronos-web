@@ -25,7 +25,7 @@ export default function TransportControls ({ eventId, taskId, context, className
                 {/* <img src='../icons/play.svg' className='h-12 w-12' /> */}
                 <PlaySVG fill={mindsetColour} />
             </Link>
-            <Link href={`?editTask=${taskId}`}>
+            <Link href={`?task=${taskId}`}>
                 <Edit2 color={mindsetColour} fill={mindsetColour} />
             </Link>
         </>}

@@ -35,7 +35,7 @@ const ToDoItem: FC<{
         </div>
         <div className='flex gap-2'>
             <Link 
-                href={`?editTask=${task.id}`}
+                href={`?task=${task.id}`}
                 className='text-sm text-gray-400 cursor-pointer'
             >{showEdit && 'Edit'}</Link>
             <button 

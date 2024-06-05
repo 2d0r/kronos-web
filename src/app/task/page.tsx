@@ -5,7 +5,7 @@ import BottomBar from '@/app/ui/bottom-bar';
 import Menu from '@/app/ui/menu';
 import CreateTask from '@/app/ui/tasks/create-task';
 import EventCard from '@/app/ui/tasks/event-card';
-import TransportControls from '@/app/ui/tasks/transport-controls';
+import TransportControls from '@/app/ui/buttons/transport-controls';
 import TopBar from '@/app/ui/top-bar';
 import clsx from 'clsx';
 import React from 'react';
@@ -18,7 +18,7 @@ import CircleTimer from '@/components/circle-timer';
 import TaskCard from '../ui/tasks/task-card';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
-    const showTaskCard = searchParams?.editTask;
+    const showTaskCard = searchParams?.task;
     const showMenu = searchParams?.menu;
 
     const events = await fetchEventsWithRelations();

@@ -29,8 +29,8 @@ const TimelineCard: FC<TimelineCardProps> = async ({
 
     // Modals
     const showMenu = searchParams?.menu;
-    // const showTaskCard = !!searchParams.editTask;
-    // const taskToEditId = searchParams.editTask;
+    // const showTaskCard = !!searchParams.task;
+    // const taskToEditId = searchParams.task;
     // const taskToEdit = taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0];
 
     return (<div className={clsx(timelineClassName, 'w-screen h-screen flex flex-col gap-8 items-center justify-start pt-[20vh]')} style={{

@@ -12,12 +12,12 @@ export default function AddTaskButton({searchParams, mindsetColour}: {searchPara
     const router = useRouter();
 
     useEffect(() => {
-        setShowAddTask(searchParams?.editTask ? true : false);
-    }, [searchParams?.editTask]);
+        setShowAddTask(searchParams?.task ? true : false);
+    }, [searchParams?.task]);
 
     return (
         <Link
-            href={showTaskCard ? pathname : `${pathname}?editTask=new`}
+            href={showTaskCard ? pathname : `${pathname}?task=new`}
             className='bottom-[2vh] right-[2vw] w-10 h-10 text-white rounded-full flex items-center justify-center'
             style={{ background: mindsetColour }}
         >
