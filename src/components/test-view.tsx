@@ -34,7 +34,7 @@ const TestView: FC<TestViewProps> = ({
 
     const [ tasksCache, setTasksCache ] = useState<TaskWithRelations[]>(tasks);
     const [ eventsCache, setEventsCache ] = useState<Event[]>(events);
-
+    
 
     // MODALS
 
@@ -42,6 +42,7 @@ const TestView: FC<TestViewProps> = ({
     const showTaskCard = !!searchParams.task;
     const taskToEditId = searchParams.task;
     const taskToEdit = taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0];
+    // const [ taskToEdit, setTaskToEdit ] = useState<TaskWithRelations>(taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0]);
 
 
     // DATA FETCH
@@ -51,6 +52,12 @@ const TestView: FC<TestViewProps> = ({
         const data = await response.json();
         const newEvents = data.events;
         return newEvents;
+    }
+    const fetchTasks = async () => {
+        const response = await fetch('/task');
+        const data = await response.json();
+        const newTasks = data.tasks;
+        return newTasks;
     }
 
 
@@ -100,7 +107,9 @@ const TestView: FC<TestViewProps> = ({
         setTimeout(async () => {
             const newEvents = await fetchEvents();
             setEventsCache(newEvents);
-        }, 1000)
+            const newTasks = await fetchTasks();
+            setTasksCache(newTasks);
+        }, 1000);
     }
 
 

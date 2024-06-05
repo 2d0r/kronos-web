@@ -127,7 +127,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     // Set task cache as task if searchParams available
     useEffect(() => {
         setMindsetColour(task?.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
-        const taskId = searchParams.get('task')
+        const taskId = searchParams.get('task');
         if (taskId && taskId !== 'new' && !task) {
             fetchTaskByIdAndUpdateCache(taskId);
         }
@@ -156,6 +156,8 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
         setIsNewTask(isNewTask);
         (!isNewTask && task) && setTaskCache(task);
     }, [searchParams]);
+    // If event id changes in searchParams, re-fetch tasks with fresh events
+
     
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'>
     <div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl text-sm text-black overflow-hidden'>
@@ -255,7 +257,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                             inputType='time'
                             colour={mindsetColour}
                             state={state}
-                            value={taskCache?.startTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || '00:00'}
+                            value={taskCache?.startTime ? taskCache?.startTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '00:00'}
                             onChange={(event: any) => handleTimeChanges(event, 'startTime')}
                         />
                         <InputField 
@@ -514,7 +516,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
             {/* Notes and checklist panel */}
             <div className='w-[350px] flex flex-col task-card'>
                 <div className=''>
-                    <EventSection event={task?.events.filter(el => el.id === eventId)[0] || {} as Event} mindsetColour={mindsetColour} />
+                    <EventSection event={taskCache?.events?.filter(el => el.id === eventId)[0] || {} as Event} mindsetColour={mindsetColour} />
                 </div>
                 <div className='h-[25vh] border-b-[0.5px] overflow-y-scroll'>
                     <NotesEditor notes={taskCache?.notes || ''} taskId={taskCache?.id} className={'task-card'} />
