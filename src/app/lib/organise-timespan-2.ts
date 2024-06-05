@@ -193,13 +193,6 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
                         }
                         console.log(task.name, '> gapsInTimespan', gapsInTimespan);
                         for (let k = 0; k < gapsInTimespan.length; k++) {
-                            // scheduleEventForTask(task, gapsInTimespan[k][0], task.duration, `${gapsInTimespan[k][0].getHours()}:${gapsInTimespan[k][0].getMinutes()}`);
-                            // eventsToScheduleDict[task.id] -= 1;
-                            // newEventsInTimespan.push({
-                            //     startTime: gapsInTimespan[k][0],
-                            //     endTime: addMinutesToDate(gapsInTimespan[k][0], task.duration),
-                            // });
-                            // break;
                             const localTime = `${ gapsInTimespan[k][0].getHours() }:${ gapsInTimespan[k][0].getMinutes() }`;
                             // console.log(task.name, '> localTime >', localTime);
                             scheduleEventForTask(task, gapsInTimespan[k][0], task.duration, localTime);
@@ -243,7 +236,7 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
             }
 
 
-            // SCHEDULE BY REPEAT DAILY OR LESS OFTEN
+            // SCHEDULE BY REPEAT (DAILY OR LESS OFTEN)
             else if (task.repeat && task.repeatTimespan !== 'hour') {
                 console.log(task.name, '> scheduling by repeat');
                 // idealDays already filtered by repeat daily or less
@@ -251,7 +244,7 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
                     const gapsInTimespan = findGapsInTimespan(getStartAndEndOfDay(idealDays[i]), newEventsInTimespan, task.duration);
                     // Attempt to schedule
                     for (let j = 0; j < gapsInTimespan.length; j++) {
-                        const localTime = `${gapsInTimespan[j][0].getHours()}:${gapsInTimespan[j][0].getMinutes()}`;
+                        const localTime = `${ gapsInTimespan[j][0].getUTCHours() }:${ gapsInTimespan[j][0].getMinutes() }`;
                         scheduleEventForTask(task, gapsInTimespan[j][0], task.duration, localTime);
                         eventsToScheduleDict[task.id] -= 1;
                         newEventsInTimespan.push({

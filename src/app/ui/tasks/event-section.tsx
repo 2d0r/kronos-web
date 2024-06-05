@@ -1,15 +1,18 @@
-import { dateToDDMMYYYY, dateToHHMM } from '@/app/utils/dateUtils';
+import { dateToDDMMYYYY, dateToHHMM, getLocalStartAndEnd, getMinutesBetweenLocalAndUTC } from '@/app/utils/dateUtils';
 import { Event } from '@prisma/client';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import React from 'react';
 
 export default function EventSection({event, mindsetColour} : {event: Event, mindsetColour: string}) {
 
-    const time = event.startTime && event.endTime ? `${dateToHHMM(event.startTime)} - ${dateToHHMM(event.endTime)}`
+    const [ start, end ] = getLocalStartAndEnd(event);
+    const [ startDate, endDate ] = [ new Date(start), new Date(end) ];
+
+    const time = event.startTime && event.endTime ? `${dateToHHMM(startDate)} - ${dateToHHMM(endDate)}`
         : '';
-    const date = event.startTime && event.endTime ? event.startTime.getDate() === event.endTime.getDate() ?
-        dateToDDMMYYYY(event.startTime)
-        : `${dateToDDMMYYYY(event.startTime)} - ${dateToDDMMYYYY(event.endTime)}`
+    const date = event.startTime && event.endTime ? startDate.getDate() === endDate.getDate() ?
+        dateToDDMMYYYY(startDate)
+        : `${dateToDDMMYYYY(startDate)} - ${dateToDDMMYYYY(endDate)}`
         : '';
     if (!event.startTime) {
         return <></>;

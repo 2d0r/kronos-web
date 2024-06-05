@@ -172,7 +172,7 @@ export function areSameDay(date1: Date, date2: Date) {
     date2Copy.setUTCHours(0, 0, 0, 0);
 
     return date1Copy.getTime() === date2Copy.getTime();
-  }
+}
 
 // Convert events from database to HexaFlexa events
 import { localDateTimeToString, utcDateTimeToString } from '@hexaflexa/timegrid';
@@ -191,8 +191,8 @@ export const eventsToHf = (events: Event[], eventColours: string[], timezone: st
             startTime = localDateTimeToString(new Date(startTimeAsNum));
             const minutesBetweenLocalTimes = minutesBetweenDates(new Date(startTimeAsNum), new Date(event.startTime));
             console.log(event.name, '> minutesBetweenLocalTimes >', minutesBetweenLocalTimes);
-            endTime = utcDateTimeToString(new Date(event.endTime));
-            console.log(event.name, 'at', startTime, '-', endTime);
+            endTime = localDateTimeToString(addMinutesToDate(new Date(event.endTime), -1 * minutesBetweenLocalTimes));
+            console.log(event.name, '>', startTime, '-', endTime);
         } else {
             startTime = localDateTimeToString(new Date(event.startTime));
             endTime = localDateTimeToString(new Date(event.endTime));
@@ -235,6 +235,31 @@ export const eventsToHf = (events: Event[], eventColours: string[], timezone: st
     }
     return eventsForHf;
 }
+
+export const getMinutesBetweenLocalAndUTC = (event: Event) => {
+    if (!event.localTime) return 0;
+    const startTimeAsNum = (new Date(event.startTime)).setHours(Number(event.localTime.split(':')[0]), Number(event.localTime.split(':')[1]));
+    const minutesBetweenLocalTimes = minutesBetweenDates(new Date(startTimeAsNum), new Date(event.startTime));
+    return minutesBetweenLocalTimes;
+}
+
+export const getLocalStartAndEnd = (event: Event) => {
+    
+    let [ startTime, endTime ] = ['', ''];
+    if (event.localTime) {
+        // Get startTime from localTime
+        const startTimeAsNum = (new Date(event.startTime)).setHours(Number(event.localTime.split(':')[0]), Number(event.localTime.split(':')[1]));
+        startTime = localDateTimeToString(new Date(startTimeAsNum));
+        // Get endTime using timezone difference
+        const minutesBetweenLocalTimes = minutesBetweenDates(new Date(startTimeAsNum), new Date(event.startTime));
+        endTime = localDateTimeToString(addMinutesToDate(new Date(event.endTime), -1 * minutesBetweenLocalTimes));
+    } else {
+        startTime = localDateTimeToString(new Date(event.startTime));
+        endTime = localDateTimeToString(new Date(event.endTime));
+    }
+    return [startTime, endTime];
+}
+
 
 export const getZonedNow = (timezone: string = 'Europe/London') => {
     return new Date(toZonedTime(new Date(), timezone));
