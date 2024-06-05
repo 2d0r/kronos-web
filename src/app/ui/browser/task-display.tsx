@@ -90,7 +90,7 @@ export default function TaskDisplay ({
                                 <span className='text-lg'>{task.name}</span>
                                 <span className='text-sm'>{task.notes}</span>
                                 <div className='w-full flex flex-col gap-2 items-start'>
-                                    { tasksCache.filter(subtask => subtask.tasksParent.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
+                                    { tasksCache.filter(subtask => subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
                                         return(<div className={'flex gap-2 items-center text-sm'} key={innerTask.id}>
                                             <Checkbox taskId={innerTask.id} status={innerTask.status} type={innerTask.type}
                                                 height='20' width='20' fill='white'

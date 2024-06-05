@@ -2,7 +2,6 @@
 
 import React from 'react';
 import MenuCard from './cards/menu-card';
-import SearchBar from './search';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import CalendarSVG from './svg/calendar-svg';

@@ -146,6 +146,7 @@ model Event {
   status        Status    @default(toDo)
   startTime     DateTime
   endTime       DateTime
+  localTime     String?
   userStartTime DateTime?
   userEndTime   DateTime?
   breaks        Break[]

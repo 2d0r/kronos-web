@@ -8,7 +8,7 @@ import prisma from './db';
 import { Event, RepeatUnit, Task, TaskType } from '@prisma/client';
 import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION, repeatUnitList } from './definitions';
 import { fetchMindsets, fetchTasks } from './data';
-import { calculatePriorityScores } from './priorityScore';
+import { calculatePriorityScores } from './priority-score';
 import { calculateTimeScore } from './time-score';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -449,7 +449,7 @@ export async function createEventPrisma(event: Event) {
 
 }
 
-export async function scheduleEventForTask(task: Task, startTime: Date, duration?: number) {
+export async function scheduleEventForTask(task: Task, startTime: Date, duration?: number, localTime?: string) {
 
   const endTime = new Date(startTime.getTime() + (duration || task.duration) * 60 * 1000);
 
@@ -461,13 +461,15 @@ export async function scheduleEventForTask(task: Task, startTime: Date, duration
     taskId: task.id,
     startTime: startTime,
     endTime: endTime,
+    localTime: localTime || null,
+    // duration: task.duration,
     userStartTime: null,
     userEndTime: null,
     notes: null,
     createdAt: new Date()
   }
 
-  createEventPrisma(eventToSchedule);
+  await createEventPrisma(eventToSchedule);
 
   return eventToSchedule as Event;
 }

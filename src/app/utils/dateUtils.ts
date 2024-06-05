@@ -1,4 +1,4 @@
-import { Event, Task } from '@prisma/client';
+import { DayOfWeek, Event, Task } from '@prisma/client';
 import { DAYS_OF_WEEK_DICT, DEFAULT_TIMES_OF_DAY } from '../lib/definitions';
 
 export function minutesBetweenDates (earlierDate : Date, laterDate : Date) {
@@ -175,37 +175,57 @@ export function areSameDay(date1: Date, date2: Date) {
   }
 
 // Convert events from database to HexaFlexa events
-import { utcDateTimeToString, localDateTimeToString } from '@hexaflexa/timegrid';
+import { localDateTimeToString, utcDateTimeToString } from '@hexaflexa/timegrid';
 import { toZonedTime } from 'date-fns-tz';
 export const eventsToHf = (events: Event[], eventColours: string[], timezone: string) => {
     let eventsForHf = [];
     for (let i = 0; i < events.length; i++) {
         const event = events[i];
-        const [ startTime, endTime ] = [ new Date(event.startTime), new Date(event.endTime) ];
-        console.log('2. organiser - event for hf', event.name, startTime, endTime)
-        if ( areSameDay(startTime, endTime) ) {
+        let [ startTime, endTime ] = ['', ''];
+        if (event.localTime) {
+            // if (Number(event.localTime.split(':')[0]) > event.startTime.getHours()) {
+
+            // }
+            console.log(event.name, '> localTime values >', Number(event.localTime.split(':')[0]), Number(event.localTime.split(':')[1]));
+            const startTimeAsNum = (new Date(event.startTime)).setHours(Number(event.localTime.split(':')[0]), Number(event.localTime.split(':')[1]));
+            startTime = localDateTimeToString(new Date(startTimeAsNum));
+            const minutesBetweenLocalTimes = minutesBetweenDates(new Date(startTimeAsNum), new Date(event.startTime));
+            console.log(event.name, '> minutesBetweenLocalTimes >', minutesBetweenLocalTimes);
+            endTime = utcDateTimeToString(new Date(event.endTime));
+            console.log(event.name, 'at', startTime, '-', endTime);
+        } else {
+            startTime = localDateTimeToString(new Date(event.startTime));
+            endTime = localDateTimeToString(new Date(event.endTime));
+        }
+        
+        if ( areSameDay(new Date(startTime), new Date(endTime)) ) {
+            // Events that start and end on the same day
             eventsForHf.push({
                 id: event.id,
                 taskId: event.taskId,
                 title: event.name,
                 resources: ['1'],
-                start: localDateTimeToString(startTime),
-                end: localDateTimeToString(endTime),
+                start: startTime,
+                end: endTime,
                 style: {
                     backgroundColor: eventColours[i]
                 },
             });
         } else {
-            const endTimeCopy = new Date(endTime.getTime());
+            // Events that start and end in different days
+            const endTimeCopy = new Date(endTime);
             const endTimeEndDay = new Date(endTimeCopy.setUTCHours(23,59,0,0));
             for (let d = new Date(startTime); d <= endTimeEndDay; d.setDate(d.getDate() + 1)) {
                 const dCopy = new Date(d.getTime());
+                const start = d.getTime() === new Date(startTime).getTime() ? startTime : utcDateTimeToString(new Date(dCopy.setUTCHours(0,0,0,0)));
+                const end = d < new Date(endTime) ? utcDateTimeToString(new Date(dCopy.setUTCHours(23, 59, 0, 0))) : endTime;
                 eventsForHf.push({
                     id: event.id,
+                    taskId: event.taskId,
                     title: event.name,
                     resources: ['1'],
-                    start: d.getTime() === startTime.getTime() ? utcDateTimeToString(startTime) : utcDateTimeToString(new Date(dCopy.setUTCHours(0,0,0,0))),
-                    end: d < endTime ? utcDateTimeToString(new Date(dCopy.setUTCHours(23, 59, 0, 0))) : utcDateTimeToString(endTime),
+                    start: start,
+                    end: end,
                     style: {
                         backgroundColor: eventColours[i]
                     },
@@ -218,4 +238,11 @@ export const eventsToHf = (events: Event[], eventColours: string[], timezone: st
 
 export const getZonedNow = (timezone: string = 'Europe/London') => {
     return new Date(toZonedTime(new Date(), timezone));
+}
+
+export const getStartAndEndOfDay = (day: Date): [Date, Date] => {
+    return [
+        new Date(new Date(day).setUTCHours(0,0,0,0)),
+        new Date(new Date(day).setUTCHours(23,59,59,999))
+    ];
 }

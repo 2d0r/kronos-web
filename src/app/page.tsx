@@ -36,7 +36,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour, 0.5)}, ${adjustLightness(mindsetColour, 0.7)})`
     }}>
         <TopBar searchParams={searchParams}>
-            <SearchBar placeholder="Search tasks, projects, dates..." />
+            {/* <SearchBar placeholder="Search tasks, projects, dates..." /> */}
         </TopBar>
         { showTaskCard === 'new' ? <TaskCard mindsets={mindsets} /> 
             : showTaskCard ?  <TaskCard task={currentTask} mindsets={mindsets}/>

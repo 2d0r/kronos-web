@@ -29,6 +29,8 @@ export const CARD_SCALES = {
 }
 export const SMALL_CARD_HEIGHT = 200;
 
+export const DEFAULT_TIME_ZONE = 'Europe/Bucharest';
+
 export const DEFAULT_TIMES_OF_DAY : { [key: string]: [number, number]} = {
     'morning': [6, 12],
     'afternoon': [12, 18],

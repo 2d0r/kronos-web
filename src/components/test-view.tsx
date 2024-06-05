@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import BottomBar from '@/app/ui/bottom-bar';
 import TopBar from '@/app/ui/top-bar';
 import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '@/app/lib/definitions';
@@ -15,8 +15,8 @@ import TaskBrowser from '@/app/ui/browser/task-browser';
 import { MindsetWithRelations } from '@/app/lib/definitions';
 import Button from './button';
 import { deleteAllEvents } from '@/app/lib/actions';
-import { addDaysToDate, getZonedNow } from '@/app/utils/dateUtils';
-import { organiseByIdealTimeFirst } from '@/app/lib/organiser-idealFirst';
+import { addDaysToDate } from '@/app/utils/dateUtils';
+import { organiseTimespanByIdealTime } from '@/app/lib/organise-timespan-2';
 
 interface TestViewProps {
     children?: JSX.Element | JSX.Element[];
@@ -94,10 +94,9 @@ const TestView: FC<TestViewProps> = ({
         setEventsCache(newEvents);
     }
     const handleOrganise = async (daysAhead: number = 30) => {
-        const currentTime = getZonedNow('Europe/Bucharest');
-        console.log('organiser - 1. timespanStart', currentTime);
+        const currentTime = new Date();
         const xDaysFromNow = addDaysToDate(currentTime, daysAhead);
-        await organiseByIdealTimeFirst([currentTime, xDaysFromNow]);
+        await organiseTimespanByIdealTime([currentTime, xDaysFromNow]);
         setTimeout(async () => {
             const newEvents = await fetchEvents();
             setEventsCache(newEvents);
@@ -118,7 +117,9 @@ const TestView: FC<TestViewProps> = ({
     return (<div className={clsx('pt-[10vh] pb-[10vh] overflow-scroll w-screen h-screen flex flex-col gap-8 items-center justify-start')} style={{
         backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.5)}, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.7)})`
     }}>
-        <TopBar searchParams={searchParams} back={back}><SearchBar placeholder='Search events, dates...'/></TopBar>
+        <TopBar searchParams={searchParams} back={back}>
+            {/* <SearchBar placeholder='Search events, dates...'/> */}
+        </TopBar>
         {showMenu && <Menu mindsetColour={mindsetColour}/>}
         {/* {showTaskCard && <TaskCard mindsets={mindsets}/>} */}
         <div className={clsx('max-h-none z-[39] bg-white rounded-3xl shadow-xl w-fit p-4 flex flex-col gap-4 items-center justify-start')}>

@@ -141,6 +141,29 @@ export async function fetchEventsWithRelations() {
   }
 }
 
+export async function findEventsInTimespan(start: Date, end: Date) {
+  try {
+    const events = await prisma.event.findMany({
+      where: {
+        OR: [{
+          startTime: { gte: start, lte: end },
+        }, {
+          endTime: { gte: start, lte: end }
+        }, {
+          startTime: { lte: start },
+          endTime: { gte: end }
+        }],
+      },
+      select: {
+        id: true,
+      }
+    });
+    return events;
+  } catch (error) {
+    console.error('Failed to find events in timespan:', error);
+  }
+}
+
 
 // Mindsets
 
@@ -268,11 +291,15 @@ export async function getCurrentMindsetColour() {
         task: true
       },
     });
+    if (nearestEvents.length === 0) {
+      return NEUTRAL_MINDSET_COLOUR;
+    } 
     const nearestMindsetId = nearestEvents[0].task.mindsetId;
     const nearestMindset = await getMindsetById(nearestMindsetId);
     return nearestMindset?.colour;
   } catch (error) {
-    console.log('Failed to get mindset', error);
+    console.log('Failed to get mindset 🔴', error);
+
   } 
   
   

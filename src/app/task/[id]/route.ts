@@ -40,6 +40,23 @@ export async function GET(req: Request, context: { params: Params }) {
 export async function DELETE(req: Request, context: { params: Params }) {
     const id= context.params.id;
     try {
+        await prisma.event.deleteMany({
+            where: { taskId: id },
+        });
+        // return Response.json({message: 'Deleted task via API route'});
+    } catch (error) {
+        console.error('Error deleting task\'s events', error);
+        return Response.json(
+            {
+                message: 'Error deleting task\'s events',
+                error,
+            },
+            {
+                status: 500,
+            }
+        );
+    }
+    try {
         await prisma.task.delete({
             where: { id: id },
         });

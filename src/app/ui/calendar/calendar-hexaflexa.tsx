@@ -1,11 +1,13 @@
+// Helxaflexa calendar library
+
 'use client';
 
-import React, { RefObject, use, useEffect, useState } from 'react';
+import React, { RefObject, useEffect, useState } from 'react';
 import { HfTimegrid, defineCustomElements } from '@hexaflexa/timegrid-react';
-import { HfTimegridConfig, utcDateTimeToString, utcDateToString, HfEvent } from '@hexaflexa/timegrid';
+import { HfTimegridConfig, utcDateToString, HfEvent } from '@hexaflexa/timegrid';
 import './calendar-hexaflexa.css';
-import { Event, Mindset, Task } from '@prisma/client';
-import { areSameDay, eventsToHf } from '@/app/utils/dateUtils';
+import { Event } from '@prisma/client';
+import { eventsToHf } from '@/app/utils/dateUtils';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import TaskCard from '../tasks/task-card';
@@ -33,7 +35,7 @@ const CalendarComponent: React.FC<{
         const eventMindset = mindsets.filter(mindset => mindset.tasks.some(task => {
         return Object.values(task).includes(event.taskId);
         }));
-        return eventMindset[0].colour;
+        return eventMindset[0]?.colour;
     });
     const [ selectedTask, setSelectedTask ] = useState<TaskWithRelations>({} as TaskWithRelations);
     const [ eventsCache, setEventsCache ] = useState<Event[]>(events);
