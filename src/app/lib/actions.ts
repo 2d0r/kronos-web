@@ -24,7 +24,6 @@ const FormSchema = z.object({
   startDate: z.string().nullable(),
   endTime: z.string().nullable(),
   endDate: z.string().nullable(),
-  idealStartTime: z.string().nullable(),
   // duration: z.string(),
   durationHours: z.string().nullable(),
   durationMinutes: z.string().nullable(),
@@ -36,6 +35,7 @@ const FormSchema = z.object({
   repeatTimespanMultiplier: z.string().nullable(),
   repeatDurationHours: z.string().nullable(),
   repeatDurationMinutes: z.string().nullable(),
+  idealStart: z.string().nullable(),
   preferredTimeOfDay: z.array(z.enum(['morning', 'afternoon', 'evening', 'night'], { invalid_type_error: 'Please select a valid time of day.' })).nullable(), // z.array(z.string().refine(value => timeOfDayList.includes(value))), // 
   preferredDayOfWeek: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], { invalid_type_error: 'Please select a valid day of the week.' })).nullish(),
   endRepeat: z.string().nullable(),
@@ -57,7 +57,6 @@ export type State = {
     endTime?: string[];
     endDate?: string[];
     deadline?: number[];
-    idealStartTime?: string[];
     durationHours?: number[];
     durationMinutes?: number[];
     // repeat?: boolean[];
@@ -67,6 +66,7 @@ export type State = {
     repeatDurationMinutes?: number[];
     repeatTimespan?: string[];
     repeatTimespanMultiplier?: number[];
+    idealStart?: string[];
     preferredTimeOfDay?: string[][];
     preferredDayOfWeek?: string[][];
     endRepeat?: string[];
@@ -94,7 +94,6 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     startDate: formData.get('startDate'),
     endTime: formData.get('endTime'),
     endDate: formData.get('endDate'),
-    idealStartTime: formData.get('idealStartTime'),
     durationHours: formData.get('durationHours'),
     durationMinutes: formData.get('durationMinutes'),
     deadline: formData.get('deadline'),
@@ -105,6 +104,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     repeatDurationHours: formData.get('repeatDurationHours'),
     repeatDurationMinutes: formData.get('repeatDurationMinutes'),
     repeatUnit: formData.get('repeatUnit'),
+    idealStart: formData.get('idealStart'),
     preferredTimeOfDay: formData.getAll('preferredTimeOfDay'),
     preferredDayOfWeek: formData.getAll('preferredDayOfWeek'),
     endRepeat: formData.get('endRepeat'),
@@ -123,7 +123,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
   }
 
   const { id, name, type, mindset, status, priority, startDate, startTime, endDate, endTime,
-    durationHours, durationMinutes, idealStartTime,
+    durationHours, durationMinutes, idealStart,
     /* repeat, */ repeatTimespanMultiplier, repeatFrequency, repeatTimespan,
     repeatUnit, repeatDurationHours, repeatDurationMinutes,
     preferredTimeOfDay, preferredDayOfWeek,
@@ -137,6 +137,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     (startDateTime && endDateTime) ? endDateTime.getTime() - startDateTime.getTime() : MIN_TASK_DURATION;
   const repeatDurationInMinutes = (repeatDurationHours || repeatDurationMinutes) ?
     (Number(repeatDurationMinutes) || 0) + (Number(repeatDurationHours) || 0) * 60 : null;
+  const idealStartHHMM = idealStart?.length && idealStart?.split(':')[0].length ? `${idealStart?.split(':')[0]}:${idealStart?.split(':')[1]}` : null;
 
   // Calculate timeScore
   const mockTask = {
@@ -183,6 +184,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         repeatTimespanMultiplier: (repeatFrequency && Number(repeatFrequency) > 1) ?  Number(repeatTimespanMultiplier) || 1 : 1,
         repeatFrequency: Number(repeatFrequency) || repeatDurationInMinutes,
         repeatTimespan: repeatTimespan,
+        idealStart: idealStartHHMM,
         preferredTimeOfDay: preferredTimeOfDay || [],
         preferredDayOfWeek: preferredDayOfWeek || [],
         endRepeat: Boolean(endRepeat),
@@ -192,7 +194,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
       },
     });
   } catch (error) {
-    console.log('Failed to create task', error);
+    console.log('Failed to create task ❌', error);
     return {
       message: 'Database Error: Failed to create task.',
     };
@@ -215,7 +217,6 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
     startDate: formData.get('startDate'),
     endTime: formData.get('endTime'),
     endDate: formData.get('endDate'),
-    idealStartTime: formData.get('idealStartTime'),
     durationHours: formData.get('durationHours'),
     durationMinutes: formData.get('durationMinutes'),
     deadline: formData.get('deadline'),
@@ -226,6 +227,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
     repeatDurationHours: formData.get('repeatDurationHours'),
     repeatDurationMinutes: formData.get('repeatDurationMinutes'),
     repeatUnit: formData.get('repeatUnit'),
+    idealStart: formData.get('idealStart'),
     preferredTimeOfDay: formData.getAll('preferredTimeOfDay'),
     preferredDayOfWeek: formData.getAll('preferredDayOfWeek'),
     endRepeat: formData.get('endRepeat'),
@@ -244,7 +246,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
   }
 
   const { id, name, type, mindset, status, priority, startDate, startTime, endDate, endTime,
-    durationHours, durationMinutes, idealStartTime,
+    durationHours, durationMinutes, idealStart,
     /* repeat, */ repeatTimespanMultiplier, repeatFrequency, repeatTimespan,
     repeatUnit, repeatDurationHours, repeatDurationMinutes,
     preferredTimeOfDay, preferredDayOfWeek,
@@ -258,6 +260,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
     (startDateTime && endDateTime) ? endDateTime.getTime() - startDateTime.getTime() : null;
   const repeatDurationInMinutes = (repeatDurationHours || repeatDurationMinutes) ?
     (Number(repeatDurationMinutes) || 0) + (Number(repeatDurationHours) || 0) * 60 : null;
+  const idealStartHHMM = idealStart?.length && idealStart?.split(':')[0].length ? `${idealStart?.split(':')[0]}:${idealStart?.split(':')[1]}` : null;
 
   const matchingMindset = await fetchMindsets().then(mindsets =>
     mindsets.find(el => el.name === mindset)
@@ -290,7 +293,8 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
         name: name,
         type: type as TaskType || 'task',
         status: status || 'toDo',
-        mindsetId: matchingMindset.id,
+        // mindsetId: matchingMindset.id,
+        mindset: { connect: { id: matchingMindset.id }},
         priority: priority,
         timeScore: timeScore,
         fixed: !!startDateTime && !!endDateTime,
@@ -302,6 +306,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
         repeatTimespanMultiplier: (repeatFrequency && Number(repeatFrequency) > 1) ?  Number(repeatTimespanMultiplier) || 1 : 1,
         repeatFrequency: Number(repeatFrequency) || repeatDurationInMinutes,
         repeatTimespan: repeatTimespan,
+        idealStart: idealStartHHMM,
         preferredTimeOfDay: preferredTimeOfDay || [],
         preferredDayOfWeek: preferredDayOfWeek || [],
         endRepeat: !!totalDuration || !!totalRepetitions || !!endRepeatDate,
@@ -311,7 +316,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
       },
     });
   } catch (error) {
-    console.log('Failed to create task', error);
+    console.log('Failed to create task ❌', error);
     return {
       message: 'Database Error: Failed to create task.',
     };
@@ -441,7 +446,7 @@ export async function createEventPrisma(event: Event) {
       },
     });
   } catch (error) {
-    console.log('Failed to create event', error);
+    console.log('Failed to create event ❌', error);
     return {
       message: 'Database Error: Failed to create event.',
     };

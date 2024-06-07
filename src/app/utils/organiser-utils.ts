@@ -3,6 +3,7 @@
 import { DayOfWeek, Event, Task } from '@prisma/client';
 import { DAYS_OF_WEEK_DICT, MAX_REP_OFFSET } from '../lib/definitions';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates } from './dateUtils';
+import { addDays } from 'date-fns';
 
 // Can only calculate for tasks that had their first session already scheduled
 export const getIdealReps = (task: Task, timespan: [Date, Date], idealFirstRepTime?: Date): Date[] => {
@@ -238,7 +239,6 @@ export function findGapsInTimespan(timespan: [Date, Date], events: (BasicEvent[]
             a[0].getTime() - b[0].getTime()
         ));
     }
-    console.log('timeGaps', timeGaps);
 
     // Filter time gaps that can fir our minimum duration
     // if (minDuration) {
@@ -347,4 +347,14 @@ export function intersectTimespans(span1: [Date, Date], span2: [Date, Date]): [D
     } else {
       return null; // No intersection
     }
+}
+
+export const dayXHourInterval = (day: Date, hourInterval: [number, number]): [Date, Date] => {
+    let dayXTimeOfDay: [Date, Date] = [
+        new Date(new Date(day).setHours(hourInterval[0], 0, 0, 0)), 
+        new Date(new Date(
+            hourInterval[0] < hourInterval[1] ? day : addDays(day, 1) // For night and other hour intervals with cross midnight
+        ).setHours(hourInterval[1], 0, 0, 0))
+    ];
+    return dayXTimeOfDay;
 }

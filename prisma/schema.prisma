@@ -34,9 +34,7 @@ model Task {
   endTime                  DateTime?
   duration                 Int
   deadline                 DateTime?
-  timeSpent                Int         @default(0)
-  repetitionsDone          Int         @default(0)
-  completion               Int?        @default(0)
+  idealStart               String?
   preferredTimeOfDay       TimeOfDay[]
   preferredDayOfWeek       DayOfWeek[]
   repeat                   Boolean     @default(false)
@@ -44,6 +42,9 @@ model Task {
   repeatFrequency          Int?
   repeatTimespanMultiplier Int         @default(1)
   repeatTimespan           TimeSpan?
+  timeSpent                Int         @default(0)
+  repetitionsDone          Int         @default(0)
+  completion               Int?        @default(0)
   firstSessionStartTime    DateTime?
   latestSessionStartTime   DateTime?
   endRepeat                Boolean     @default(false)

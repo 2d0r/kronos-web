@@ -257,7 +257,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                             inputType='time'
                             colour={mindsetColour}
                             state={state}
-                            value={taskCache?.startTime ? taskCache?.startTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '00:00'}
+                            value={taskCache?.startTime !== null ? taskCache?.startTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '00:00'}
                             onChange={(event: any) => handleTimeChanges(event, 'startTime')}
                         />
                         <InputField 
@@ -290,31 +290,6 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                     </div>
                     </div>
                 </>)}
-
-                {/* Ideal start */}
-                {!taskCache?.fixed && (
-                <div className='flex'>
-                    <button 
-                        type='button'
-                        onClick={() => { 
-                            setIdealStart(!idealStart);
-                            setTaskCache(prevTask => ({ ...prevTask, startTime: null }));
-                        }}
-                        style={{color: idealStart || taskCache?.startTime ? 'black' : 'lightgrey'}}
-                        className='text-left cursor-pointer font-medium my-2 formKeysColumn'
-                        >Ideal start
-                    </button>
-                    { (idealStart || taskCache?.startTime) ? 
-                    <InputField 
-                        fieldName='idealStartTime'
-                        placeholder='Enter start time'
-                        inputType='time'
-                        label=''
-                        colour={mindsetColour}
-                        state={state}
-                        value={taskCache?.fixed ? '' : taskCache?.startTime?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || '00:00'}
-                    /> : <></>}
-                </div>)}
                 <div className={'divider'}></div>
 
                 {/* Repeat? */}
@@ -375,9 +350,40 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                         />
                     </div>
                 </div>)}
+
+                {/* Ideal start */}
+                {!taskCache?.fixed && (<>
+                <div className='divider'></div>
+                <div className='flex'>
+                    <button 
+                        type='button'
+                        onClick={() => { 
+                            setIdealStart(!idealStart);
+                            setTaskCache(prevTask => ({ ...prevTask, startTime: null }));
+                        }}
+                        style={{color: idealStart || taskCache?.idealStart ? 'black' : 'lightgrey'}}
+                        className='text-left cursor-pointer font-medium my-2 formKeysColumn'
+                        >Ideal start
+                    </button>
+                    { (idealStart || taskCache?.idealStart) ? 
+                    <InputField 
+                        fieldName='idealStart'
+                        placeholder='Enter start time'
+                        inputType='time'
+                        label=''
+                        colour={mindsetColour}
+                        state={state}
+                        value={taskCache?.idealStart || ''}
+                        onChange={(event: any) => {
+                            const timeBits = event.target.value.split(':');
+                            handleTaskCacheUpdate('idealStart', `${timeBits[0]}:${timeBits[1]}`);
+                        }}
+                    /> : <></>}
+                </div></>)}
+                
+                {/* Preferred times and days */}
                 {!taskCache?.fixed && (<>
                     {(!taskCache?.repeat || taskCache?.repeatTimespan !== 'hour') && (<>
-                        <div className='divider'></div>
                         <MultiSelectionField
                             fieldName='preferredTimeOfDay'
                             prompt='Preferred daytimes'
