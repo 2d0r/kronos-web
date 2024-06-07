@@ -9,7 +9,7 @@ import Menu from './ui/menu';
 import prisma from './lib/db';
 import { Task } from '@prisma/client';
 import { adjustLightness } from './utils/colourUtils';
-import SearchBar from './ui/search';
+// import SearchBar from './ui/search';
 import TaskCard from './ui/tasks/task-card';
 import Link from 'next/link';
 
@@ -46,7 +46,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             {eventQueue.length > 0 && 
                 <div className='w-full items-center justify-center flex flex-col gap-4'>
                     {!showMenu && (<>
-                        <Link href={`?task=${currentTask.id}`} >
+                        <Link href={`?task=${currentTask.id}&event=${eventQueue[0].id}`} >
                             <EventCard event={eventQueue[0]} task={taskQueue[0]} mindset={mindsetQueue[0]} />
                         </Link>
                         <TransportControls eventId={eventQueue[0].id} taskId={currentTask.id} mindsetColour={mindsetColour} context='timeline'/>

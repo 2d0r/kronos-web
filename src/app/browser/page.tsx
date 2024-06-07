@@ -1,5 +1,5 @@
 import React from 'react';
-import TimelineCard from '../ui/timeline-card';
+import TimelineCard from '../ui/timeline-board';
 import { NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '../lib/definitions';
 import { fetchMindsets, fetchTasksWithRelations, getCurrentMindsetColour } from '../lib/data';
 import TaskBrowser from '../ui/browser/task-browser';

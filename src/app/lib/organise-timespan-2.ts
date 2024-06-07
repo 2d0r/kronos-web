@@ -4,10 +4,17 @@ import prisma from './db';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates, getStartAndEndOfDay } from '../utils/dateUtils';
 import { fetchEvents } from './data';
 import { scheduleEventForTask } from './actions';
-import { DEFAULT_TIMES_OF_DAY, DEFAULT_TIME_ZONE, priorityList } from './definitions';
-import { sortByCustomOrder } from '../utils/taskUtils';
-import { BasicEvent, checkGapIsFree, findGapsInTimespan, findGapsThatStartInTimespan, findMatchingDaysOfWeekInTimespan, idealRepsXIdealDays, intersectTimespans, timespanToDatesArray } from '../utils/organiser-utils';
-import { toZonedTime } from 'date-fns-tz';
+import { DEFAULT_TIMES_OF_DAY, PRIORITY_ORDER } from './definitions';
+import { 
+    BasicEvent, 
+    checkGapIsFree, 
+    findGapsInTimespan, 
+    findGapsThatStartInTimespan, 
+    findMatchingDaysOfWeekInTimespan, 
+    idealRepsXIdealDays, 
+    intersectTimespans, 
+    timespanToDatesArray 
+} from '../utils/organiser-utils';
 
 /**
  * Organiser by ideal time first:
@@ -32,16 +39,20 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
             status: { not: 'done' },
             fixed: { not: true },
             type: { not: 'goal' }, 
-        }, 
-        orderBy: {
-            timeScore: 'desc'
-        }
+        },
     });
     tasksToSchedule = tasksToSchedule
         .filter(el => el.totalRepetitions ? el.totalRepetitions > el.repetitionsDone : true) // filter out tasks that have finished their repetitions
         // .filter(el => (el.totalDuration && el.durationDone) && el.totalDuration > el.durationDone) // filter out tasks which ran out of totalDuration
         .filter(el => (el.deadline && el.deadline > timespan[0]) || !el.deadline); // filter out tasks for which the deadline has passed
-    // console.log('tasksToSchedule', tasksToSchedule);
+    // console.log('filtered tasks', tasksToSchedule);
+
+
+    // SORT TASKS TO SCHEDULE
+    tasksToSchedule.sort((b, a) => (
+        PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority] || a.timeScore - b.timeScore
+    ));
+    // console.log('sorted tasks', tasksToSchedule.map(task => [task.name, task.priority, task.timeScore])); // ✅
 
 
     // COUNT EVENTS THAT NEED SCHEDULING
@@ -97,22 +108,15 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
             startTime: 'asc',
         }
     });
-    console.log('eventsInTimespan', eventsInTimespan.map(event => [event.startTime, event.endTime]));
+    // Find first event after timespan (to schedule events that start in but continue after timespan)
+
+    // console.log('eventsInTimespan', eventsInTimespan.map(event => [event.startTime, event.endTime]));
     let newEventsInTimespan: BasicEvent[] = eventsInTimespan as BasicEvent[];
-
-
-    // FIND GAPS IN TIMESPAN
-    let timeGaps = findGapsInTimespan(timespan, newEventsInTimespan, 10);
 
 
     // LOOP THROUGH TASKS
 
-    // Sort tasks by priority, then by time score
-    let tasksToScheduleSorted = sortByCustomOrder(tasksToSchedule, 'priority', priorityList)
-        .sort((a, b) => (a.timeScore - b.timeScore));
-
-    // Loop through sorted tasks
-    tasksToScheduleSorted.forEach(task => {
+    tasksToSchedule.forEach(task => {
 
 
         // FILTER THE DAYS TO SCHEDULE IN
@@ -130,12 +134,6 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
 
         for (let x = 1; x <= eventsToScheduleDict[task.id]; x++) {
             // Find the most specific ideal time, schedule it if there is room, find the next most specific if not
-
-
-            // SCHEDULE FIXED TASKS
-            if (task.fixed === true) {
-
-            }
 
             
             // SCHEDULE BY IDEAL START
@@ -189,7 +187,7 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
                         if (gapsInTimespan.length === 0) {
                             // Find gaps that only start in timespan (not fit)
                             // To do: move this further down in specificity ?
-                            gapsInTimespan = findGapsThatStartInTimespan(idealTimespan, events, task.duration);
+                            gapsInTimespan = findGapsThatStartInTimespan(idealTimespan, newEventsInTimespan, task.duration);
                         }
                         console.log(task.name, '> gapsInTimespan', gapsInTimespan);
                         for (let k = 0; k < gapsInTimespan.length; k++) {
@@ -241,9 +239,11 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
                 console.log(task.name, '> scheduling by repeat');
                 // idealDays already filtered by repeat daily or less
                 for (let i = 0; i < idealDays.length; i++) {
-                    const gapsInTimespan = findGapsInTimespan(getStartAndEndOfDay(idealDays[i]), newEventsInTimespan, task.duration);
+                    const gapsInTimespan = findGapsThatStartInTimespan(getStartAndEndOfDay(idealDays[i]), newEventsInTimespan, task.duration);
+                    console.log(task.name, '> gapsInTimespan:', gapsInTimespan);
                     // Attempt to schedule
                     for (let j = 0; j < gapsInTimespan.length; j++) {
+                        if (!intersectTimespans(gapsInTimespan[j], timespan)) break;
                         const localTime = `${ gapsInTimespan[j][0].getUTCHours() }:${ gapsInTimespan[j][0].getMinutes() }`;
                         scheduleEventForTask(task, gapsInTimespan[j][0], task.duration, localTime);
                         eventsToScheduleDict[task.id] -= 1;

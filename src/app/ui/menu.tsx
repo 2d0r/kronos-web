@@ -46,9 +46,9 @@ export default function Menu({mindsetColour = 'black', onBlur}: {mindsetColour?:
                 <Link href={'/calendar'} className='menu-link'>Calendar</Link>
                 <Link href={'/browser'} className='menu-link'>Tasks & Projects</Link>
                 <Link href={'/tests'} className='menu-link'>Tests</Link>
-                <Link href={pathname} className='menu-link'>Stats</Link>
+                {/* <Link href={pathname} className='menu-link'>Stats</Link> */}
                 <Link href={'/browser?logbook=true'} className='menu-link'>Logbook</Link>
-                <Link href={pathname} className='menu-link'>Settings</Link>
+                {/* <Link href={pathname} className='menu-link'>Settings</Link> */}
             </div>
         </div>);
     }

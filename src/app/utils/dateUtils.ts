@@ -181,23 +181,7 @@ export const eventsToHf = (events: Event[], eventColours: string[], timezone: st
     let eventsForHf = [];
     for (let i = 0; i < events.length; i++) {
         const event = events[i];
-        let [ startTime, endTime ] = ['', ''];
-        if (event.localTime) {
-            // if (Number(event.localTime.split(':')[0]) > event.startTime.getHours()) {
-
-            // }
-            console.log(event.name, '> localTime values >', Number(event.localTime.split(':')[0]), Number(event.localTime.split(':')[1]));
-            const startTimeAsNum = (new Date(event.startTime)).setHours(Number(event.localTime.split(':')[0]), Number(event.localTime.split(':')[1]));
-            startTime = localDateTimeToString(new Date(startTimeAsNum));
-            const minutesBetweenLocalTimes = minutesBetweenDates(new Date(startTimeAsNum), new Date(event.startTime));
-            console.log(event.name, '> minutesBetweenLocalTimes >', minutesBetweenLocalTimes);
-            endTime = localDateTimeToString(addMinutesToDate(new Date(event.endTime), -1 * minutesBetweenLocalTimes));
-            console.log(event.name, '>', startTime, '-', endTime);
-        } else {
-            startTime = localDateTimeToString(new Date(event.startTime));
-            endTime = localDateTimeToString(new Date(event.endTime));
-        }
-        
+        const [ startTime, endTime ] = getLocalStartAndEnd(event);
         if ( areSameDay(new Date(startTime), new Date(endTime)) ) {
             // Events that start and end on the same day
             eventsForHf.push({
@@ -233,6 +217,7 @@ export const eventsToHf = (events: Event[], eventColours: string[], timezone: st
             }
         }
     }
+    // console.log('eventsForHf', eventsForHf);
     return eventsForHf;
 }
 

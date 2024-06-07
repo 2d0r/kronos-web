@@ -209,25 +209,28 @@ export type BasicEvent = {
 }
 
 export function findGapsInTimespan(timespan: [Date, Date], events: (BasicEvent[] | Event[]), minDuration?: number) {
-    const eventsInTimespan = events.filter(el => {
-        if (el.startTime <= timespan[0] && timespan[0] < el.endTime) return true;
-        if (el.startTime <= timespan[1] && timespan[1] < el.endTime) return true;
-        if (timespan[0] <= el.startTime && el.endTime <= timespan[1]) return true;
-        return false;
-    });
-    const eventTimes = eventsInTimespan.map(event => [event.startTime, event.endTime]);
+    // Find existing events in the timespan
+    const eventsInTimespan = findEventsInTimespan(timespan, events);
+    const eventTimes = eventsInTimespan.map(event => [event.startTime, event.endTime]).sort((a, b) => a[0].getTime() - b[0].getTime());
+    console.log('eventTimes', eventTimes);
+
+    // Get the timegaps between the events
     let timeGaps : [Date, Date][] = [];
     // If there are no events, set timespan as the only timeGap
     if(!eventTimes.length) {
         timeGaps.push([timespan[0], timespan[1]]);
     } else {
         for ( let idx = 0; idx < eventTimes.length; idx++) {
-            const eventStartEnd = eventTimes[idx];
+            // const eventStartEnd = eventTimes[idx];
             if ( idx === 0 ) {
-                if (minutesBetweenDates(timespan[0], eventStartEnd[0]) > 0 ) {
-                    timeGaps.push([timespan[0], eventStartEnd[0]]);
+                if (minutesBetweenDates(timespan[0], eventTimes[idx][0]) >= (minDuration || 10) ) {
+                    timeGaps.push([timespan[0], eventTimes[idx][0]]);
                 }
-            } else if (minutesBetweenDates(eventTimes[idx - 1][1], eventTimes[idx][0]) > 0) {
+            } else if (idx === eventTimes.length - 1) {
+                if (minutesBetweenDates(eventTimes[idx][1], timespan[1]) > (minDuration || 10)) {
+                    timeGaps.push([eventTimes[idx][1], timespan[1]]);
+                }
+            } else if (minutesBetweenDates(eventTimes[idx - 1][1], eventTimes[idx][0]) > (minDuration || 10)) {
                 timeGaps.push([eventTimes[idx - 1][1], eventTimes[idx][0]]);
             }
         }
@@ -235,36 +238,46 @@ export function findGapsInTimespan(timespan: [Date, Date], events: (BasicEvent[]
             a[0].getTime() - b[0].getTime()
         ));
     }
-    if (minDuration) {
-        const timeGapsWithMinDuration = timeGaps.filter(gap => minutesBetweenDates(gap[0], gap[1]) >= minDuration);
-        return timeGapsWithMinDuration
-    }
+    console.log('timeGaps', timeGaps);
+
+    // Filter time gaps that can fir our minimum duration
+    // if (minDuration) {
+    //     const timeGapsWithMinDuration = timeGaps.filter(gap => minutesBetweenDates(gap[0], gap[1]) >= minDuration);
+    //     console.log('timeGaps with minDuration', timeGapsWithMinDuration);
+    //     return timeGapsWithMinDuration;
+    // }
     return timeGaps;
 }
 
 export function findGapsThatStartInTimespan(timespan: [Date, Date], events: (BasicEvent[] | Event[]), taskDuration?: number) {
+    // Find existing events in the timespan
     const eventsInTimespan = findEventsInTimespan(timespan, events);
-    const eventAfterTimespan = events.filter(el => el.endTime <= timespan[0])[0];
-    const eventsBasic = eventAfterTimespan ? [...eventsInTimespan, eventAfterTimespan].map(event => [event.startTime, event.endTime]) :
-        eventsInTimespan.map(event => [event.startTime, event.endTime]);
-    console.log('eventsBasic >', eventsBasic);
+    const eventAfterTimespan = events.filter(el => timespan[1] <= el.startTime)[0];
+    if (eventAfterTimespan) {
+        eventsInTimespan.push(eventAfterTimespan);
+    }
+    const eventspans = eventsInTimespan.map(event => [event.startTime, event.endTime]);
+    // Sort eventspans
+    eventspans.sort((a, b) => a[0].getTime() - b[0].getTime());
+    console.log('eventspans >', eventspans);
+
+    // Find gaps between the eventspans
     let timeGaps : [Date, Date][] = [];
     // If there are no events, set timespan as the only timeGap
-    if(!eventsBasic.length) {
+    if(!eventspans.length) {
         timeGaps.push([timespan[0], timespan[1]]);
     } else {
-        for ( let i = 0; i <= eventsBasic.length; i++) {
-            const eventStartEnd = eventsBasic[i];
+        for ( let i = 0; i <= eventspans.length; i++) {
             if ( i === 0 ) {
-                if (minutesBetweenDates(timespan[0], eventStartEnd[0]) > 0 ) {
-                    timeGaps.push([timespan[0], eventStartEnd[0]]);
+                if (minutesBetweenDates(timespan[0], eventspans[i][0]) >= (taskDuration || 10) ) {
+                    timeGaps.push([timespan[0], eventspans[i][0]]);
                 }
-            } else if (i === eventsBasic.length) {
-                if (!eventAfterTimespan) {
-                    timeGaps.push([eventsBasic[i - 1][1], addMinutesToDate(eventsBasic[i - 1][1], taskDuration || 0)]);
+            } else if (i === eventspans.length) {
+                if (!eventAfterTimespan && taskDuration) {
+                    timeGaps.push([eventspans[i - 1][1], addMinutesToDate(eventspans[i - 1][1], taskDuration)]);
                 }
-            } else if (minutesBetweenDates(eventsBasic[i - 1][1], eventsBasic[i][0]) > 0) {
-                timeGaps.push([eventsBasic[i - 1][1], eventsBasic[i][0]]);
+            } else if (minutesBetweenDates(eventspans[i - 1][1], eventspans[i][0]) >= (taskDuration || 10)) {
+                timeGaps.push([eventspans[i - 1][1], eventspans[i][0]]);
             }
         }
         timeGaps = timeGaps.sort((a, b) => (
