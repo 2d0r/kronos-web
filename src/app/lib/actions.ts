@@ -181,7 +181,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         duration: duration,
         repeat: (!!repeatFrequency && !!repeatTimespanMultiplier && !!repeatTimespan),
         repeatUnit: repeatUnit || 'sessions',
-        repeatTimespanMultiplier: (repeatFrequency && Number(repeatFrequency) > 1) ?  Number(repeatTimespanMultiplier) || 1 : 1,
+        repeatTimespanMultiplier: (repeatFrequency && Number(repeatFrequency) >= 1) ?  Number(repeatTimespanMultiplier) || 1 : 1,
         repeatFrequency: Number(repeatFrequency) || repeatDurationInMinutes,
         repeatTimespan: repeatTimespan,
         idealStart: idealStartHHMM,
@@ -303,7 +303,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
         duration: durationInMinutes || MIN_TASK_DURATION,
         repeat: (!!repeatFrequency && !!repeatTimespan),
         repeatUnit: repeatUnit || 'sessions',
-        repeatTimespanMultiplier: (repeatFrequency && Number(repeatFrequency) > 1) ?  Number(repeatTimespanMultiplier) || 1 : 1,
+        repeatTimespanMultiplier: (repeatFrequency && Number(repeatFrequency) >= 1) ?  Number(repeatTimespanMultiplier) || 1 : 1,
         repeatFrequency: Number(repeatFrequency) || repeatDurationInMinutes,
         repeatTimespan: repeatTimespan,
         idealStart: idealStartHHMM,
@@ -442,7 +442,8 @@ export async function createEventPrisma(event: Event) {
   try {
     await prisma.event.create({
       data: {
-        ...event
+        ...event,
+        startTime: event.startTime
       },
     });
   } catch (error) {
@@ -454,8 +455,9 @@ export async function createEventPrisma(event: Event) {
 
 }
 
-export async function scheduleEventForTask(task: Task, startTime: Date, duration?: number, localTime?: string) {
+export async function scheduleEventForTask(task: Task, startTimeProp: Date, duration?: number, localTime?: string) {
 
+  const startTime = new Date(startTimeProp);
   const endTime = new Date(startTime.getTime() + (duration || task.duration) * 60 * 1000);
 
   const eventToSchedule: Event = {

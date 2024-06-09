@@ -13,9 +13,32 @@ import {
     findGapsThatStartInTimespan, 
     findMatchingDaysOfWeekInTimespan, 
     idealRepsXIdealDays, 
-    intersectTimespans, 
-    timespanToDatesArray 
+    impreciseRepsXIdealDays, 
+    intersectTimespans,
+    timespanToDatesArray,
 } from '../utils/organiser-utils';
+import { Task } from '@prisma/client';
+
+
+const organiseEvent = (startTime: Date, task: Task, newEventsInTimespan: any, eventsToScheduleDict: any, repeatingTaskOrganiserPhase: string | null, firstRepStart: Date, useLocalTime: boolean = true) => {
+    const localTime = useLocalTime ? `${ startTime.getHours() }:${ startTime.getMinutes() }` : undefined;
+    scheduleEventForTask(task, startTime, task.duration, localTime);
+    eventsToScheduleDict[task.id] -= 1;
+    newEventsInTimespan.push({
+        startTime: startTime,
+        endTime: addMinutesToDate(startTime, task.duration),
+    });
+    firstRepStart = repeatingTaskOrganiserPhase === 'firstRep' ? new Date(startTime) : firstRepStart;
+    repeatingTaskOrganiserPhase = 
+        repeatingTaskOrganiserPhase === 'firstRep' ? 'idealReps'         // if firstRep was just scheduled, next rep is scheduled at idealRep
+        : repeatingTaskOrganiserPhase === 'impreciseReps' ? 'idealReps'  // if an impreciseRep was just scheduled, next rep starts over with idealRep
+        : repeatingTaskOrganiserPhase === 'idealReps' ? 'idealReps'      // if an idealRep was just scheduled, next rep starts over with idealRep
+        : null;  
+    console.log(task.name, '> Scheduled! 🥳');
+    return [ newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart ];
+    // break;
+}
+
 
 /**
  * Organiser by ideal time first:
@@ -121,9 +144,7 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
 
 
     // LOOP THROUGH TASKS
-
     tasksToSchedule.forEach(task => {
-
 
         // FILTER THE DAYS TO SCHEDULE IN
         let idealDays: Date[] = timespanToDatesArray(timespan);
@@ -131,45 +152,77 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
         if (task.preferredDayOfWeek.length > 0) {
             idealDays = findMatchingDaysOfWeekInTimespan(task.preferredDayOfWeek, timespan);
         }
-        // Intersect with repetition days
+        // Intersect with repetition days (for tasks )
         if (task.repeat && task.repeatTimespan && task.repeatTimespan !== 'hour' && task.firstSessionStartTime) {
             idealDays = idealRepsXIdealDays(task, idealDays, timespan);
         }
-        // console.log(task.name, '> timespan:', timespan, '> idealDays:', idealDays); // ✅
+        // console.log(task.name, '> idealDays:', idealDays); // ✅
+
+        let scheduled = false;
+
+        // Save first rep of a new task
+        let repeatingTaskOrganiserPhase: ('firstRep' | 'idealReps' | 'impreciseReps' | null) = task.repeat ? task.firstSessionStartTime ? 'idealReps' : 'firstRep': null;
+        let firstRepStart: Date = new Date();
+        let idealDaysBackup = idealDays;
 
 
-        for (let x = 1; x <= eventsToScheduleDict[task.id]; x++) {
+        // GO THROUGH NUMBER OF EVENTS LEFT TO SCHEDULE
+        // for (let x = 1; x <= eventsToScheduleDict[task.id]; x++) {
+        while (eventsToScheduleDict[task.id] > 0) {
             // Find the most specific ideal time, schedule it if there is room, find the next most specific if not
 
-            
+            scheduled = false; // break variable
+            console.log(task.name, '> firstRepStart', firstRepStart);
+
+            // Update ideal days if firstRep has been scheduled 🔁
+            if (repeatingTaskOrganiserPhase === 'firstRep') {
+                // Force first rep to be scheduled within its rep interval, from the start of the timespan
+                const repeatIntervalInDays = Math.round(calcRepeatIntervalInMinutes(task) / 60 / 24);
+                idealDays = idealDays.slice(0, repeatIntervalInDays);
+                if (!idealDays.length) idealDays = idealDaysBackup;
+            } else if (repeatingTaskOrganiserPhase === 'idealReps') {
+                idealDays = idealRepsXIdealDays(task, idealDaysBackup, timespan, new Date(firstRepStart));
+                if (!idealDays.length) idealDays = idealDaysBackup;
+            } else if (repeatingTaskOrganiserPhase === 'impreciseReps') {
+                idealDays = impreciseRepsXIdealDays(task, idealDaysBackup, timespan, new Date(firstRepStart));
+                if (!idealDays.length) idealDays = idealDaysBackup;
+            }
+            // Sort idealDays in order
+            idealDays = idealDays.sort((a, b) => a.getTime() - b.getTime());
+            console.log(task.name, '> repeatPhase', repeatingTaskOrganiserPhase);
+            console.log(task.name, '> idealDays:', idealDays);
+
+
             // SCHEDULE BY IDEAL START
-            if (task.idealStart && !task.fixed) {
-                const [ hours, minutes ] = [ task.idealStart.split(':')[0], task.idealStart.split(':')[1] ];
-                // Attempt to schedule
+            if ((task.idealStart && !task.fixed) || repeatingTaskOrganiserPhase === 'idealReps') {
+                const [ hours, minutes ] = task.idealStart ? [ task.idealStart.split(':')[0], task.idealStart.split(':')[1] ]
+                    : [firstRepStart.getHours(), firstRepStart.getMinutes()]; // 🔁
+                console.log(task.name, '> scheduling by idealStart >', hours, ':', minutes);  
+                // Loop through idealDays - check each for gap at idealTime
                 for (let i = 0; i < idealDays.length; i++) {
                     const idealTime = new Date(new Date(idealDays[i]).setHours(Number(hours), Number(minutes)));
+                    console.log(task.name, '> idealTime:', idealTime);
                     if (idealTime < timespan[0] || timespan[1] < idealTime) {
-                        break;
+                        continue;
                     }
                     const [ eventStart, eventEnd ] = [ idealTime, addMinutesToDate(idealTime, task.duration) ];
                     const gapIsFree = checkGapIsFree(eventsInTimespan, eventStart, eventEnd);
+                    // console.log(task.name, '> gap is free:', gapIsFree, '> from:', eventStart);
+                    // Schedule if there is a gap
                     if (gapIsFree === true) {
-                        const localTime = `${eventStart.getHours()}:${eventStart.getMinutes()}`;
-                        scheduleEventForTask(task, eventStart, task.duration, localTime);
-                        eventsToScheduleDict[task.id] -= 1;
-                        newEventsInTimespan.push({
-                            startTime: eventStart,
-                            endTime: eventEnd,
-                        });
+                        // console.log(task.name, '> found gap >', eventStart);
+                        [newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart] 
+                            = organiseEvent(eventStart, task, newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart);
+                        scheduled = true;
                         break;
                     }
+                    if (scheduled) break;
                 }
                 // To do: schedule near ideal time (± 1-2 hrs)
             }
 
 
             // SCHEDULE BY HOURLY REPEAT (disabled)
-
             // else if (task.repeat && task.repeatTimespan === 'hour') {
             // }
             // if (eventsToScheduleDict[task.id] === 0) break;
@@ -184,11 +237,13 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
                         const [ startOfTimeOfDay, endOfTimeOfDay ] = DEFAULT_TIMES_OF_DAY[task.preferredTimeOfDay[j]];
                         let idealTimespan = dayXHourInterval(idealDays[i], [ startOfTimeOfDay, endOfTimeOfDay ]);
                         console.log(task.name, '> idealTimespan', idealTimespan);
+
                         // Get intersection with main timespan; Break if there is none
                         const timespanIntersection = intersectTimespans(timespan, idealTimespan);
-                        if (!timespanIntersection) break;
+                        if (!timespanIntersection) continue;
                         idealTimespan = timespanIntersection;
                         console.log(task.name, '> idealTimespan after X', idealTimespan);
+
                         // Find gaps and attempt to schedule
                         let gapsInTimespan = findGapsInTimespan(idealTimespan, newEventsInTimespan, task.duration);
                         if (gapsInTimespan.length === 0) {
@@ -197,21 +252,16 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
                             gapsInTimespan = findGapsThatStartInTimespan(idealTimespan, newEventsInTimespan, task.duration);
                         }
                         console.log(task.name, '> gapsInTimespan', gapsInTimespan);
+
                         for (let k = 0; k < gapsInTimespan.length; k++) {
-                            const localTime = `${ gapsInTimespan[k][0].getHours() }:${ gapsInTimespan[k][0].getMinutes() }`;
-                            // console.log(task.name, '> localTime >', localTime);
-                            scheduleEventForTask(task, gapsInTimespan[k][0], task.duration, localTime);
-                            // console.log(task.name, '> startTime >', toZonedTime(gapsInTimespan[j][0], DEFAULT_TIME_ZONE));
-                            eventsToScheduleDict[task.id] -= 1;
-                            newEventsInTimespan.push({
-                                startTime: gapsInTimespan[k][0],
-                                endTime: addMinutesToDate(gapsInTimespan[k][0], task.duration),
-                            });
+                            [newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart] 
+                                = organiseEvent(gapsInTimespan[k][0], task, newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart);
+                            scheduled = true;
                             break;
                         }
-                        if (eventsToScheduleDict[task.id] === 0) break;
+                        if (scheduled) break;
                     }
-                    if (eventsToScheduleDict[task.id] === 0) break;
+                    if (scheduled) break;
                 }
             }
 
@@ -225,44 +275,36 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
                     console.log(task.name, '> gapsInTimespan:', gapsInTimespan);
                     // Attempt to schedule
                     for (let j = 0; j < gapsInTimespan.length; j++) {
-                        const localTime = `${ gapsInTimespan[j][0].getUTCHours() }:${ gapsInTimespan[j][0].getMinutes() }`;
-                        // console.log(task.name, '> localTime >', localTime);
-                        scheduleEventForTask(task, gapsInTimespan[j][0], task.duration, localTime);
-                        // console.log(task.name, '> startTime >', toZonedTime(gapsInTimespan[j][0], DEFAULT_TIME_ZONE));
-                        eventsToScheduleDict[task.id] -= 1;
-                        newEventsInTimespan.push({
-                            startTime: gapsInTimespan[j][0],
-                            endTime: addMinutesToDate(gapsInTimespan[j][0], task.duration),
-                        });
+                        [newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart] = organiseEvent(
+                            gapsInTimespan[j][0], task, newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart
+                        );
+                        scheduled = true;
                         break;
                     }
-                    if (eventsToScheduleDict[task.id] === 0) break;
+                    if (scheduled) break;
                 }
             }
 
 
             // SCHEDULE BY REPEAT (DAILY OR LESS OFTEN)
-            else if (task.repeat && task.repeatTimespan !== 'hour') {
-                console.log(task.name, '> scheduling by repeat');
-                // idealDays already filtered by repeat daily or less
-                for (let i = 0; i < idealDays.length; i++) {
-                    const gapsInTimespan = findGapsThatStartInTimespan(getStartAndEndOfDay(idealDays[i]), newEventsInTimespan, task.duration);
-                    console.log(task.name, '> gapsInTimespan:', gapsInTimespan);
-                    // Attempt to schedule
-                    for (let j = 0; j < gapsInTimespan.length; j++) {
-                        if (!intersectTimespans(gapsInTimespan[j], timespan)) break;
-                        const localTime = `${ gapsInTimespan[j][0].getUTCHours() }:${ gapsInTimespan[j][0].getMinutes() }`;
-                        scheduleEventForTask(task, gapsInTimespan[j][0], task.duration, localTime);
-                        eventsToScheduleDict[task.id] -= 1;
-                        newEventsInTimespan.push({
-                            startTime: gapsInTimespan[j][0],
-                            endTime: addMinutesToDate(gapsInTimespan[j][0], task.duration),
-                        });
-                        break;
-                    }
-                    if (eventsToScheduleDict[task.id] === 0) break;
-                }
-            }
+            // else if (task.repeat && task.repeatTimespan !== 'hour') {
+            //     console.log(task.name, '> scheduling by repeat');
+            //     // idealDays already filtered by repeat daily or less
+            //     for (let i = 0; i < idealDays.length; i++) {
+            //         const gapsInTimespan = findGapsThatStartInTimespan(getStartAndEndOfDay(idealDays[i]), newEventsInTimespan, task.duration);
+            //         console.log(task.name, '> gapsInTimespan:', gapsInTimespan);
+            //         // Attempt to schedule
+            //         for (let j = 0; j < gapsInTimespan.length; j++) {
+            //             if (!intersectTimespans(gapsInTimespan[j], timespan)) break;
+            //             [ newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart ] = organiseEvent(
+            //                 gapsInTimespan[j][0], task, newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart
+            //             );
+            //             scheduled = true;
+            //             break;
+            //         }
+            //         if (scheduled) break;
+            //     }
+            // }
 
 
             // SCHEDULE BY MINDSET MAP
@@ -277,13 +319,28 @@ export async function organiseTimespanByIdealTime(timespan: [Date, Date]) {
                 const gapsInTimespan = findGapsInTimespan(timespan, newEventsInTimespan, task.duration);
                 console.log(task.name, '> gapsInTimespan:', gapsInTimespan);
                 for (let i = 0; i < gapsInTimespan.length; i++) {
-                    scheduleEventForTask(task, gapsInTimespan[i][0]);
-                    eventsToScheduleDict[task.id] -= 1;
-                    newEventsInTimespan.push({
-                        startTime: gapsInTimespan[i][0],
-                        endTime: addMinutesToDate(gapsInTimespan[i][0], task.duration),
-                    });
+                    // scheduleEventForTask(task, gapsInTimespan[i][0]);
+                    // eventsToScheduleDict[task.id] -= 1;
+                    // newEventsInTimespan.push({
+                    //     startTime: gapsInTimespan[i][0],
+                    //     endTime: addMinutesToDate(gapsInTimespan[i][0], task.duration),
+                    // });
+                    [newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart] = organiseEvent(
+                        gapsInTimespan[i][0], task, newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart, false
+                    );
+                    scheduled = true;
                     break;
+                }
+            }
+
+            // If we failed to schedule a repeating task, give it another 2 chances
+            if (task.repeat) {
+                if (repeatingTaskOrganiserPhase = 'firstRep') {
+                    // x--;
+                    repeatingTaskOrganiserPhase = 'idealReps';
+                } else if (repeatingTaskOrganiserPhase = 'idealReps') {
+                    // x--;
+                    repeatingTaskOrganiserPhase = 'impreciseReps';
                 }
             }
             

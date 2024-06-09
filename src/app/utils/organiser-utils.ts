@@ -1,9 +1,11 @@
 // If repeating: Go to its next occurrence -> go to a time that divides perfectly by timespan
 
 import { DayOfWeek, Event, Task } from '@prisma/client';
-import { DAYS_OF_WEEK_DICT, MAX_REP_OFFSET } from '../lib/definitions';
+import { DAYS_OF_WEEK_DICT, DEFAULT_TIME_ZONE, MAX_REP_OFFSET } from '../lib/definitions';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates } from './dateUtils';
 import { addDays } from 'date-fns';
+import { scheduleEventForTask } from '../lib/actions';
+import { getTimezoneOffset } from 'date-fns-tz';
 
 // Can only calculate for tasks that had their first session already scheduled
 export const getIdealReps = (task: Task, timespan: [Date, Date], idealFirstRepTime?: Date): Date[] => {
@@ -23,6 +25,8 @@ export const getIdealReps = (task: Task, timespan: [Date, Date], idealFirstRepTi
                 idealReps.push(idealRep);
                 idealRep = new Date(idealRep.getTime() + repInterval * 60 * 1000);
             }
+        } else {
+            console.error('No data on first repetition provided');
         }
     } else {
         console.error(`Task ${task.name} does not have enough repetition data`);
@@ -30,77 +34,64 @@ export const getIdealReps = (task: Task, timespan: [Date, Date], idealFirstRepTi
     return idealReps;
 }
 
-export const idealRepsXTimespan = (
-    task: Task, idealDays: Date[], timespan: [Date, Date]
-): Date[] => {
-    let newIdealDays: Date[] = [];
-    const prefDatesSorted = idealDays.sort();
-    // TO DO: move getting ideal reps into main function
-    const idealReps = getIdealReps(task, timespan);
-    idealReps.forEach(rep => {
-        const repDay = new Date(rep.setUTCHours(0,0,0,0));
-        if (idealDays.includes(repDay)) {
-            newIdealDays.push(repDay);
-        } else {
-            const repIntervalMinutes = calcRepeatIntervalInMinutes(task);
-            const impreciseRepSpan = [
-                new Date(repDay.getTime() - (repIntervalMinutes * MAX_REP_OFFSET)),
-                new Date(repDay.getTime() + (repIntervalMinutes * MAX_REP_OFFSET))
-            ];
-            // find the nearest prefDate to our repetitionDay
-            for ( let i = 0; i <= idealDays.length; i++) {
-                const prefDate = prefDatesSorted[i];
-                if ( prefDate > impreciseRepSpan[0] && prefDate < impreciseRepSpan[1]) {
-                    newIdealDays.push(prefDate);
-                } else {
-                    // Find to which imprecise timespan limit the prefDate is closer => use that limit
-                    if (Math.abs(prefDate.getTime() - impreciseRepSpan[0].getTime()) < Math.abs(prefDate.getTime() - impreciseRepSpan[1].getTime())) {
-                        newIdealDays.push(impreciseRepSpan[0]);
-                    } else {
-                        newIdealDays.push(impreciseRepSpan[1]);
-                    }
-                }
-            }
-
-        }
+export const impreciseRepsXTimespan = (
+    task: Task, timespan: [Date, Date], firstRepTime?: Date,
+): [Date, Date][] => {
+    const idealReps = getIdealReps(task, timespan, firstRepTime);
+    const impreciseReps = idealReps.map(repTime => {
+        const repIntervalMinutes = calcRepeatIntervalInMinutes(task);
+        const impreciseRep: [Date, Date] = [
+            new Date(repTime.getTime() - (repIntervalMinutes * MAX_REP_OFFSET)),
+            new Date(repTime.getTime() + (repIntervalMinutes * MAX_REP_OFFSET))
+        ];
+        return impreciseRep;
     });
-    return newIdealDays;
+    return impreciseReps;
 }
 
 export const idealRepsXIdealDays = (
-    task: Task, idealDays: Date[], timespan: [Date, Date]
+    task: Task, idealDays: Date[], timespan: [Date, Date], firstRepStart?: Date,
+): Date[] => {
+    let idealRepDays: Date[] = [];
+    // TO DO: move getting ideal reps into main function
+    const idealReps = getIdealReps(task, timespan, firstRepStart); // Get ideal repetition time for tasks that have already had events scheduled
+    const idealDaysAsNum = idealDays.map(day => day.getTime());
+    console.log(task.name, '> idealReps', idealReps, '> idealDays', idealDays);
+    idealReps.forEach(rep => {
+        const repDay = new Date(rep.setUTCHours(0,0,0,0));
+        if (idealDaysAsNum.includes(repDay.getTime())) {
+            // if repDay is among idealDays
+            idealRepDays.push(repDay);
+        }
+    });
+    return idealRepDays.sort((a, b) => a.getTime() - b.getTime());
+}
+
+export const impreciseRepsXIdealDays = (
+    task: Task, idealDays: Date[], timespan: [Date, Date], firstRepStart?: Date,
 ): Date[] => {
     let newIdealDays: Date[] = [];
     idealDays.sort();
     // TO DO: move getting ideal reps into main function
-    const idealReps = getIdealReps(task, timespan); // Get ideal repetition time for tasks that have already had events scheduled
-    console.log(task.name, '> idealReps >', idealReps);
+    const idealReps = getIdealReps(task, timespan, firstRepStart); // Get ideal repetition time for tasks that have already had events scheduled
     idealReps.forEach(rep => {
         const repDay = new Date(rep.setUTCHours(0,0,0,0));
-        if (idealDays.includes(repDay)) {
-            // if repDay is among idealDays
-            newIdealDays.push(repDay);
-        } else if (timespan[0].getTime() < repDay.getTime() && repDay.getTime() < timespan[1].getTime()) {
-            // if repDay is in timespan
-            newIdealDays.push(repDay);
-        } else {
-            const repIntervalMinutes = calcRepeatIntervalInMinutes(task);
-            const impreciseRepSpan = [
-                new Date(repDay.getTime() - (repIntervalMinutes * MAX_REP_OFFSET)),
-                new Date(repDay.getTime() + (repIntervalMinutes * MAX_REP_OFFSET))
-            ];
-            // find the nearest prefDate to our repetitionDay
-            for ( let i = 0; i <= idealDays.length; i++) {
-                const prefDate = idealDays[i];
-                if ( prefDate > impreciseRepSpan[0] && prefDate < impreciseRepSpan[1]) {
-                    newIdealDays.push(prefDate);
+        const repIntervalMinutes = calcRepeatIntervalInMinutes(task);
+        const impreciseRepSpan = [
+            new Date(repDay.getTime() - (repIntervalMinutes * MAX_REP_OFFSET)),
+            new Date(repDay.getTime() + (repIntervalMinutes * MAX_REP_OFFSET))
+        ];
+        // find the nearest prefDate to our repetitionDay
+        for ( let i = 0; i <= idealDays.length; i++) {
+            const prefDate = idealDays[i];
+            if ( prefDate > impreciseRepSpan[0] && prefDate < impreciseRepSpan[1]) {
+                newIdealDays.push(prefDate);
+            } else {
+                // Find to which imprecise timespan limit the prefDate is closer => use that limit
+                if (Math.abs(prefDate.getTime() - impreciseRepSpan[0].getTime()) < Math.abs(prefDate.getTime() - impreciseRepSpan[1].getTime())) {
+                    newIdealDays.push(impreciseRepSpan[0]);
                 } else {
-                    // Find to which imprecise timespan limit the prefDate is closer => use that limit
-                    if (Math.abs(prefDate.getTime() - impreciseRepSpan[0].getTime()) < Math.abs(prefDate.getTime() - impreciseRepSpan[1].getTime())) {
-                        newIdealDays.push(impreciseRepSpan[0]);
-                    } else {
-                        newIdealDays.push(impreciseRepSpan[1]);
-                    }
+                    newIdealDays.push(impreciseRepSpan[1]);
                 }
             }
         }
@@ -314,7 +305,11 @@ export function findGapsThatStartInTimespan(timespan: [Date, Date], events: (Bas
 
 export const timespanToDatesArray = (timespan: [Date, Date]): Date[] => {
     const datesInTimespan: Date[] = [];
-    const dateCursor = new Date(new Date(timespan[0]).setUTCHours(0,0,0,0));
+    // If time is earlier than local-UTC difference, cursor needs to start one day later
+    const hourDifference = getTimezoneOffset(DEFAULT_TIME_ZONE) / 1000 / 60 / 60;
+    const dayOffset = new Date().getHours() < hourDifference ? 1 : 0;
+
+    const dateCursor = new Date(new Date(addDays(timespan[0], dayOffset)).setUTCHours(0,0,0,0));
     while (dateCursor <= timespan[1]) {
         datesInTimespan.push(new Date(dateCursor));
         dateCursor.setDate(dateCursor.getDate() + 1);
