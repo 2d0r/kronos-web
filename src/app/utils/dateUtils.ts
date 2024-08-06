@@ -121,7 +121,7 @@ export function startOfDay(date: Date): Date {
 }
 
 export function dateToDDMMYYYY (date: Date) {
-    return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`;
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 }
 
 export function minutesToDisplayDuration (durationMinutes: number, displaySeconds: boolean = false) {

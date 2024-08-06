@@ -1,7 +1,7 @@
 // If repeating: Go to its next occurrence -> go to a time that divides perfectly by timespan
 
 import { DayOfWeek, Event, Task } from '@prisma/client';
-import { DAYS_OF_WEEK_DICT, DEFAULT_TIME_ZONE, MAX_REP_OFFSET } from '../lib/definitions';
+import { DAYS_OF_WEEK_DICT, DEFAULT_TIME_ZONE, MAX_REP_OFFSET, PRIORITY_ORDER, TaskWithRelations } from '../lib/definitions';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates } from './dateUtils';
 import { addDays } from 'date-fns';
 import { scheduleEventForTask } from '../lib/actions';
@@ -172,7 +172,7 @@ export function checkGapIsFree(events: Event[], start: Date, end: Date) {
     return true;
 }
 
-export function findEventsInTimespan(timespan: [Date, Date], events: (Event[] | BasicEvent[])) {
+export function filterEventsInTimespan(timespan: [Date, Date], events: (Event[] | BasicEvent[])) {
     const eventsInTimespan = events.filter(el => {
         if (el.startTime <= timespan[0] && timespan[0] < el.endTime) return true;
         if (el.startTime <= timespan[1] && timespan[1] < el.endTime) return true;
@@ -202,7 +202,7 @@ export type BasicEvent = {
 
 export function findGapsInTimespan(timespan: [Date, Date], events: (BasicEvent[] | Event[]), minDuration?: number) {
     // Find existing events in the timespan
-    const eventsInTimespan = findEventsInTimespan(timespan, events);
+    const eventsInTimespan = filterEventsInTimespan(timespan, events);
     const eventTimes = eventsInTimespan.map(event => [event.startTime, event.endTime]).sort((a, b) => a[0].getTime() - b[0].getTime());
     console.log('eventTimes', eventTimes);
 
@@ -242,7 +242,7 @@ export function findGapsInTimespan(timespan: [Date, Date], events: (BasicEvent[]
 
 export function findGapsThatStartInTimespan(timespan: [Date, Date], events: (BasicEvent[] | Event[]), taskDuration?: number) {
     // Find existing events in the timespan
-    const eventsInTimespan = findEventsInTimespan(timespan, events);
+    const eventsInTimespan = filterEventsInTimespan(timespan, events);
     const eventAfterTimespan = events.filter(el => timespan[1] <= el.startTime)[0];
     if (eventAfterTimespan) {
         eventsInTimespan.push(eventAfterTimespan);
@@ -352,4 +352,22 @@ export const dayXHourInterval = (day: Date, hourInterval: [number, number]): [Da
         ).setHours(hourInterval[1], 0, 0, 0))
     ];
     return dayXTimeOfDay;
+}
+
+export const filterSortTasksToSchedule = (tasksToSchedule: TaskWithRelations[], timespan?: [Date, Date]) => {
+    // FILTER TASKS TO SCHEDULE
+    tasksToSchedule = tasksToSchedule
+        .filter(el => el.totalRepetitions ? el.totalRepetitions > el.repetitionsDone : true) // filter out tasks that have finished their repetitions
+        // .filter(el => (el.totalDuration && el.durationDone) && el.totalDuration > el.durationDone) // filter out tasks which ran out of totalDuration
+        .filter(el => (el.deadline && timespan && el.deadline > timespan[0]) || !el.deadline); // filter out tasks for which the deadline has passed
+    // console.log('filtered tasks', tasksToSchedule);
+
+    // SORT TASKS TO SCHEDULE
+    tasksToSchedule.sort((b, a) => (
+        PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority] 
+        || Number(a.repeat) - Number(b.repeat)  // Sort repeating tasks above one-timers
+        || a.timeScore - b.timeScore
+    ));
+
+    return tasksToSchedule;
 }

@@ -6,11 +6,12 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import prisma from './db';
 import { Event, RepeatUnit, Task, TaskType } from '@prisma/client';
-import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION, repeatUnitList } from './definitions';
-import { fetchMindsets, fetchTasks } from './data';
+import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION, TaskWithRelations, repeatUnitList } from './definitions';
+import { fetchMindsets, fetchTasks, findEventIdsInTimespan } from './data';
 import { calculatePriorityScores } from './priority-score';
 import { calculateTimeScore } from './time-score';
 import { v4 as uuidv4 } from 'uuid';
+import { organiseTask } from './organise-task';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -37,7 +38,7 @@ const FormSchema = z.object({
   repeatDurationMinutes: z.string().nullable(),
   idealStart: z.string().nullable(),
   preferredTimeOfDay: z.array(z.enum(['morning', 'afternoon', 'evening', 'night'], { invalid_type_error: 'Please select a valid time of day.' })).nullable(), // z.array(z.string().refine(value => timeOfDayList.includes(value))), // 
-  preferredDayOfWeek: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], { invalid_type_error: 'Please select a valid day of the week.' })).nullish(),
+  preferredDayOfWeek: z.array(z.enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], { invalid_type_error: 'Please select a valid day of the week.' })).nullable(),
   endRepeat: z.string().nullable(),
   totalDuration: z.string().nullable(),
   totalRepetitions: z.string().nullable(),
@@ -167,7 +168,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
   // });
 
   try {
-    await prisma.task.create({
+    const newTask = await prisma.task.create({
       data: {
         id: id,
         name: name,
@@ -193,6 +194,13 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         deadline: endRepeatDate ? endRepeatDate : deadline,
       },
     });
+    
+    try {
+      await organiseTask(newTask as TaskWithRelations);
+    } catch (error) {
+      console.log('Failed to organise task ❌', error);
+    }
+
   } catch (error) {
     console.log('Failed to create task ❌', error);
     return {
@@ -285,7 +293,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
   const timeScore = calculateTimeScore(mockTask);
 
   try {
-    await prisma.task.update({
+    const newTask = await prisma.task.update({
       where: {
         id: id
       },
@@ -315,6 +323,13 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
         deadline: deadline !== null ? deadline : endRepeatDate,
       },
     });
+
+    try {
+      await organiseTask(newTask as TaskWithRelations);
+    } catch (error) {
+      console.log('Failed to organise task ❌', error);
+    }
+
   } catch (error) {
     console.log('Failed to create task ❌', error);
     return {
@@ -507,6 +522,48 @@ export async function deleteAllEvents() {
     return {
       message: `Database Error: Failed to delete all events`,
     };
+  }
+}
+
+export async function deleteEventsById(eventIds: string[]) {
+  try {
+    await prisma.event.deleteMany({
+      where: {
+        id: { in: eventIds }
+      }
+    });
+  } catch (error) {
+    console.log('Failed to delete events by id', error);
+    return {
+      message: `Database Error: Failed to delete events by id`,
+    };
+  }
+}
+
+export async function deleteEventsInTimespan(timespan: [Date, Date]) {
+  const eventIdsInTimespan = await findEventIdsInTimespan(timespan[0], timespan[1]);
+  try {
+    await prisma.event.deleteMany({
+      where: {
+        id: { in: eventIdsInTimespan?.map(el => el.id) }
+      }
+    });
+  } catch (error) {
+    console.error('Failed to delete events in timespan:', error);
+  }
+}
+
+export async function deleteFlexEventsInTimespan(timespan: [Date, Date]) {
+  const eventIdsInTimespan = await findEventIdsInTimespan(timespan[0], timespan[1]);
+  try {
+    await prisma.event.deleteMany({
+      where: {
+        id: { in: eventIdsInTimespan?.map(el => el.id) },
+        fixed: false,
+      }
+    });
+  } catch (error) {
+    console.error('Failed to delete events in timespan:', error);
   }
 }
 

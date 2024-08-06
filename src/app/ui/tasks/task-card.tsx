@@ -7,14 +7,14 @@ import { Dropdown, InputField, MultiSelectionField } from './form-fields';
 import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, DEFAULT_MINDSET, URLSearchParamsKronos, MIN_TASK_DURATION } from '@/app/lib/definitions';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { $Enums, DayOfWeek, Event, Mindset, Task, TimeOfDay } from '@prisma/client';
+import { DayOfWeek, Event, Mindset, TimeOfDay } from '@prisma/client';
 import { useRouter } from 'next/navigation';
-import { editTaskPrisma, createTaskPrisma, deleteTaskPrisma } from '@/app/lib/actions';
+import { editTaskPrisma, createTaskPrisma } from '@/app/lib/actions';
 import { parseISO } from 'date-fns';
 import NotesEditor from '@/components/notes-editor';
 import ChecklistEditor from '@/components/checklist-editor';
 import {v4 as uuidv4} from 'uuid';
-import { reorganiseTask } from '@/app/lib/organise-task';
+import { organiseTask } from '@/app/lib/organise-task';
 import EventSection from './event-section';
 
 
@@ -39,7 +39,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     const [ taskCache, setTaskCache ] = useState<TaskWithRelations>((!isNewTask && task) ? task : {id: uuidv4()} as TaskWithRelations);
     const [ endRepeat, setEndRepeat ] = useState<(string | null)>('No');
     const [ idealStart, setIdealStart ] = useState<boolean>(false);
-    const [repeatUnit, setRepeatUnit] = useState<string | null>('sessions');
+    const [ repeatUnit, setRepeatUnit ] = useState<string | null>('sessions');
     const [ mindsetColour, setMindsetColour] = useState<string>(taskCache?.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
     const [ deadline, setDeadline ] = useState<boolean>(false);
     const [ taskIsEdited, setTaskIsEdited ] = useState<boolean>(false);
@@ -47,7 +47,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     const [ eventId, setEventId ] = useState<string>(searchParams.get('event') || '');
 
 
-    // FORM
+    // FORM DISPATCH
 
     const initialState = { message: null, errors: {} };
     // Set up to edit task or to create new task
@@ -109,10 +109,10 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
             setTaskCache(task => ({...task, endTime: dateTime}));
         }
     }
-    const closeModalAndRefetchTasks = () => {
+    const handleTaskSubmit = () => {
+        // Callback to parent component
         isNewTask && onTaskCreate ? onTaskCreate(taskCache) : 
             onTaskUpdate ? onTaskUpdate(taskCache) : ()=>{};
-        if (!isNewTask) reorganiseTask(taskCache?.id);
         router.back();
     };
     const handleDeleteTask = (taskId: string) => {
@@ -138,7 +138,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     }, [taskCache?.mindset]);
     // Signal task as ready to submit once the compulsory fields are filled
     useEffect(() => {
-        // console.log('taskCache', taskCache);
+        console.log('taskCache', taskCache);
         // Check if task was edited
         (task && task !== taskCache) ? setTaskIsEdited(true) : setTaskIsEdited(false);
         // Check if new task has enough valid inputs to be added
@@ -156,7 +156,6 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
         setIsNewTask(isNewTask);
         (!isNewTask && task) && setTaskCache(task);
     }, [searchParams]);
-    // If event id changes in searchParams, re-fetch tasks with fresh events
 
     
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'>
@@ -172,7 +171,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                 className={`!border-0 !text-xl font-bold placeholder:text-lg placeholder:text-gray-300 pl-0 cursor-text !bg-transparent rounded-none text-center`}
                 colour={mindsetColour}
                 state={state}
-                value={taskCache?.name}
+                value={taskCache?.name || ''}
                 onChange={(event: any) => handleTaskCacheUpdate('name', event.target.value)}
             />
             <Link href={pathname} onClick={() => router.back()} >
@@ -558,7 +557,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
                     className={`task-card h-8 text-black ${taskIsReady ? '' : 'bg-gray-300 cursor-not-allowed'}`}
                     disabled={!taskIsReady}
                     style={{ backgroundColor: taskIsReady ? mindsetColour : '' }}
-                    onClick={closeModalAndRefetchTasks}
+                    onClick={handleTaskSubmit}
                     >{isNewTask ? 'Add task' : 'Save'}
                 </Button>
             </div>

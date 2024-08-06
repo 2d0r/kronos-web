@@ -33,7 +33,6 @@ model Task {
   startTime                DateTime?
   endTime                  DateTime?
   duration                 Int
-  deadline                 DateTime?
   idealStart               String?
   preferredTimeOfDay       TimeOfDay[]
   preferredDayOfWeek       DayOfWeek[]
@@ -43,13 +42,14 @@ model Task {
   repeatTimespanMultiplier Int         @default(1)
   repeatTimespan           TimeSpan?
   timeSpent                Int         @default(0)
-  repetitionsDone          Int         @default(0)
-  completion               Int?        @default(0)
   firstSessionStartTime    DateTime?
   latestSessionStartTime   DateTime?
   endRepeat                Boolean     @default(false)
   totalDuration            Int?
   totalRepetitions         Int?
+  repetitionsDone          Int         @default(0)
+  completion               Int?        @default(0)
+  deadline                 DateTime?
   notes                    String?
   checklist                String?
   tasksBefore              Task[]      @relation("TaskCausality")

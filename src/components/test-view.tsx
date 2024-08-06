@@ -1,6 +1,6 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC, useState, useEffect } from 'react';
 import BottomBar from '@/app/ui/bottom-bar';
 import TopBar from '@/app/ui/top-bar';
 import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '@/app/lib/definitions';
@@ -16,7 +16,7 @@ import { MindsetWithRelations } from '@/app/lib/definitions';
 import Button from './button';
 import { deleteAllEvents } from '@/app/lib/actions';
 import { addDaysToDate } from '@/app/utils/dateUtils';
-import { organiseTimespanByIdealTime } from '@/app/lib/organise-timespan-2';
+import { organiseTimespan } from '@/app/lib/organise-timespan';
 
 interface TestViewProps {
     children?: JSX.Element | JSX.Element[];
@@ -41,8 +41,8 @@ const TestView: FC<TestViewProps> = ({
     const showMenu = searchParams?.menu;
     const showTaskCard = !!searchParams.task;
     const taskToEditId = searchParams.task;
-    const taskToEdit = taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0];
-    // const [ taskToEdit, setTaskToEdit ] = useState<TaskWithRelations>(taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0]);
+    // const taskToEdit = taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0];
+    const [ taskToEdit, setTaskToEdit ] = useState<TaskWithRelations>(taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0]);
 
 
     // DATA FETCH
@@ -69,7 +69,7 @@ const TestView: FC<TestViewProps> = ({
             const data = await response.json();
             const newEvents = data.events;
             setEventsCache(prevEvents => [...prevEvents, ...newEvents]);
-        }, 1000);
+        }, 2000);
     }
     const handleTaskUpdate = (newTask: TaskWithRelations) => {
         const newTasksCache = tasksCache.map(task => {
@@ -103,7 +103,7 @@ const TestView: FC<TestViewProps> = ({
     const handleOrganise = async (daysAhead: number = 30) => {
         const currentTime = new Date();
         const xDaysFromNow = addDaysToDate(currentTime, daysAhead);
-        await organiseTimespanByIdealTime([currentTime, xDaysFromNow]);
+        await organiseTimespan([currentTime, xDaysFromNow]);
         setTimeout(async () => {
             const newEvents = await fetchEvents();
             setEventsCache(newEvents);
@@ -115,9 +115,9 @@ const TestView: FC<TestViewProps> = ({
 
     // HOOKS
 
-    // useEffect(() => {
-    //     console.log('testView - tasksCache', tasksCache);
-    // }, [tasksCache])
+    useEffect(() => {
+        setTaskToEdit(taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0]);
+    }, [tasksCache]);
     // useEffect(() => {
     //     console.log('testView - eventsCache', eventsCache);
     // }, [eventsCache])

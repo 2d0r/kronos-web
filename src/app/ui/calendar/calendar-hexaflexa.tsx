@@ -80,7 +80,7 @@ const CalendarComponent: React.FC<{
             headerResourceConfig: {
                 showTitle: false,
                 showImage: false
-            }
+            },
         });
     };
     const [ timegridConfig, setTimegridConfig ] = useState<HfTimegridConfig>(getTimegridConfig(eventsForHf));

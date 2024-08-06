@@ -25,7 +25,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
     });
     const eventQueue = events.filter(event => event.startTime > new Date());
     const taskQueue = eventQueue.map(event => event.task as Task);
-    const currentTask = await fetchTaskWithRelations(taskQueue[0].id);
+    const currentTask = taskQueue.length ? await fetchTaskWithRelations(taskQueue[0].id) : undefined;
     
     const mindsetColour = await getCurrentMindsetColour() || NEUTRAL_MINDSET_COLOUR;
     const mindsetQueue = taskQueue.map(task => {
@@ -43,9 +43,10 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             : <></>}
         <div className='w-full h-full flex flex-col items-center justify-center'>
             {showMenu && <Menu mindsetColour={mindsetColour} />}
+            {/* Next event */}
             {eventQueue.length > 0 && 
                 <div className='w-full items-center justify-center flex flex-col gap-4'>
-                    {!showMenu && (<>
+                    {(!showMenu && currentTask) && (<>
                         <Link href={`?task=${currentTask.id}&event=${eventQueue[0].id}`} >
                             <EventCard event={eventQueue[0]} task={taskQueue[0]} mindset={mindsetQueue[0]} />
                         </Link>
@@ -53,16 +54,19 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
                     </>)}
                 </div>
             }
-            {(eventQueue.length > 1 && !showMenu) ?
-                <EventCard nextTask={true}
-                    event={eventQueue[1]} 
-                    task={eventQueue[1].task}
-                    mindset={mindsetQueue[1]} 
-                /> : showMenu ? <EventCard nextTask={true}
-                    event={eventQueue[0]} 
-                    task={eventQueue[0].task}
-                    mindset={mindsetQueue[0]} 
-                /> : <></>
+            {/* Later event */}
+            {!!eventQueue.length && (
+                (eventQueue.length > 1 && !showMenu) ?
+                    <EventCard nextTask={true}
+                        event={eventQueue[1]} 
+                        task={eventQueue[1].task}
+                        mindset={mindsetQueue[1]} 
+                    /> : showMenu ? <EventCard nextTask={true}
+                        event={eventQueue[0]} 
+                        task={eventQueue[0].task}
+                        mindset={mindsetQueue[0]} 
+                    /> : <></>
+                )
             }
 
         </div>

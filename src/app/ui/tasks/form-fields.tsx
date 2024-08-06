@@ -225,18 +225,25 @@ export function MultiSelectionField(
     }
 ) {
     const [ selectedOptions, setSelectedOptions ] = useState<string[]>(selected);
+
+    useEffect(() => {
+        setSelectedOptions(selected);
+    }, [selected]);
+
     const handleSelect = (event : React.ChangeEvent<HTMLInputElement>) => {
         const isChecked = event.target.checked; // If checkbox was toggled
+        const value = event.target.value;
+
         const newOptions = isChecked ? 
-            [...selectedOptions, event.target.value] // Add if checked
-            : selectedOptions.filter(option => option !== event.target.value) // Remove if unchecked
+            [...selectedOptions, value] // Add if checked
+            : selectedOptions.filter(option => option !== value) // Remove if unchecked
         setSelectedOptions(newOptions);
         onChange(newOptions);
     }
     const selectionList = list.map((item, idx) => {
         const checked = (type === 'radio' && selectedOptions[selectedOptions.length - 1] === item) ||
             (type === 'checkbox' && selectedOptions.includes(item));
-        const hidden = false;// if not selected and field is not in focus
+        const hidden = false; // if not selected and field is not in focus
         return (hidden ? <></> :
             <div className={'flex items-center overflow-hidden'} 
                 style={{ color: colour }}
@@ -250,6 +257,7 @@ export function MultiSelectionField(
                     className='hidden'
                     aria-describedby='task-error'
                     onChange={handleSelect}
+                    checked={checked}
                 />
                 <label
                     htmlFor={item}

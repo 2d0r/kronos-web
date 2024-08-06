@@ -6,7 +6,6 @@ import {
 } from './definitions';
 import prisma from './db';
 import { Event, Task } from '@prisma/client';
-import { addHours } from 'date-fns';
 
 
 // Tasks
@@ -21,6 +20,13 @@ export async function fetchTasks() {
       process.exit(1);
   }
 }
+
+// export const fetchTasksViaRoute = async () => {
+//   const response = await fetch('/task');
+//   const data = await response.json();
+//   const newTasks = data.tasks;
+//   return newTasks;
+// }
 
 export async function fetchTasksWithRelations() {
   try {
@@ -114,8 +120,39 @@ export async function allTasksHaveActiveEvents() {
   }
 }
 
+export const getTasksToSchedule = async () => {
+  try {
+    const tasks: TaskWithRelations[] = await prisma.task.findMany({
+      include: { 
+          tasksBefore: true,
+          tasksAfter: true,
+          tasksRightBefore: true,
+          tasksRightAfter: true,
+          tasksParent: true,
+          tasksChild: true,
+          mindset: true,
+          events: true,
+      }, // Include the subtasks relation
+      where: {
+        status: {not: 'done'},
+        fixed: false,
+        AND: [{
+            type: { not: 'goal' }
+        }, {
+            type: { not: 'project' }
+        }],
+      }
+    }); 
+    return tasks;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch the latest tasks.');
+  }
+}
 
-// Events
+
+
+// EVENTS
 
 export async function fetchEvents() {
   try {
@@ -141,7 +178,7 @@ export async function fetchEventsWithRelations() {
   }
 }
 
-export async function findEventsInTimespan(start: Date, end: Date) {
+export async function findEventIdsInTimespan(start: Date, end?: Date) {
   try {
     const events = await prisma.event.findMany({
       where: {
@@ -164,8 +201,32 @@ export async function findEventsInTimespan(start: Date, end: Date) {
   }
 }
 
+export async function findEventsInTimespan(start: Date, end?: Date) {
+  try {
+    const events = await prisma.event.findMany({
+      where: {
+        OR: [{
+          startTime: { gte: start, lte: end },
+        }, {
+          endTime: { gte: start, lte: end }
+        }, {
+          startTime: { lte: start },
+          endTime: { gte: end }
+        }],
+      },
+      include: {
+        task: true,
+      }
+    });
+    return events;
+  } catch (error) {
+    console.error('Failed to find events in timespan:', error);
+  }
+}
 
-// Mindsets
+
+
+// MINDSETS
 
 export async function fetchMindsets() {
   try {
