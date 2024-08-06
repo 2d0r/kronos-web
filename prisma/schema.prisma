@@ -170,3 +170,15 @@ model Break {
   @@index([id])
   @@map("breaks")
 }
+
+model Timespan {
+  id        String       @id @default(uuid())
+  startTime DateTime
+  endTime   DateTime
+  type      TimespanType @default(organised)
+}
+
+enum TimespanType {
+  organised
+  holiday
+}

@@ -1,10 +1,10 @@
 // If repeating: Go to its next occurrence -> go to a time that divides perfectly by timespan
 
-import { DayOfWeek, Event, Task } from '@prisma/client';
+import { DayOfWeek, Event, Task, Timespan } from '@prisma/client';
 import { DAYS_OF_WEEK_DICT, DEFAULT_TIME_ZONE, MAX_REP_OFFSET, PRIORITY_ORDER, TaskWithRelations } from '../lib/definitions';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates } from './dateUtils';
 import { addDays } from 'date-fns';
-import { scheduleEventForTask } from '../lib/actions';
+import { createTimespan, fetchIntersectingTimespans, scheduleEventForTask, updateTimespan } from '../lib/actions';
 import { getTimezoneOffset } from 'date-fns-tz';
 
 // Can only calculate for tasks that had their first session already scheduled
@@ -370,4 +370,51 @@ export const filterSortTasksToSchedule = (tasksToSchedule: TaskWithRelations[], 
     ));
 
     return tasksToSchedule;
+}
+
+export const scheduleEventAndReturnOrganiserParams = (
+    startTime: Date, 
+    task: Task, 
+    newEventsInTimespan: any, 
+    eventsToScheduleDict: any, 
+    repeatingTaskOrganiserPhase: string | null, 
+    firstRepStart: Date, 
+    useLocalTime: boolean = true,
+) => {
+    const localTime = useLocalTime ? `${ startTime.getHours() }:${ startTime.getMinutes() }` : undefined;
+    scheduleEventForTask(task, startTime, task.duration, localTime);
+    eventsToScheduleDict[task.id] -= 1;
+    newEventsInTimespan.push({
+        startTime: startTime,
+        endTime: addMinutesToDate(startTime, task.duration),
+    });
+    firstRepStart = repeatingTaskOrganiserPhase === 'firstRep' ? new Date(startTime) : firstRepStart;
+    repeatingTaskOrganiserPhase = 
+        repeatingTaskOrganiserPhase === 'firstRep' ? 'idealReps'         // if firstRep was just scheduled, next rep is scheduled at idealRep
+        : repeatingTaskOrganiserPhase === 'impreciseReps' ? 'idealReps'  // if an impreciseRep was just scheduled, next rep starts over with idealRep
+        : repeatingTaskOrganiserPhase === 'idealReps' ? 'idealReps'      // if an idealRep was just scheduled, next rep starts over with idealRep
+        : null;  
+    console.log(task.name, '> Scheduled! 🥳');
+    return [ newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart ];
+    // break;
+}
+
+export const updateOrganisedTimespans = async (organisedTimespan: [Date, Date]) => {
+    const timespans: Timespan[] = await fetchIntersectingTimespans(organisedTimespan);
+    const timespan = timespans[0]; // Normally only one existing timespan should overlap; Else there's an error elsewhere
+    
+    // If existing organised timespan overlaps, merge them
+    if (timespans.length) {
+        const existingTimespan: [Date, Date] = [ timespan.startTime, timespan.endTime ]; 
+        const mergedTimespan: [Date, Date] = [
+            new Date(Math.min(existingTimespan[0].getTime(), organisedTimespan[0].getTime())),
+            new Date(Math.max(existingTimespan[1].getTime(), organisedTimespan[1].getTime()))
+        ];
+        await updateTimespan(timespan.id, mergedTimespan);
+    } else {
+        // If no overlap, just add the new one
+        await createTimespan(organisedTimespan, 'organised');
+    }
+    
+
 }

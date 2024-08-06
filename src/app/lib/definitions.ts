@@ -1,4 +1,4 @@
-import { Status, TimeSpan, Priority, TimeOfDay, DayOfWeek, RepeatUnit, Prisma, Mindset } from '@prisma/client';
+import { Status, TimeSpan, Priority, TimeOfDay, DayOfWeek, RepeatUnit, Prisma, Mindset, TimespanType } from '@prisma/client';
 import { Url } from 'next/dist/shared/lib/router/router';
 import { ReactElement } from 'react';
 
@@ -132,6 +132,7 @@ export const timeSpanList = getEnumValues(TimeSpan);
 export const timeOfDayList = getEnumValues(TimeOfDay);
 export const dayOfWeekList = getEnumValues(DayOfWeek);
 export const repeatUnitList = getEnumValues(RepeatUnit);
+export const timespanTypeList = getEnumValues(TimespanType);
 
 export let prismaEnums = {
     status: getEnumValues(Status),

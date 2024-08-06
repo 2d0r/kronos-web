@@ -5,7 +5,7 @@ import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import prisma from './db';
-import { Event, RepeatUnit, Task, TaskType } from '@prisma/client';
+import { Event, RepeatUnit, Task, TaskType, TimespanType } from '@prisma/client';
 import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION, TaskWithRelations, repeatUnitList } from './definitions';
 import { fetchMindsets, fetchTasks, findEventIdsInTimespan } from './data';
 import { calculatePriorityScores } from './priority-score';
@@ -585,5 +585,69 @@ export async function getMindsetProximity(mindset1: string, mindset2: string) {
     return {
       message: 'Error getting mindset proximity. Check mindset names',
     };
+  }
+}
+
+
+
+// TIMESPAN
+
+
+
+export const fetchIntersectingTimespans = async (givenTimespan: [Date, Date]) => {
+  try {
+    const timespans = await prisma.timespan.findMany({
+      where: {
+        type: 'organised',
+        OR: [
+          {
+            startTime: { gte: givenTimespan[0], lte: givenTimespan[1] },
+          },
+          {
+            endTime: { gte: givenTimespan[0], lte: givenTimespan[1] },
+          },
+          {
+            startTime: { lte: givenTimespan[0] },
+            endTime: { gte: givenTimespan[1] },
+          }
+        ],
+      }
+    });
+    return timespans;
+  } catch (error) {
+    console.error('Error fetching intersecting timespans.');
+    throw new Error('Database error: Failed to fetch intersecting timespans.');
+  }
+}
+
+export const createTimespan = async (timespan: [Date, Date], type: TimespanType) => {
+  try {
+    await prisma.timespan.create({
+      data: {
+        startTime: timespan[0],
+        endTime: timespan[1],
+        type: type,
+      }
+    })
+  } catch (error) {
+    console.error('Error creating timespan.');
+    throw new Error('Database error: Failed to create timespans.');
+  }
+}
+
+export const updateTimespan = async (id: string, timespan: [Date, Date]) => {
+  try {
+    await prisma.timespan.update({
+      where: {
+        id: id,
+      },
+      data: {
+        startTime: timespan[0],
+        endTime: timespan[1],
+      },
+    })
+  } catch (error) {
+    console.error('Error updating organised timespans.');
+    throw new Error('Database error: Failed to update organised timespans.');
   }
 }

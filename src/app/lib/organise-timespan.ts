@@ -3,8 +3,8 @@
 import prisma from './db';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates, getStartAndEndOfDay } from '../utils/dateUtils';
 import { fetchEvents, getTasksByIds, getTasksToSchedule } from './data';
-import { deleteEventsById, deleteFlexEventsInTimespan, scheduleEventForTask } from './actions';
-import { DEFAULT_TIMES_OF_DAY, eventsToSchedule, EventWithRelations, PRIORITY_ORDER, TaskWithRelations } from './definitions';
+import { deleteEventsById, deleteFlexEventsInTimespan } from './actions';
+import { DEFAULT_TIMES_OF_DAY, eventsToSchedule,TaskWithRelations } from './definitions';
 import { 
     BasicEvent, 
     checkGapIsFree, 
@@ -12,41 +12,13 @@ import {
     filterSortTasksToSchedule,
     findGapsInTimespan, 
     findGapsThatStartInTimespan, 
-    findMatchingDaysOfWeekInTimespan, 
     idealRepsXIdealDays, 
     impreciseRepsXIdealDays, 
     intersectTimespans,
     timespanToDatesArray,
+    scheduleEventAndReturnOrganiserParams,
+    updateOrganisedTimespans,
 } from '../utils/organiser-utils';
-import { Task } from '@prisma/client';
-
-
-const scheduleEvent = (
-    startTime: Date, 
-    task: Task, 
-    newEventsInTimespan: any, 
-    eventsToScheduleDict: any, 
-    repeatingTaskOrganiserPhase: string | null, 
-    firstRepStart: Date, 
-    useLocalTime: boolean = true,
-) => {
-    const localTime = useLocalTime ? `${ startTime.getHours() }:${ startTime.getMinutes() }` : undefined;
-    scheduleEventForTask(task, startTime, task.duration, localTime);
-    eventsToScheduleDict[task.id] -= 1;
-    newEventsInTimespan.push({
-        startTime: startTime,
-        endTime: addMinutesToDate(startTime, task.duration),
-    });
-    firstRepStart = repeatingTaskOrganiserPhase === 'firstRep' ? new Date(startTime) : firstRepStart;
-    repeatingTaskOrganiserPhase = 
-        repeatingTaskOrganiserPhase === 'firstRep' ? 'idealReps'         // if firstRep was just scheduled, next rep is scheduled at idealRep
-        : repeatingTaskOrganiserPhase === 'impreciseReps' ? 'idealReps'  // if an impreciseRep was just scheduled, next rep starts over with idealRep
-        : repeatingTaskOrganiserPhase === 'idealReps' ? 'idealReps'      // if an idealRep was just scheduled, next rep starts over with idealRep
-        : null;  
-    console.log(task.name, '> Scheduled! 🥳');
-    return [ newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart ];
-    // break;
-}
 
 
 /**
@@ -230,7 +202,7 @@ export async function organiseTimespan({
                     if (gapIsFree === true) {
                         console.log(task.name, '> found gap >', eventStart);
                         [newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart] 
-                            = scheduleEvent(eventStart, task, newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart);
+                            = scheduleEventAndReturnOrganiserParams(eventStart, task, newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart);
                         scheduled = true;
                         break;
                     }
@@ -273,7 +245,7 @@ export async function organiseTimespan({
 
                         for (let k = 0; k < gapsInTimespan.length; k++) {
                             [newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart] 
-                                = scheduleEvent(gapsInTimespan[k][0], task, newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart);
+                                = scheduleEventAndReturnOrganiserParams(gapsInTimespan[k][0], task, newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart);
                             scheduled = true;
                             break;
                         }
@@ -293,7 +265,7 @@ export async function organiseTimespan({
                     console.log(task.name, '> gapsInTimespan:', gapsInTimespan);
                     // Attempt to schedule
                     for (let j = 0; j < gapsInTimespan.length; j++) {
-                        [newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart] = scheduleEvent(
+                        [newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart] = scheduleEventAndReturnOrganiserParams(
                             gapsInTimespan[j][0], task, newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart
                         );
                         scheduled = true;
@@ -343,7 +315,7 @@ export async function organiseTimespan({
                     //     startTime: gapsInTimespan[i][0],
                     //     endTime: addMinutesToDate(gapsInTimespan[i][0], task.duration),
                     // });
-                    [newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart] = scheduleEvent(
+                    [newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart] = scheduleEventAndReturnOrganiserParams(
                         gapsInTimespan[i][0], task, newEventsInTimespan, eventsToScheduleDict, repeatingTaskOrganiserPhase, firstRepStart, false
                     );
                     scheduled = true;
@@ -377,5 +349,6 @@ export async function organiseTimespan({
             
         }
     });
-}
 
+    updateOrganisedTimespans(timespan);
+}
