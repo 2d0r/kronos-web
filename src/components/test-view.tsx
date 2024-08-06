@@ -103,7 +103,14 @@ const TestView: FC<TestViewProps> = ({
     const handleOrganise = async (daysAhead: number = 30) => {
         const currentTime = new Date();
         const xDaysFromNow = addDaysToDate(currentTime, daysAhead);
-        await organiseTimespan([currentTime, xDaysFromNow]);
+        await organiseTimespan({
+            timespan: [currentTime, xDaysFromNow],
+            eventsToSchedule: [
+                { taskId: '6d955a12-031e-4085-91a0-8a71d6b801cd', count: 0 },
+                { taskId: '7d299836-67e2-482e-bac8-da6fb5ec8708', count: 2 },
+            ],
+            displaceAllFlexEvents: false,
+        });
         setTimeout(async () => {
             const newEvents = await fetchEvents();
             setEventsCache(newEvents);

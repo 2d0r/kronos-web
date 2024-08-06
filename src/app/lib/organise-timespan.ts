@@ -2,9 +2,9 @@
 
 import prisma from './db';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates, getStartAndEndOfDay } from '../utils/dateUtils';
-import { fetchEvents, getTasksToSchedule } from './data';
+import { fetchEvents, getTasksByIds, getTasksToSchedule } from './data';
 import { deleteEventsById, deleteFlexEventsInTimespan, scheduleEventForTask } from './actions';
-import { DEFAULT_TIMES_OF_DAY, EventWithRelations, PRIORITY_ORDER } from './definitions';
+import { DEFAULT_TIMES_OF_DAY, eventsToSchedule, EventWithRelations, PRIORITY_ORDER, TaskWithRelations } from './definitions';
 import { 
     BasicEvent, 
     checkGapIsFree, 
@@ -21,7 +21,15 @@ import {
 import { Task } from '@prisma/client';
 
 
-const scheduleEvent = (startTime: Date, task: Task, newEventsInTimespan: any, eventsToScheduleDict: any, repeatingTaskOrganiserPhase: string | null, firstRepStart: Date, useLocalTime: boolean = true) => {
+const scheduleEvent = (
+    startTime: Date, 
+    task: Task, 
+    newEventsInTimespan: any, 
+    eventsToScheduleDict: any, 
+    repeatingTaskOrganiserPhase: string | null, 
+    firstRepStart: Date, 
+    useLocalTime: boolean = true,
+) => {
     const localTime = useLocalTime ? `${ startTime.getHours() }:${ startTime.getMinutes() }` : undefined;
     scheduleEventForTask(task, startTime, task.duration, localTime);
     eventsToScheduleDict[task.id] -= 1;
@@ -43,70 +51,89 @@ const scheduleEvent = (startTime: Date, task: Task, newEventsInTimespan: any, ev
 
 /**
  * Organiser by ideal time first:
- *  1. Loop through tasks by user-set priority, then by 
+ *  1. Loop through tasks by user-set priority, then by timeScore (later: by mindset maps)
  *  2. Schedule tasks in their ideal times, based on user input
  *  3. If there is no ideal gap left, find secondary ideal times (to serve fewer of the preferences)
- *  4. If there is no secondary gap left, find the nearest gap the follows the mindset map
- *  5. If there are no mindset gaps, schedule as soon as possible
+ *  4. If there is no secondary gap left, find the nearest gap (later: that matches the mindset map)
+ *  5. If not, schedule as soon as possible
  *  6. If there is no time left, throw an alert; Recommend events to replace - by inverse priority
  *      - Save the best events to replace while searching for gaps
  */
+interface OrganiseTimespanProps {
+    timespan: [Date, Date], 
+    displaceableEventIds?: string[], 
+    displaceAllFlexEvents?: boolean,
+    eventsToSchedule?: eventsToSchedule,
+};
 
-export async function organiseTimespan(
-    timespan: [Date, Date], displaceableEventIds?: string[],
-) {
+export async function organiseTimespan({
+    timespan, 
+    displaceableEventIds = [], 
+    displaceAllFlexEvents = true,
+    eventsToSchedule = [],
+} : OrganiseTimespanProps ) {
+    console.log('timespan', timespan);
     const timespanInMinutes = minutesBetweenDates(timespan[0], timespan[1]);
-    const events = await fetchEvents();
+    const events = await fetchEvents(); // To do: only fetch events in timespanToOrganise
 
 
     // DELETE EXISTING FLEXIBLE EVENTS IN TIMESPAN
-    // Temporary; Best is to save them and re-schedule
-    if (displaceableEventIds?.includes('none')) {
-        // Don't delete any events, none are to be displaced
-    } else if (displaceableEventIds?.length) {
+    if (displaceableEventIds?.length) {
         await deleteEventsById(displaceableEventIds);
-    } else {
+    } else if (displaceAllFlexEvents) {
         await deleteFlexEventsInTimespan(timespan);
     }
 
 
     // FILTER AND SORT TASKS TO SCHEDULE
-    let tasksToSchedule = await getTasksToSchedule();
+    let tasksToSchedule;
+    if (eventsToSchedule.length) {
+        const taskIds = eventsToSchedule.map(event => event.taskId);
+        tasksToSchedule = await getTasksByIds(taskIds) || {} as TaskWithRelations[];
+    } else {
+        tasksToSchedule = await getTasksToSchedule() || {} as TaskWithRelations[];
+    }
     tasksToSchedule = filterSortTasksToSchedule(tasksToSchedule, timespan);
     // console.log('sorted tasks', tasksToSchedule.map(task => [task.name, task.priority, task.timeScore])); // ✅
 
-
     // COUNT EVENTS THAT NEED SCHEDULING
-    let eventsToScheduleDict : {[key: string]: number} = {};
-    // Add one-time events first
-    tasksToSchedule.filter(task => task.repeat === false).forEach(task => {
-        eventsToScheduleDict[task.id] = 1;
-    });
-    // For repeating tasks, estimate number of sessions that fit in the given timespan
-    tasksToSchedule.filter(task => task.repeat === true).forEach((task, idx) => {
-        if ( task.repeatUnit === 'sessions' && task.repeatFrequency && task.repeatTimespanMultiplier && task.repeatTimespan ) {
-            const taskRepeatIntervalInMinutes = calcRepeatIntervalInMinutes(task);
-            
-            // Find where we are between the task's sessions, by dividing the time before its first event by its repeatTimespan
-            const eventsBeforeTimespan = events.filter(event => (event.taskId === task.id && event.startTime < timespan[0]));
-            let frequencyPhase = 0;
-            if ( eventsBeforeTimespan.length ) {
-                const firstEventStart = eventsBeforeTimespan
-                    .reduce((min, event) => min.startTime < event.startTime ? min : event).startTime;
-                frequencyPhase = minutesBetweenDates(firstEventStart, firstEventStart) % taskRepeatIntervalInMinutes;
-                console.log('firstEventStart', firstEventStart);
+    let eventsToScheduleDict: {[key: string]: number} = {};
+    if (eventsToSchedule.length) {
+        // Use given events
+        eventsToSchedule.forEach(event => {
+            eventsToScheduleDict[event.taskId] = event.count;
+        })
+    } else {
+        // Add one-time events first
+        tasksToSchedule.filter(task => task.repeat === false).forEach(task => {
+            eventsToScheduleDict[task.id] = 1;
+        });
+        // For repeating tasks, estimate number of sessions that fit in the given timespan
+        tasksToSchedule.filter(task => task.repeat === true).forEach((task, idx) => {
+            if ( task.repeatUnit === 'sessions' && task.repeatFrequency && task.repeatTimespanMultiplier && task.repeatTimespan ) {
+                const taskRepeatIntervalInMinutes = calcRepeatIntervalInMinutes(task);
+                
+                // Find where we are between the task's sessions, by dividing the time before its first event by its repeatTimespan
+                const eventsBeforeTimespan = events.filter(event => (event.taskId === task.id && event.startTime < timespan[0]));
+                let frequencyPhase = 0;
+                if ( eventsBeforeTimespan.length ) {
+                    const firstEventStart = eventsBeforeTimespan
+                        .reduce((min, event) => min.startTime < event.startTime ? min : event).startTime;
+                    frequencyPhase = minutesBetweenDates(firstEventStart, firstEventStart) % taskRepeatIntervalInMinutes;
+                    console.log('firstEventStart', firstEventStart);
+                }
+                
+                // Substract frequency phase from timespan, to accurately estimate how many sessions fit in this timespan
+                const taskSessionsToSchedule = Math.round((timespanInMinutes - frequencyPhase) / taskRepeatIntervalInMinutes);
+                // console.log('taskSessionsToSchedule', taskSessionsToSchedule); // ✅
+                eventsToScheduleDict[task.id] = taskSessionsToSchedule;
+            } else {
+                return {
+                    message: 'Error: task is missing repetition data.'
+                }
             }
-            
-            // Substract frequency phase from timespan, to accurately estimate how many sessions fit in this timespan
-            const taskSessionsToSchedule = Math.round((timespanInMinutes - frequencyPhase) / taskRepeatIntervalInMinutes);
-            // console.log('taskSessionsToSchedule', taskSessionsToSchedule); // ✅
-            eventsToScheduleDict[task.id] = taskSessionsToSchedule;
-        } else {
-            return {
-                message: 'Error: task is missing repetition data.'
-            }
-        }
-    });
+        });
+    }
     // console.log('eventsToScheduleDict:', eventsToScheduleDict); // ✅
 
 

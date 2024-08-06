@@ -1,5 +1,4 @@
-import { $Enums, Mindset, Priority, Task } from '@prisma/client';
-import { TaskWithRelations } from '../lib/definitions';
+import { Mindset, Task } from '@prisma/client';
 
 interface Sortable {
     [key: string]: any;

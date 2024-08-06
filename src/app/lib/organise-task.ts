@@ -9,6 +9,7 @@ import { organiseTimespan } from './organise-timespan';
 
 export async function organiseTask(newTask: TaskWithRelations) {
 
+    // Get all tasks that can be rescheduled ? (status: !done, type: task)
     let tasksToReschedule = await getTasksToSchedule();
     const eventsAfterNow = await findEventsInTimespan(new Date());
 
@@ -38,14 +39,26 @@ export async function organiseTask(newTask: TaskWithRelations) {
         : displaceableEvents?.[0]?.endTime;
 
     // OPTION 1: Delete displaceableEvents in the timespan and reschedule
-    await organiseTimespan(
-        [new Date(), lastEventEnd || addDays(new Date(), 7)], 
-        displaceableEvents?.map(el => el.id) || ['none'],
-    );
+    await organiseTimespan({
+        timespan: [new Date(), lastEventEnd || addDays(new Date(), 7)],
+        displaceableEventIds: displaceableEvents?.map(el => el.id) || [],
+        displaceAllFlexEvents: false,
+    });
     // To do: Save existing displaceableEvents, reschedule them
     // To do: Save scheduled intervals => only reschedule from now to end of scheduled interval
 
     // OPTION 2: Displace events gradually (more efficient for emptier timespans)
     // To do: Check if timespan is crowded
+
+
+
+
+
+
+    // Check crowdedness of timespanToOrganise
+
+    // If crowded: Reorganise en masse
+        // Get all events of lower priority -> save in displacedEvents -> delete events
+        // 
 
 }

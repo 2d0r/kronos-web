@@ -146,7 +146,38 @@ export const getTasksToSchedule = async () => {
     return tasks;
   } catch (error) {
     console.error('Database Error:', error);
-    throw new Error('Failed to fetch the latest tasks.');
+    throw new Error('Failed to fetch all tasks to schedule.');
+  }
+}
+
+export const getTasksByIds = async (taskIds: string[]) => {
+  try {
+    const tasks: TaskWithRelations[] = await prisma.task.findMany({
+      include: { 
+          tasksBefore: true,
+          tasksAfter: true,
+          tasksRightBefore: true,
+          tasksRightAfter: true,
+          tasksParent: true,
+          tasksChild: true,
+          mindset: true,
+          events: true,
+      }, // Include the subtasks relation
+      where: {
+        id: { in: taskIds },
+        status: {not: 'done'},
+        fixed: false,
+        AND: [{
+            type: { not: 'goal' }
+        }, {
+            type: { not: 'project' }
+        }],
+      }
+    }); 
+    return tasks;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch tasks by ID.');
   }
 }
 

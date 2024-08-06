@@ -184,3 +184,8 @@ export interface URLSearchParamsKronos extends URLSearchParams {
     logbook: boolean
     task: string
 }
+
+export type eventsToSchedule = {
+    taskId: string,
+    count: number,
+}[];
