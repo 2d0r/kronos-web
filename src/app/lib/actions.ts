@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import prisma from './db';
 import { Event, RepeatUnit, Task, TaskType, TimespanType } from '@prisma/client';
 import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION, TaskWithRelations, repeatUnitList } from './definitions';
-import { fetchMindsets, fetchTasks, findEventIdsInTimespan } from './data';
+import { fetchMindsets, getTasks, findEventIdsInTimespan } from './data';
 import { calculatePriorityScores } from './priority-score';
 import { calculateTimeScore } from './time-score';
 import { v4 as uuidv4 } from 'uuid';
@@ -194,19 +194,18 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         deadline: endRepeatDate ? endRepeatDate : deadline,
       },
     });
-    
-    try {
-      await organiseTask(newTask as TaskWithRelations);
-    } catch (error) {
-      console.log('Failed to organise task ❌', error);
-    }
-
   } catch (error) {
     console.log('Failed to create task ❌', error);
     return {
       message: 'Database Error: Failed to create task.',
     };
   }
+
+  // try {
+  //   await organiseTask(newTask as TaskWithRelations);
+  // } catch (error) {
+  //   console.log('Failed to organise task ❌', error);
+  // }
 
   revalidatePath('/');
   // redirect('/timeline');
@@ -323,19 +322,18 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
         deadline: deadline !== null ? deadline : endRepeatDate,
       },
     });
-
-    try {
-      await organiseTask(newTask as TaskWithRelations);
-    } catch (error) {
-      console.log('Failed to organise task ❌', error);
-    }
-
   } catch (error) {
     console.log('Failed to create task ❌', error);
     return {
       message: 'Database Error: Failed to create task.',
     };
   }
+
+  // try {
+  //     await organiseTask(newTask as TaskWithRelations);
+  // } catch (error) {
+  //   console.log('Failed to organise task ❌', error);
+  // }
 
   revalidatePath('/');
   // redirect('/timeline');
@@ -415,7 +413,7 @@ export async function updateTaskField(entryId: string, field: keyof Task, value:
 }
 
 export async function updatePriorityScores() {
-  const tasks = await fetchTasks();
+  const tasks = await getTasks();
   const mindsets = await fetchMindsets();
   const updatedTasks = calculatePriorityScores(tasks, mindsets);
   updatedTasks.forEach((task) => {
@@ -426,7 +424,7 @@ export async function updatePriorityScores() {
 }
 
 export async function updateTimeScores() {
-  const tasks = await fetchTasks();
+  const tasks = await getTasks();
   tasks.forEach((task) => {
     const timeScore = calculateTimeScore(task);
     updateTaskField(task.id, 'timeScore', timeScore);
@@ -567,6 +565,21 @@ export async function deleteFlexEventsInTimespan(timespan: [Date, Date]) {
   }
 }
 
+export async function deleteEventsOfTask(taskId: string, timespan: [Date, Date]) {
+  try {
+    await prisma.event.deleteMany({
+      where: {
+        taskId: taskId,
+        startTime: { gte: timespan[0], lt: timespan[1] },
+        endTime: { gte: timespan[0] },
+      },
+    });
+  } catch (error) {
+    console.error('Failed to delete events by task id and timespan:', error);
+    // throw new Error('Database error: Failed to delete events by task id, from a timespan');
+  }
+}
+
 
 // MINDSETS
 
@@ -592,10 +605,9 @@ export async function getMindsetProximity(mindset1: string, mindset2: string) {
 
 // TIMESPAN
 
-
-
-export const fetchIntersectingTimespans = async (givenTimespan: [Date, Date]) => {
+export const getIntersectingTimespans = async (givenTimespan?: [Date, Date]) => {
   try {
+    if(!givenTimespan) givenTimespan = [ new Date(), new Date()];
     const timespans = await prisma.timespan.findMany({
       where: {
         type: 'organised',
@@ -611,12 +623,15 @@ export const fetchIntersectingTimespans = async (givenTimespan: [Date, Date]) =>
             endTime: { gte: givenTimespan[1] },
           }
         ],
+      },
+      orderBy: {
+        endTime: 'desc',
       }
     });
     return timespans;
   } catch (error) {
     console.error('Error fetching intersecting timespans.');
-    throw new Error('Database error: Failed to fetch intersecting timespans.');
+    // throw new Error('Database error: Failed to fetch intersecting timespans.');
   }
 }
 
@@ -631,7 +646,7 @@ export const createTimespan = async (timespan: [Date, Date], type: TimespanType)
     })
   } catch (error) {
     console.error('Error creating timespan.');
-    throw new Error('Database error: Failed to create timespans.');
+    // throw new Error('Database error: Failed to create timespans.');
   }
 }
 
@@ -648,6 +663,6 @@ export const updateTimespan = async (id: string, timespan: [Date, Date]) => {
     })
   } catch (error) {
     console.error('Error updating organised timespans.');
-    throw new Error('Database error: Failed to update organised timespans.');
+    // throw new Error('Database error: Failed to update organised timespans.');
   }
 }

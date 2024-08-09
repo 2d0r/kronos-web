@@ -75,10 +75,11 @@ export function InputField(
 }
 
 export function Dropdown ( 
-    { fieldName, list, defaultValue, prompt, onChange = () => {}, label, colour = NEUTRAL_MINDSET_COLOUR, className = '', state } : {
+    { fieldName, list, value, prompt, onChange = () => {}, label, colour = NEUTRAL_MINDSET_COLOUR, className = '', state, defaultValue } : {
         fieldName: string,
         list: string[],
-        defaultValue: string,
+        value?: string,
+        defaultValue?: string,
         prompt: string,
         onChange?: any,
         label?: string,
@@ -87,9 +88,9 @@ export function Dropdown (
         state?: any,
     }
 ) {
-    const [ selection, setSelection ] = useState<string>(defaultValue);
+    const [ selection, setSelection ] = useState<string>(value || defaultValue || '');
     const handleSelect = (event : React.ChangeEvent<HTMLSelectElement>) => {
-        setSelection(event.target.value !== undefined ? event.target.value : defaultValue);
+        setSelection(event.target.value !== undefined ? event.target.value : value || '');
         onChange(event);
     }
 
@@ -104,7 +105,7 @@ export function Dropdown (
                 name={fieldName}
                 className={`${className} peer block cursor-pointer rounded-lg border-none py-2 pl-4 text-sm outline-0 placeholder:text-gray-500 focus:![${colour}]`}
                 style={{ backgroundColor: adjustLightness(colour, 0.95) }}
-                defaultValue={defaultValue}
+                value={value} defaultValue={defaultValue}
                 onChange={handleSelect}
                 aria-describedby='task-error'
             >

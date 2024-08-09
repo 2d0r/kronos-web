@@ -15,7 +15,7 @@ export const useTaskContext = () => useContext(TaskContext);
 
 // Provider component to wrap the parent and pass down the context values
 export const TaskCacheProvider = ({ children, tasks } : { children: ReactNode, tasks: TaskWithRelations[] }) => {
-    // const tasks = await fetchTasks();
+    // const tasks = await getTasks();
     const [ tasksCache, setTasksCache ] = useState<TaskWithRelations[]>(tasks);
   
     return (

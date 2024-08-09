@@ -190,3 +190,5 @@ export type eventsToSchedule = {
     taskId: string,
     count: number,
 }[];
+
+export type ActionType = ('edit' | 'create' | 'delete');

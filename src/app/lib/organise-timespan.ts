@@ -2,7 +2,7 @@
 
 import prisma from './db';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates, getStartAndEndOfDay } from '../utils/dateUtils';
-import { fetchEvents, getTasksByIds, getTasksToSchedule } from './data';
+import { getEvents, getTasksByIds, getTasksToSchedule } from './data';
 import { deleteEventsById, deleteFlexEventsInTimespan } from './actions';
 import { DEFAULT_TIMES_OF_DAY, eventsToSchedule,TaskWithRelations } from './definitions';
 import { 
@@ -46,7 +46,7 @@ export async function organiseTimespan({
 } : OrganiseTimespanProps ) {
     console.log('timespan', timespan);
     const timespanInMinutes = minutesBetweenDates(timespan[0], timespan[1]);
-    const events = await fetchEvents(); // To do: only fetch events in timespanToOrganise
+    const events = await getEvents(); // To do: only fetch events in timespanToOrganise
 
 
     // DELETE EXISTING FLEXIBLE EVENTS IN TIMESPAN

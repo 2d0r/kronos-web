@@ -3,13 +3,13 @@
 import { FC, useState, useEffect } from 'react';
 import BottomBar from '@/app/ui/bottom-bar';
 import TopBar from '@/app/ui/top-bar';
-import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '@/app/lib/definitions';
+import { ActionType, EventWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '@/app/lib/definitions';
 import SearchBar from '@/app/ui/search';
 import Menu from '@/app/ui/menu';
 import { adjustLightness } from '@/app/utils/colourUtils';
 import TaskCard from '@/app/ui/tasks/task-card';
 import clsx from 'clsx';
-import { Event, Status, TaskType } from '@prisma/client';
+import { Event } from '@prisma/client';
 import CalendarComponent from '@/app/ui/calendar/calendar-hexaflexa';
 import TaskBrowser from '@/app/ui/browser/task-browser';
 import { MindsetWithRelations } from '@/app/lib/definitions';
@@ -17,6 +17,7 @@ import Button from './button';
 import { deleteAllEvents } from '@/app/lib/actions';
 import { addDaysToDate } from '@/app/utils/dateUtils';
 import { organiseTimespan } from '@/app/lib/organise-timespan';
+import { fetchEvents, fetchTask, fetchTasks, fetchUpdatedTaskEvents } from '@/app/lib/data';
 
 interface TestViewProps {
     children?: JSX.Element | JSX.Element[];
@@ -40,60 +41,27 @@ const TestView: FC<TestViewProps> = ({
 
     const showMenu = searchParams?.menu;
     const showTaskCard = !!searchParams.task;
-    const taskToEditId = searchParams.task;
-    // const taskToEdit = taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0];
-    const [ taskToEdit, setTaskToEdit ] = useState<TaskWithRelations>(taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0]);
 
 
     // DATA FETCH
 
-    const fetchEvents = async () => {
-        const response = await fetch('/event');
-        const data = await response.json();
-        const newEvents = data.events;
-        return newEvents;
-    }
-    const fetchTasks = async () => {
-        const response = await fetch('/task');
-        const data = await response.json();
-        const newTasks = data.tasks;
-        return newTasks;
-    }
-
 
     // HANDLERS
 
-    const handleEventUpdate = (taskId: string) => {
-        setTimeout(async () => {
-            const response = await fetch(`/event/${taskId}`);
-            const data = await response.json();
-            const newEvents = data.events;
-            setEventsCache(prevEvents => [...prevEvents, ...newEvents]);
-        }, 2000);
-    }
-    const handleTaskUpdate = (newTask: TaskWithRelations) => {
-        const newTasksCache = tasksCache.map(task => {
-            return task.id === newTask.id ? {...task, ...newTask} : task;
-        });
-        setTasksCache(newTasksCache);
-        handleEventUpdate(newTask.id);
-    }
-    const handleTaskCreate = (newTask: TaskWithRelations) => {
-        const newTasksCache = [...tasksCache, {
-            ...newTask,
-            status: 'toDo' as Status,
-            type: 'task' as TaskType,
-        }];
-        setTasksCache(newTasksCache);
-        handleEventUpdate(newTask.id);
-    }
-    const handleTaskDelete = async (taskId: string) => {
-        await fetch(`/task/${taskId}`, {
-            method: 'DELETE'
-        });
-        const newTasksCache = tasksCache.filter(task => task.id !== taskId);
-        setTasksCache(newTasksCache);
-        handleEventUpdate(taskId);
+    const handleTaskUpdate = async (taskId: string, action: ActionType) => {
+        switch(action) {
+            case 'create':
+                const newTask = await fetchTask(taskId);
+                setTasksCache(prevCache => ([ ...prevCache, newTask ]));
+            case 'delete':
+                if (tasksCache.length)
+                    setTasksCache(prevCache => prevCache.filter(task => task.id !== taskId));
+            case 'edit':
+                const editedTask = await fetchTask(taskId);
+                setTasksCache(prevCache => ([ ...prevCache.filter(task => task.id !== taskId), editedTask ]));
+        }
+        const newEvents = await fetchUpdatedTaskEvents(taskId);
+        setEventsCache(prevEvents => [...prevEvents, ...newEvents]);
     }
     const handleDeleteAllEvents = async () => {
         await deleteAllEvents();
@@ -105,11 +73,11 @@ const TestView: FC<TestViewProps> = ({
         const xDaysFromNow = addDaysToDate(currentTime, daysAhead);
         await organiseTimespan({
             timespan: [currentTime, xDaysFromNow],
-            eventsToSchedule: [
-                { taskId: '6d955a12-031e-4085-91a0-8a71d6b801cd', count: 0 },
-                { taskId: '7d299836-67e2-482e-bac8-da6fb5ec8708', count: 2 },
-            ],
-            displaceAllFlexEvents: false,
+            // eventsToSchedule: [
+            //     { taskId: '6d955a12-031e-4085-91a0-8a71d6b801cd', count: 0 },
+            //     { taskId: '7d299836-67e2-482e-bac8-da6fb5ec8708', count: 2 },
+            // ],
+            // displaceAllFlexEvents: false,
         });
         setTimeout(async () => {
             const newEvents = await fetchEvents();
@@ -120,15 +88,6 @@ const TestView: FC<TestViewProps> = ({
     }
 
 
-    // HOOKS
-
-    useEffect(() => {
-        setTaskToEdit(taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0]);
-    }, [tasksCache]);
-    // useEffect(() => {
-    //     console.log('testView - eventsCache', eventsCache);
-    // }, [eventsCache])
-
 
     return (<div className={clsx('pt-[10vh] pb-[10vh] overflow-scroll w-screen h-screen flex flex-col gap-8 items-center justify-start')} style={{
         backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.5)}, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.7)})`
@@ -137,7 +96,6 @@ const TestView: FC<TestViewProps> = ({
             {/* <SearchBar placeholder='Search events, dates...'/> */}
         </TopBar>
         {showMenu && <Menu mindsetColour={mindsetColour}/>}
-        {/* {showTaskCard && <TaskCard mindsets={mindsets}/>} */}
         <div className={clsx('max-h-none z-[39] bg-white rounded-3xl shadow-xl w-fit p-4 flex flex-col gap-4 items-center justify-start')}>
             <div className='h-[60vh] w-[80vw]'>
                 <CalendarComponent 
@@ -171,11 +129,9 @@ const TestView: FC<TestViewProps> = ({
         </div>
         {showTaskCard && 
             <TaskCard 
-                task={taskToEdit} 
-                mindsets={mindsets} 
-                onTaskUpdate={handleTaskUpdate}
-                onTaskCreate={handleTaskCreate}
-                onTaskDelete={handleTaskDelete} 
+                // task={taskToEdit} 
+                mindsets={mindsets}
+                onTaskUpdate={(taskId, action) => handleTaskUpdate(taskId, action)}
         />}
         <BottomBar searchParams={searchParams} mindsetColour={mindsetColour} />
     </div>)

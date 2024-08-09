@@ -10,7 +10,7 @@ import { Event, Task } from '@prisma/client';
 
 // Tasks
 
-export async function fetchTasks() {
+export async function getTasks() {
   try {
       const allTasks = await prisma.task.findMany();
       return allTasks;
@@ -92,7 +92,7 @@ export async function getCurrentTask() {
     });
     if (currentEvents.length > 0) {
       const currentEventsTaskIds = currentEvents.map(el => el.taskId);
-      const tasks = await fetchTasks();
+      const tasks = await getTasks();
       const currentTasks = tasks.filter(el => currentEventsTaskIds.includes(el.id))
         .sort((a,b) => (a.priorityScore - b.priorityScore));
       return currentTasks;
@@ -185,7 +185,7 @@ export const getTasksByIds = async (taskIds: string[]) => {
 
 // EVENTS
 
-export async function fetchEvents() {
+export async function getEvents() {
   try {
     const allEvents = await prisma.event.findMany();
     return allEvents;
@@ -395,4 +395,28 @@ export async function getCurrentMindsetColour() {
   } 
   
   
+}
+
+
+export const fetchEvents = async () => {
+  const response = await fetch('/event');
+  const data = await response.json();
+  const newEvents = data.events;
+  return newEvents;
+}
+export const fetchTasks = async () => {
+  const response = await fetch('/task');
+  const data = await response.json();
+  const newTasks = data.tasks;
+  return newTasks;
+}
+export const fetchTask = async (taskId: string) => {
+  const response = await fetch(`/task/${taskId}`);
+  const data = await response.json();
+  return data.task;
+}
+export const fetchUpdatedTaskEvents = async (taskId: string) => {
+  const response = await fetch(`/event/${taskId}`);
+  const data = await response.json();
+  return data.events;
 }

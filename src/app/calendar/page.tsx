@@ -1,10 +1,10 @@
 import CalendarComponent from '../ui/calendar/calendar-hexaflexa';
 import TimelineCard from '../ui/timeline-board';
 import { NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from '../lib/definitions';
-import { fetchEvents, fetchMindsetsWithRelations, getCurrentMindsetColour } from '../lib/data';
+import { getEvents, fetchMindsetsWithRelations, getCurrentMindsetColour } from '../lib/data';
 
 export default async function Page({searchParams}: {searchParams: URLSearchParamsKronos}) {
-  const events = await fetchEvents();
+  const events = await getEvents();
   const mindsets = await fetchMindsetsWithRelations();
   const mindsetColour = await getCurrentMindsetColour();
 

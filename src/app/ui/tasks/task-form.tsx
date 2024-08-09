@@ -1,57 +1,38 @@
-'use client';
+'use-client';
 
-import { useState, useEffect } from 'react';
-import { useFormState } from 'react-dom';
-import Button from '@/components/button';
-import { Dropdown, InputField, MultiSelectionField } from './form-fields';
-import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, DEFAULT_MINDSET, URLSearchParamsKronos, MIN_TASK_DURATION, ActionType } from '@/app/lib/definitions';
-import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { DayOfWeek, Event, Mindset, TimeOfDay } from '@prisma/client';
-import { useRouter } from 'next/navigation';
-import { editTaskPrisma, createTaskPrisma } from '@/app/lib/actions';
-import { parseISO } from 'date-fns';
-import NotesEditor from '@/components/notes-editor';
-import ChecklistEditor from '@/components/checklist-editor';
-import {v4 as uuidv4} from 'uuid';
-import { organiseTask } from '@/app/lib/organise-task';
-import EventSection from './event-section';
+import React, { useState } from 'react';
+import { Dropdown, InputField } from './form-fields';
+import { Link } from 'lucide-react';
+import { NEUTRAL_MINDSET_COLOUR, TaskWithRelations } from '@/app/lib/definitions';
 import { addMinutesToDate, minutesBetweenDates } from '@/app/utils/dateUtils';
+import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 
+interface TaskFormProps {
+    task: TaskWithRelations;
+}
 
-export default function TaskCard({task, mindsets, onTaskUpdate} : {
-    task?: TaskWithRelations, 
-    mindsets: Mindset[],
-    onTaskUpdate: (taskId: string, action: ActionType) => void,
-}) {
+export default function TaskForm({task} : TaskFormProps) {
 
-    const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const taskId = searchParams.get('task');
     const event = searchParams.get('event');
 
 
     // STATES
 
-    const [ taskCache, setTaskCache ] = useState<TaskWithRelations>({} as TaskWithRelations);
-    const [ isNewTask, setIsNewTask ] = useState<boolean>(false);
+    const [ taskCache, setTaskCache ] = useState<TaskWithRelations>(task);
     const [ endRepeat, setEndRepeat ] = useState<(string | null)>('No');
     const [ idealStart, setIdealStart ] = useState<boolean>(false);
     const [ repeatUnit, setRepeatUnit ] = useState<string | null>('sessions');
-    const [ mindsetColour, setMindsetColour] = useState<string>(taskCache.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
+    const [ mindsetColour, setMindsetColour] = useState<string>(taskCache?.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
     const [ deadline, setDeadline ] = useState<boolean>(false);
     const [ taskIsEdited, setTaskIsEdited ] = useState<boolean>(false);
     const [ taskIsReady, setTaskIsReady ] = useState<boolean>(false);
     const [ eventId, setEventId ] = useState<string>(event || '');
 
 
-    // FORM DISPATCH
-
-    const initialState = { message: null, errors: {} };
-    // Set up to edit task or to create new task
-    const editTaskHere : any = isNewTask ? createTaskPrisma : editTaskPrisma;
-    const [state, dispatch] = useFormState(editTaskHere, initialState);
+    // HOOKS 
 
 
     // HANDLERS
@@ -67,7 +48,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
     const handleTimeChanges = (event: React.ChangeEvent<HTMLSelectElement>, 
         type: ('startTime' | 'endTime' | 'startDate' | 'endDate')
     ) => {
-        let dateTime = type.includes('start') ? taskCache.startTime : taskCache.endTime;
+        let dateTime = type.includes('start') ? taskCache?.startTime : taskCache?.endTime;
         const inputValue = event.target.value;
 
         if (dateTime === null) {
@@ -119,70 +100,29 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
     const handleDurationChange = (event: React.ChangeEvent<HTMLSelectElement>, unit: 'minutes' | 'hours') => {
         // When user changes duration, only change end, don't change start
         const durationInMinutes = 
-            unit === 'hours' ? (taskCache.duration || 0) % 60 + Number(event.target.value) * 60 :
-            (taskCache.duration || 0) - (taskCache.duration || 0) % 60 + Number(event.target.value);
+            unit === 'hours' ? (taskCache?.duration || 0) % 60 + Number(event.target.value) * 60 :
+            (taskCache?.duration || 0) - (taskCache?.duration || 0) % 60 + Number(event.target.value);
         setTaskCache(taskCache => ({...taskCache, 
             duration: durationInMinutes,
             endTime: taskCache.fixed && taskCache.startTime && durationInMinutes > 0 ? addMinutesToDate(taskCache.startTime, durationInMinutes) : taskCache.endTime,
         }));
     }
     const handleTaskSubmit = () => {
-        // Tasks database is being created/edited in parallel, via form action
-        // We just have to signal the parent component to update its task and event list
-        onTaskUpdate(taskCache.id, isNewTask ? 'create' : 'edit');
+        // Callback to parent component, with updated cache
+        (isNewTask && onTaskCreate) ? onTaskCreate(taskCache) : 
+        onTaskUpdate ? onTaskUpdate(taskCache) : 
+        ()=>{};
         // Organise task in 
         // organiseTask(taskCache);
         router.back();
     };
-    const handleDeleteTask = async (taskId: string) => {
-        await fetch(`/task/${taskId}`, {
-            method: 'DELETE'
-        }).then(() => {
-            onTaskUpdate(taskId, 'delete');
-            router.back();
-        });
+    const handleDeleteTask = (taskId: string) => {
+        onTaskDelete && onTaskDelete(taskId);
+        router.back();
     }
 
 
-    // HOOKS
-
-    useEffect(() => {
-        if (taskId && taskId !== 'new') {
-            fetch(`/task/${taskId}`)
-                .then((response) => response.json())
-                .then((data) => setTaskCache(data.task));
-            setIsNewTask(false);
-        } else if (taskId === 'new') {
-            setIsNewTask(true);
-            setTaskCache(prevCache => ({
-                ...prevCache, id: uuidv4(),
-            }))
-        }
-    }, [taskId]);
-    
-    // Update mindset colour for whole card when mindset is selected
-    useEffect(() => {
-        setMindsetColour(mindsets.filter(el => el.name === taskCache.mindset?.name)[0]?.colour || NEUTRAL_MINDSET_COLOUR);
-    }, [taskCache.mindset]);
-    // Signal task as ready to submit once the compulsory fields are filled
-    useEffect(() => {
-        console.log('taskCache', taskCache);
-        // Check if task was edited
-        (task && task !== taskCache) ? setTaskIsEdited(true) : setTaskIsEdited(false);
-        // Check if new task has enough valid inputs to be added
-        (
-            taskCache.name 
-            && taskCache.id
-            && taskCache.mindset
-            && taskCache.priority
-            && (taskCache.duration > 0 || (taskCache.startTime && taskCache.endTime))
-        ) ? setTaskIsReady(true) : setTaskIsReady(false);
-    }, [taskCache]);
-
-    
-    return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'>
-    <div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl text-sm text-black overflow-hidden'>
-    <form action={dispatch}>
+    return (<form action={dispatch}>
         {/* Top bar */}
         <div className='w-full h-16 flex justify-between items-center p-4 border-b-[0.5px]'>
             <div className='w-8 h-8'></div>
@@ -193,7 +133,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                 className={`!border-0 !text-xl font-bold placeholder:text-lg placeholder:text-gray-300 pl-0 cursor-text !bg-transparent rounded-none text-center`}
                 colour={mindsetColour}
                 state={state}
-                value={taskCache.name || ''}
+                value={taskCache?.name || ''}
                 onChange={(event: any) => handleTaskCacheUpdate('name', event.target.value)}
             />
             <Link href={pathname} onClick={() => router.back()} >
@@ -211,7 +151,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                     onChange={(event: any) => {
                         handleTaskCacheUpdate('mindset', event.target.value);
                     }}
-                    value={taskCache.mindset?.name || ''}
+                    defaultValue={taskCache.mindset?.name || ''}
                     colour={mindsetColour}
                     state={state}
                 />
@@ -221,7 +161,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                     label='Priority'
                     list={priorityList}
                     onChange={(event: any) => handleTaskCacheUpdate('priority', event.target.value)}
-                    value={taskCache.priority || ''}
+                    defaultValue={taskCache.priority || ''}
                     colour={mindsetColour}
                     state={state}
                 />
@@ -235,7 +175,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                         tail='hrs'
                         colour={mindsetColour}
                         state={state}
-                        value={String(Math.floor(taskCache.duration / 60)) || ''}
+                        value={String(Math.floor(taskCache?.duration / 60)) || ''}
                         onChange={(event: any) => {handleDurationChange(event, 'hours')}}
                     />
                     <InputField 
@@ -244,7 +184,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                         tail='min'
                         colour={mindsetColour}
                         state={state}
-                        value={String(taskCache.duration % 60) || ''}
+                        value={String(taskCache?.duration % 60) || ''}
                         onChange={(event: any) => {handleDurationChange(event, 'minutes')}}
                     />
                 </div>
@@ -254,15 +194,15 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                     type='button'
                     className='w-full flex my-2 font-medium'
                     onClick={() => {
-                        setTaskCache(prevTask => ({ ...prevTask, fixed: !taskCache.fixed, 
-                            startTime: !taskCache.fixed ? null : taskCache.startTime, 
-                            endTime: !taskCache.fixed ? null : taskCache.endTime,
+                        setTaskCache(prevTask => ({ ...prevTask, fixed: !taskCache?.fixed, 
+                            startTime: !taskCache?.fixed ? null : taskCache?.startTime, 
+                            endTime: !taskCache?.fixed ? null : taskCache?.endTime,
                         }));
                     }}
-                    style={{color: taskCache.fixed ? 'black' : 'lightgrey'}}
+                    style={{color: taskCache?.fixed ? 'black' : 'lightgrey'}}
                     >Scheduled
                 </button>
-                {taskCache.fixed && (<>
+                {taskCache?.fixed && (<>
                     <div className='flex items-center gap-2'>
                     <div className='flex flex-col gap-2'>
                         <InputField 
@@ -270,7 +210,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             inputType='time'
                             colour={mindsetColour}
                             state={state}
-                            value={taskCache.startTime instanceof Date ? 
+                            value={taskCache?.startTime instanceof Date ? 
                                 taskCache.startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '00:00'
                             }
                             onChange={(event: any) => handleTimeChanges(event, 'startTime')}
@@ -293,7 +233,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             inputType='time'
                             colour={mindsetColour}
                             state={state}
-                            value={taskCache.endTime instanceof Date ? 
+                            value={taskCache?.endTime instanceof Date ? 
                                 taskCache.endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }) : '00:00'
                             }
                             onChange={(event: any) => handleTimeChanges(event, 'endTime')}
@@ -319,13 +259,13 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                     className='w-full flex my-2 font-medium'
                     onClick={() => { setTaskCache(taskCache => ({
                         ...taskCache,
-                        repeat: !taskCache.repeat
+                        repeat: !taskCache?.repeat
                     }))}}
-                    style={{color: taskCache.repeat ? 'black' : 'lightgrey'}}
+                    style={{color: taskCache?.repeat ? 'black' : 'lightgrey'}}
                 >Repeat</button>
 
                 {/* For repeating tasks */}
-                {taskCache.repeat && (<div className=''>
+                {taskCache?.repeat && (<div className=''>
                     <div className='flex mb-2 items-top *:mb-0 overflow-x-scroll items-center gap-2'>
                         {repeatUnit === 'sessions' ? (<>
                             <InputField 
@@ -334,7 +274,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                                 inputType='number'
                                 colour={mindsetColour}
                                 state={state}
-                                value={String(taskCache.repeatFrequency || 0)}
+                                value={String(taskCache?.repeatFrequency || 0)}
                                 onChange={(event: any) => handleTaskCacheUpdate('repeatFrequency', Number(event.target.value) || 0)}
                             />
                         </>) : (<>
@@ -344,19 +284,19 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                                 inputType='number'
                                 colour={mindsetColour}
                                 state={state}
-                                value={String(taskCache.repeatFrequency || 0)}
+                                value={String(taskCache?.repeatFrequency || 0)}
                                 onChange={(event: any) => handleTaskCacheUpdate('repeatFrequency', Number(event.target.value))}
                             />
                         </>)}
-                        time{taskCache.repeatFrequency === 1 ? '' : 's'} every
-                        {(taskCache.repeatFrequency === 1) ? 
+                        time{taskCache?.repeatFrequency === 1 ? '' : 's'} every
+                        {(taskCache?.repeatFrequency === 1) ? 
                             <InputField 
                                 fieldName='repeatTimespanMultiplier'
                                 placeholder=''
                                 inputType='number'
                                 colour={mindsetColour}
                                 state={state}
-                                value={String(taskCache.repeatTimespanMultiplier)}
+                                value={String(taskCache?.repeatTimespanMultiplier)}
                                 onChange={(event: any) => handleTaskCacheUpdate('repeatTimespanMultiplier', Number(event.target.value))}
                             /> : <></>
                         }
@@ -364,7 +304,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             fieldName='repeatTimespan'
                             prompt=''
                             list={timeSpanList.filter(el => el.toLowerCase() !== 'hour')} // Removed hourly repetition
-                            value={taskCache.repeatTimespan || 'Day'}
+                            defaultValue={taskCache?.repeatTimespan || 'Day'}
                             onChange={(event: any) => handleTaskCacheUpdate('repeatTimespan', event.target.value)}
                             colour={mindsetColour}
                             state={state}
@@ -373,7 +313,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                 </div>)}
 
                 {/* Ideal start */}
-                {!taskCache.fixed && (<>
+                {!taskCache?.fixed && (<>
                 <div className='divider'></div>
                 <div className='flex'>
                     <button 
@@ -382,11 +322,11 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             setIdealStart(!idealStart);
                             setTaskCache(prevTask => ({ ...prevTask, startTime: null }));
                         }}
-                        style={{color: idealStart || taskCache.idealStart ? 'black' : 'lightgrey'}}
+                        style={{color: idealStart || taskCache?.idealStart ? 'black' : 'lightgrey'}}
                         className='text-left cursor-pointer font-medium my-2 formKeysColumn'
                         >Ideal start
                     </button>
-                    { (idealStart || taskCache.idealStart) ? 
+                    { (idealStart || taskCache?.idealStart) ? 
                     <InputField 
                         fieldName='idealStart'
                         placeholder='Enter start time'
@@ -394,7 +334,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                         label=''
                         colour={mindsetColour}
                         state={state}
-                        value={taskCache.idealStart || ''}
+                        value={taskCache?.idealStart || ''}
                         onChange={(event: any) => {
                             const timeBits = event.target.value.split(':');
                             handleTaskCacheUpdate('idealStart', `${timeBits[0]}:${timeBits[1]}`);
@@ -403,8 +343,8 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                 </div></>)}
                 
                 {/* Preferred times and days */}
-                {!taskCache.fixed && (<>
-                    {(!taskCache.repeat || taskCache.repeatTimespan !== 'hour') && (<>
+                {!taskCache?.fixed && (<>
+                    {(!taskCache?.repeat || taskCache?.repeatTimespan !== 'hour') && (<>
                         <MultiSelectionField
                             fieldName='preferredTimeOfDay'
                             prompt='Preferred daytimes'
@@ -413,11 +353,11 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             className='w-full-key'
                             colour={mindsetColour}
                             state={state}
-                            selected={taskCache.preferredTimeOfDay || []}
+                            selected={taskCache?.preferredTimeOfDay || []}
                             onChange={(value: string[]) => handleTaskCacheUpdate('preferredTimeOfDay', value as TimeOfDay[])}
                         />
                     </>)}
-                    {(!taskCache.repeat || (taskCache.repeatTimespan !== 'hour' && taskCache.repeatTimespan !== 'day')) && (<>
+                    {(!taskCache?.repeat || (taskCache?.repeatTimespan !== 'hour' && taskCache?.repeatTimespan !== 'day')) && (<>
                         <MultiSelectionField 
                             fieldName='preferredDayOfWeek'
                             prompt='Preferred days'
@@ -426,24 +366,24 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             colour={mindsetColour}
                             state={state}
                             className='w-full-key'
-                            selected={taskCache.preferredDayOfWeek || []}
+                            selected={taskCache?.preferredDayOfWeek || []}
                             onChange={(value: string[]) => handleTaskCacheUpdate('preferredDayOfWeek', value as DayOfWeek[])}
                         />
                     </>)}
                 </>)}
-                {taskCache.repeat && (<>
+                {taskCache?.repeat && (<>
                     <div className={'divider'}></div>
                     <div className='flex flex-col gap-2'>
                         <button 
                             type='button'
                             className='w-full flex my-2 font-medium'
                             onClick={() => {
-                                handleTaskCacheUpdate('endRepeat', !taskCache.endRepeat);
+                                handleTaskCacheUpdate('endRepeat', !taskCache?.endRepeat);
                                 setTaskCache(prevTask => ({ ...prevTask, totalDuration: null, totalRepetitions: null, deadline: null }));
                             }}
-                            style={{color: taskCache.endRepeat ? 'black' : 'lightgrey'}}
+                            style={{color: taskCache?.endRepeat ? 'black' : 'lightgrey'}}
                         >End repeat</button>
-                        {(taskCache.repeat && taskCache.endRepeat) && (<>
+                        {(taskCache?.repeat && taskCache?.endRepeat) && (<>
                             <div className='flex h-8 gap-2 items-center pl-2'>
                                 <button 
                                     type='button'
@@ -454,16 +394,16 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                                             deadline: newEndRepeat === 'yes' ? null : prevTask.deadline,
                                         }));
                                     }}
-                                    style={{color: endRepeat === 'date' || taskCache.deadline ? 'black' : 'lightgrey'}}
+                                    style={{color: endRepeat === 'date' || taskCache?.deadline ? 'black' : 'lightgrey'}}
                                     className='text-left'
                                 >On a date</button>
-                                {(endRepeat === 'date' || taskCache.deadline) ? <InputField 
+                                {(endRepeat === 'date' || taskCache?.deadline) ? <InputField 
                                     fieldName='endRepeatDate'
                                     placeholder='End repeat on date'
                                     inputType='date'
                                     colour={mindsetColour}
                                     state={state}
-                                    value={taskCache.deadline?.toISOString().slice(0, 10) || ''}
+                                    value={taskCache?.deadline?.toISOString().slice(0, 10) || ''}
                                     onChange={(event: any) => event.target.value && handleTaskCacheUpdate('deadline', parseISO(event.target.value))}
                                 /> : <></>}
                             </div>
@@ -477,16 +417,16 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                                             totalDuration: newEndRepeat === 'yes' ? null : prevTask.totalDuration,
                                         }));
                                     }}
-                                    style={{color: endRepeat === 'duration' || taskCache.totalDuration ? 'black' : 'lightgrey'}}
+                                    style={{color: endRepeat === 'duration' || taskCache?.totalDuration ? 'black' : 'lightgrey'}}
                                     className='text-left'
                                 >After a total duration</button>
-                                {(endRepeat === 'duration' || taskCache.totalDuration) ? <InputField 
+                                {(endRepeat === 'duration' || taskCache?.totalDuration) ? <InputField 
                                     fieldName='totalDuration'
                                     placeholder='0'
                                     inputType='number'
                                     colour={mindsetColour}
                                     state={state}
-                                    value={String(taskCache.totalDuration) || ''}
+                                    value={String(taskCache?.totalDuration) || ''}
                                     onChange={(event: any) => handleTaskCacheUpdate('totalDuration', Number(event.target.value))}
                                 /> : <></>}
                             </div>
@@ -500,16 +440,16 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                                             totalRepetitions: newEndRepeat === 'yes' ? null : prevTask.totalRepetitions,
                                         }));
                                     }}
-                                    style={{color: endRepeat === 'repetitions' || taskCache.totalRepetitions ? 'black' : 'lightgrey'}}
+                                    style={{color: endRepeat === 'repetitions' || taskCache?.totalRepetitions ? 'black' : 'lightgrey'}}
                                     className='text-left'
                                 >After a number of repetitions</button>
-                                {(endRepeat === 'repetitions' || taskCache.totalRepetitions) ? <InputField 
+                                {(endRepeat === 'repetitions' || taskCache?.totalRepetitions) ? <InputField 
                                     fieldName='totalRepetitions'
                                     placeholder='0'
                                     inputType='number'
                                     colour={mindsetColour}
                                     state={state}
-                                    value={String(taskCache.totalRepetitions) || ''}
+                                    value={String(taskCache?.totalRepetitions) || ''}
                                     onChange={(event: any) => handleTaskCacheUpdate('totalRepetitions', Number(event.target.value))}
                                 /> : <></>}
                             </div>
@@ -517,7 +457,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                     </div>
                 </>)}
                 
-                {(taskCache.fixed && !taskCache.repeat) && (<>
+                {(taskCache?.fixed && !taskCache?.repeat) && (<>
                     <div className='divider h-[1px] w-full bg-black/20'></div>
                     <div className='flex h-8 gap-2 items-center'>
                         <button
@@ -533,7 +473,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             inputType='date'
                             colour={mindsetColour}
                             state={state}
-                            value={String(taskCache.totalDuration) || ''}
+                            value={String(taskCache?.totalDuration) || ''}
                         />}
                     </div>
                 </>)}
@@ -543,13 +483,13 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
             {/* Notes and checklist panel */}
             <div className='w-[350px] flex flex-col task-card'>
                 <div className=''>
-                    <EventSection event={taskCache.events?.filter(el => el.id === eventId)[0] || {} as Event} mindsetColour={mindsetColour} />
+                    <EventSection event={taskCache?.events?.filter(el => el.id === eventId)[0] || {} as Event} mindsetColour={mindsetColour} />
                 </div>
                 <div className='h-[25vh] border-b-[0.5px] overflow-y-scroll'>
-                    <NotesEditor notes={taskCache.notes || ''} taskId={taskCache.id} className={'task-card'} />
+                    <NotesEditor notes={taskCache?.notes || ''} taskId={taskCache?.id} className={'task-card'} />
                 </div>
                 <div className='h-[25vh]'>
-                    <ChecklistEditor checklist={taskCache.checklist || ''} taskId={taskCache.id} className={'task-card'} />
+                    <ChecklistEditor checklist={taskCache?.checklist || ''} taskId={taskCache?.id} className={'task-card'} />
                 </div>
             </div>
             
@@ -586,11 +526,9 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
         </div>
 
         {/* Data to be sent to form without direct input */}
-            <input type='hidden' name='id' id='id'  value={taskCache.id || ''} />
+            <input type='hidden' name='id' id='id'  value={taskCache?.id || ''} />
             <input type='hidden' name='type' id='type'  value={'task'} />
-            <input type='hidden' name='repeat' id='repeat' value={String(taskCache.repeat) || 'false'} />
+            <input type='hidden' name='repeat' id='repeat' value={String(taskCache?.repeat) || 'false'} />
             {/* task.fixed is sent based on startTime and endTime */}
-    </form>
-    </div>
-    </div>);
-}
+    </form>)
+    }

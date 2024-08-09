@@ -3,9 +3,7 @@ import { TaskWithRelations, URLSearchParamsKronos } from '@/app/lib/definitions'
 import { whiteGlassBg, wireCard } from '@/app/lib/styles';
 import BottomBar from '@/app/ui/bottom-bar';
 import Menu from '@/app/ui/menu';
-import CreateTask from '@/app/ui/tasks/create-task';
 import EventCard from '@/app/ui/tasks/event-card';
-import TransportControls from '@/app/ui/buttons/transport-controls';
 import TopBar from '@/app/ui/top-bar';
 import clsx from 'clsx';
 import React from 'react';
@@ -35,7 +33,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             backgroundImage: `linear-gradient(to bottom left, ${adjustLightness(eventMindset.colour, 0.2)}, ${adjustLightness(eventMindset.colour, -0.2)})`
         }}>
         <TopBar searchParams={searchParams}/>
-        {showTaskCard && <TaskCard mindsets={mindsets}/>}
+        {showTaskCard && <TaskCard mindsets={mindsets} onTaskUpdate={() => {}}/>}
         {showMenu && <Menu />}
         <div className='w-full h-full content-center justify-center flex flex-row text-center'>
             {/* Left area */}

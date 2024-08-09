@@ -3,13 +3,14 @@
 import { Mindset, Priority, Status, Task, TaskType } from '@prisma/client';
 import { FC, useEffect, useState } from 'react';
 import { Dropdown } from '../tasks/form-fields';
-import { DEFAULT_MINDSET_LIST, TaskWithRelations, URLSearchParamsKronos } from '@/app/lib/definitions';
+import { ActionType, DEFAULT_MINDSET_LIST, TaskWithRelations, URLSearchParamsKronos } from '@/app/lib/definitions';
 import '@/app/globals.css';
 import { adjustLightness } from '@/app/utils/colourUtils';
 import { History } from 'lucide-react';
 import Link from 'next/link';
 import TaskCard from '../tasks/task-card';
 import TaskDisplay from './task-display';
+import { fetchTask, fetchUpdatedTaskEvents } from '@/app/lib/data';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
@@ -75,22 +76,22 @@ const TaskBrowser: FC<{
         setLogbookView(newLogbookView);
         setSort(newSort);
     }
-    const handleTaskUpdate = (newTask: TaskWithRelations) => {
-        const newTasksCache = tasksCache.map(task => {
-            return task.id === newTask.id ? {...task, ...newTask} : task;
-        });
-        setTasksCache(newTasksCache);
-        onTasksUpdate && onTasksUpdate(newTasksCache); // Send cache to parent component
-    }
-    const handleTaskCreate = (newTask: TaskWithRelations) => {
-        const newTasksCache = [...tasksCache, {
-            ...newTask,
-            status: 'toDo' as Status,
-            type: 'task' as TaskType,
-        }];
-        setTasksCache(newTasksCache);
-        onTasksUpdate && onTasksUpdate(newTasksCache); // Send cache to parent component
-    }
+    // const handleTaskEdit = (newTask: TaskWithRelations) => {
+    //     const newTasksCache = tasksCache.map(task => {
+    //         return task.id === newTask.id ? {...task, ...newTask} : task;
+    //     });
+    //     setTasksCache(newTasksCache);
+    //     onTasksUpdate && onTasksUpdate(newTasksCache); // Send cache to parent component
+    // }
+    // const handleTaskCreate = (newTask: TaskWithRelations) => {
+    //     const newTasksCache = [...tasksCache, {
+    //         ...newTask,
+    //         status: 'toDo' as Status,
+    //         type: 'task' as TaskType,
+    //     }];
+    //     setTasksCache(newTasksCache);
+    //     onTasksUpdate && onTasksUpdate(newTasksCache); // Send cache to parent component
+    // }
     const handleTaskDelete = async (taskId: string) => {
         await fetch(`/task/${taskId}`, {
             method: 'DELETE'
@@ -98,6 +99,19 @@ const TaskBrowser: FC<{
         const newTasksCache = tasksCache.filter(task => task.id !== taskId)
         setTasksCache(newTasksCache);
         onTasksUpdate && onTasksUpdate(newTasksCache); // Send cache to parent component
+    }
+    const handleTaskUpdate = async (taskId: string, action: ActionType) => {
+        switch(action) {
+            case 'create':
+                const newTask = await fetchTask(taskId);
+                setTasksCache(prevCache => ([ ...prevCache, newTask ]));
+            case 'delete':
+                if (tasksCache.length)
+                    setTasksCache(prevCache => prevCache.filter(task => task.id !== taskId));
+            case 'edit':
+                const editedTask = await fetchTask(taskId);
+                setTasksCache(prevCache => ([ ...prevCache.filter(task => task.id !== taskId), editedTask ]));
+        }
     }
 
 
@@ -124,10 +138,8 @@ const TaskBrowser: FC<{
             {(showTaskCard && parentName !== 'TestView') &&
             <TaskCard 
                 task={taskToEdit} 
-                mindsets={mindsets} 
-                onTaskUpdate={handleTaskUpdate} 
-                onTaskCreate={handleTaskCreate}
-                onTaskDelete={handleTaskDelete} 
+                mindsets={mindsets}
+                onTaskUpdate={handleTaskUpdate}
             />}
             {/* Tab bar */}
             <div className='flex gap-4 items-center justify-center'>

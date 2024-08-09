@@ -38,9 +38,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         <TopBar searchParams={searchParams}>
             {/* <SearchBar placeholder="Search tasks, projects, dates..." /> */}
         </TopBar>
-        { showTaskCard === 'new' ? <TaskCard mindsets={mindsets} /> 
-            : showTaskCard ?  <TaskCard task={currentTask} mindsets={mindsets}/>
-            : <></>}
+        { showTaskCard && <TaskCard mindsets={mindsets} onTaskUpdate={() => {}} />}
         <div className='w-full h-full flex flex-col items-center justify-center'>
             {showMenu && <Menu mindsetColour={mindsetColour} />}
             {/* Next event */}
