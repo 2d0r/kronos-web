@@ -1,6 +1,6 @@
 import { Editor } from '@tiptap/react';
 import { FC } from 'react';
-import ToolbarButton from '../app/ui/buttons/toolbar-button';
+import ToolbarButton from '@/components/buttons/toolbar-button';
 import { Bold, CircleCheck, HeadingIcon, Italic, List } from 'lucide-react';
 import clsx from 'clsx';
 

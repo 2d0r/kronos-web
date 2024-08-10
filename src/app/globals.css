@@ -223,7 +223,7 @@ ul[data-type="taskList"] {
   }
 
   .notesEditor-toolbar-button {
-    @apply: !border-black;
+    @apply !border-black;
   }
   
   input[type='checkbox']:checked {
@@ -231,11 +231,15 @@ ul[data-type="taskList"] {
   }
 }
 
-
 .divider {
   @apply h-[0.5px] w-full border-b-[0.5px];
 }
-
 .remove-default-focus {
   @apply: focus-visible:!border-none focus-visible:!outline-none focus:!ring-transparent;
+}
+.whiteGlassBg {
+  @apply bg-gradient-to-br from-gray-400/10 to-gray-100/10 backdrop-blur-md;
+}
+.wirecard {
+  @apply border-[0.5px] border-white rounded-[30px] overflow-hidden;
 }

@@ -1,4 +1,4 @@
-import { deleteTaskPrisma } from '@/app/lib/actions';
+import { deleteTaskPrisma } from '@/lib/actions';
 
 export async function DeleteTask({ id }: { id: string }) {
     const deleteTaskWithId = deleteTaskPrisma.bind(null, id);

@@ -1,6 +1,6 @@
 'use client';
 
-import { updateTaskField } from '@/app/lib/actions';
+import { updateTaskField } from '@/lib/actions';
 import Document from '@tiptap/extension-document';
 import Paragraph from '@tiptap/extension-paragraph';
 import TaskItem from '@tiptap/extension-task-item';

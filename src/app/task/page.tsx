@@ -1,19 +1,18 @@
-import { fetchEventsWithRelations, fetchMindsets, getEventMindset } from '@/app/lib/data';
-import { TaskWithRelations, URLSearchParamsKronos } from '@/app/lib/definitions';
-import { whiteGlassBg, wireCard } from '@/app/lib/styles';
-import BottomBar from '@/app/ui/bottom-bar';
-import Menu from '@/app/ui/menu';
-import EventCard from '@/app/ui/tasks/event-card';
-import TopBar from '@/app/ui/top-bar';
+import { fetchEventsWithRelations, getMindsets, getEventMindset } from '@/lib/data';
+import { TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
+import BottomBar from '@/components/bottom-bar';
+import Menu from '@/components/menu';
+import EventCard from '@/components/tasks/event-card';
+import TopBar from '@/components/top-bar';
 import clsx from 'clsx';
 import React from 'react';
 import { Task, Event } from '@prisma/client';
-import { dateToHHMM, minutesBetweenDates, minutesToDisplayDuration } from '@/app/utils/dateUtils';
-import { adjustLightness } from '@/app/utils/colourUtils';
+import { dateToHHMM, minutesBetweenDates, minutesToDisplayDuration } from '@/utils/dateUtils';
+import { adjustLightness } from '@/utils/colourUtils';
 import NotesEditor from '@/components/notes-editor';
 import ChecklistEditor from '@/components/checklist-editor';
 import CircleTimer from '@/components/circle-timer';
-import TaskCard from '../ui/tasks/task-card';
+import TaskCard from '@/components/tasks/task-card';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
     const showTaskCard = searchParams?.task;
@@ -26,7 +25,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
     const currentTask = taskQueue[0];
     const eventMindset = await getEventMindset(currentEvent);
     const nextEventMindset = await getEventMindset(nextEvent);
-    const mindsets = await fetchMindsets();
+    const mindsets = await getMindsets();
 
     return (<div className='w-screen h-screen text-white flex justify-center'
         style={{
@@ -38,7 +37,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         <div className='w-full h-full content-center justify-center flex flex-row text-center'>
             {/* Left area */}
             <div className='h-full w-1/3 flex flex-col items-end justify-center'>
-                <div className={clsx(wireCard, 'w-5/6 min-h-[16vh] max-h-[50vh] overflow-scroll')}>
+                <div className='wireCard w-5/6 min-h-[16vh] max-h-[50vh] overflow-scroll'>
                     <NotesEditor 
                         notes={currentTask.notes || ''} 
                         taskId={currentTask.id} 
@@ -49,7 +48,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             {/* Central widget */}
             <div className='h-full w-1/3 flex flex-col items-center justify-around'>
                 <div>{currentEvent ? dateToHHMM(currentEvent.startTime) : ''}</div>
-                <div className={clsx('w-1/3 max-w-[400px] min-w-[240px] h-1/2 flex flex-col justify-between items-center py-6', whiteGlassBg, wireCard)}>
+                <div className='whiteGlassBg wireCard w-1/3 max-w-[400px] min-w-[240px] h-1/2 flex flex-col justify-between items-center py-6'>
                     <div>
                         <div className='text-3xl'>{currentEvent.name}</div>
                         <div className='text-sm'>{minutesToDisplayDuration(minutesBetweenDates(currentEvent.startTime, currentEvent.endTime))}</div>
@@ -60,9 +59,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             </div>
             {/* Right area */}
             <div className='h-full w-1/3 flex flex-col items-start justify-center'>
-                <div className={clsx(
-                    wireCard, 'p-4 w-5/6 min-h-[16vh] max-h-[50vh]'
-                )}>
+                <div className='wireCard p-4 w-5/6 min-h-[16vh] max-h-[50vh]'>
                     <ChecklistEditor checklist={currentTask.checklist || ''} taskId={currentTask.id} className='doing-task' />
                 </div>
             </div>

@@ -1,5 +1,4 @@
-import { fetchTaskWithRelations, fetchTasksWithRelations } from '@/app/lib/data';
-import { TaskWithRelations } from '@/app/lib/definitions';
+import { TaskWithRelations } from '@/lib/definitions';
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
 // Define the shape of the context state

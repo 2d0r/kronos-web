@@ -1,8 +1,8 @@
 'use client';
 
-import PauseSVG from '@/app/ui/svg/pause-svg';
-import PlaySVG from '@/app/ui/svg/play-svg';
-import { minutesToTimerDisplay } from '@/app/utils/dateUtils';
+import PauseSVG from '@/components/svg/pause-svg';
+import PlaySVG from '@/components/svg/play-svg';
+import { minutesToTimerDisplay } from '@/utils/dateUtils';
 import Link from 'next/link';
 import { FC, useState } from 'react';
 import { CountdownCircleTimer } from "react-countdown-circle-timer";

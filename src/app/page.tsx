@@ -1,23 +1,22 @@
 import React from 'react';
-import { fetchMindsets, fetchTaskWithRelations, getCurrentMindsetColour } from './lib/data';
-import TopBar from './ui/top-bar';
-import EventCard from './ui/tasks/event-card';
-import BottomBar from './ui/bottom-bar';
-import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from './lib/definitions';
-import TransportControls from './ui/buttons/transport-controls';
-import Menu from './ui/menu';
-import prisma from './lib/db';
+import { getMindsets, fetchTaskWithRelations, getCurrentMindsetColour } from '@/lib/data';
+import TopBar from '@/components/top-bar';
+import EventCard from '@/components/tasks/event-card';
+import BottomBar from '@/components/bottom-bar';
+import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from '@/lib/definitions';
+import TransportControls from '@/components/buttons/transport-controls';
+import Menu from '@/components/menu';
+import prisma from '@/lib/db';
 import { Task } from '@prisma/client';
-import { adjustLightness } from './utils/colourUtils';
-// import SearchBar from './ui/search';
-import TaskCard from './ui/tasks/task-card';
+import { adjustLightness } from '@/utils/colourUtils';
+import TaskCard from '@/components/tasks/task-card';
 import Link from 'next/link';
 
 export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
     const showTaskCard = searchParams?.task;
     const showMenu = searchParams?.menu;
 
-    const mindsets = await fetchMindsets();
+    const mindsets = await getMindsets();
     const events: EventWithRelations[] = await prisma.event.findMany({
         include: {
             task: true
@@ -29,7 +28,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
     
     const mindsetColour = await getCurrentMindsetColour() || NEUTRAL_MINDSET_COLOUR;
     const mindsetQueue = taskQueue.map(task => {
-        return mindsets.filter(el => el.id === task.mindsetId)[0];
+        return mindsets.filter((el: any) => el.id === task.mindsetId)[0];
     })
 
     return (<div className='w-screen h-screen' style={{

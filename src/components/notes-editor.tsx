@@ -2,7 +2,7 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import { FC } from 'react';
-import { updateTaskNotes } from '@/app/lib/actions';
+import { updateTaskNotes } from '@/lib/actions';
 import '@/app/globals.css';
 import Strike from '@tiptap/extension-strike';
 import Heading from '@tiptap/extension-heading';
