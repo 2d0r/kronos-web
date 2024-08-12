@@ -18,7 +18,7 @@ import TaskItem from '@tiptap/extension-task-item';
 import TaskList from '@tiptap/extension-task-list';
 import Text from '@tiptap/extension-text';
 import TextStyle from '@tiptap/extension-text-style';
-import Toolbar from '@/components/toolbar';
+import Toolbar from '@/components/notes-editor/notes-toolbar';
 import Placeholder from '@tiptap/extension-placeholder';
 import clsx from 'clsx';
 

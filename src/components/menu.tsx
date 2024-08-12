@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import MenuCard from '@/components/cards/menu-card';
+import MenuCard from '@/components/ui/menu-card';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import CalendarSVG from '@/components/svg/calendar-svg';

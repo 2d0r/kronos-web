@@ -1,16 +1,16 @@
 import { fetchEventsWithRelations, getMindsets, getEventMindset } from '@/lib/data';
 import { TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
-import BottomBar from '@/components/bottom-bar';
+import BottomBar from '@/components/ui/bottom-bar';
 import Menu from '@/components/menu';
-import EventCard from '@/components/tasks/event-card';
-import TopBar from '@/components/top-bar';
+import EventCard from '@/components/event-card';
+import TopBar from '@/components/ui/top-bar';
 import clsx from 'clsx';
 import React from 'react';
 import { Task, Event } from '@prisma/client';
 import { dateToHHMM, minutesBetweenDates, minutesToDisplayDuration } from '@/utils/dateUtils';
 import { adjustLightness } from '@/utils/colourUtils';
-import NotesEditor from '@/components/notes-editor';
-import ChecklistEditor from '@/components/checklist-editor';
+import NotesEditor from '@/components/notes-editor/notes-editor';
+import ChecklistEditor from '@/components/notes-editor/checklist-editor';
 import CircleTimer from '@/components/circle-timer';
 import TaskCard from '@/components/tasks/task-card';
 

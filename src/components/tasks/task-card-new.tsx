@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
-import Button from '@/components/button';
-import { Dropdown, InputField, MultiSelectionField } from './form-fields';
+import Button from '@/components/buttons/button';
+import { Dropdown, InputField, MultiSelectionField } from '@/components/form-fields';
 import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, DEFAULT_MINDSET, URLSearchParamsKronos, MIN_TASK_DURATION } from '@/lib/definitions';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -11,13 +11,13 @@ import { DayOfWeek, Event, Mindset, TimeOfDay } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { editTaskPrisma, createTaskPrisma } from '@/lib/actions';
 import { parseISO } from 'date-fns';
-import NotesEditor from '@/components/notes-editor';
-import ChecklistEditor from '@/components/checklist-editor';
+import NotesEditor from '@/components/notes-editor/notes-editor';
+import ChecklistEditor from '@/components/notes-editor/checklist-editor';
 import {v4 as uuidv4} from 'uuid';
 import { organiseTask } from '@/lib/organise-task';
 import EventSection from './event-section';
 import { addMinutesToDate, minutesBetweenDates } from '@/utils/dateUtils';
-import TaskForm from './task-form';
+import TaskForm from './task-form-new';
 
 
 export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, onTaskDelete} : {
@@ -29,20 +29,26 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     // searchParams?: URLSearchParamsKronos,
 }) {
 
-    const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const event = searchParams.get('event');
     const taskId = searchParams.get('task');
+
 
 
     // STATES
 
-    // const [ isNewTask, setIsNewTask ] = useState<boolean>(searchParams.get('task') === 'new' ? true : false);
-    // const [ isOpen, setIsOpen ] = useState<boolean>(false);
-    // const [ taskCache, setTaskCache ] = useState<TaskWithRelations>((!isNewTask && task) ? task : {id: uuidv4()} as TaskWithRelations);
-    const [ taskCache, setTaskCache ] = useState<TaskWithRelations>({} as TaskWithRelations);
     const [ isNewTask, setIsNewTask ] = useState<boolean>(false);
-    
+    const [ taskCache, setTaskCache ] = useState<TaskWithRelations>({} as TaskWithRelations);
+    const [ endRepeat, setEndRepeat ] = useState<(string | null)>('No');
+    const [ idealStart, setIdealStart ] = useState<boolean>(false);
+    const [ repeatUnit, setRepeatUnit ] = useState<string | null>('sessions');
+    const [ mindsetColour, setMindsetColour] = useState<string>(taskCache?.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
+    const [ deadline, setDeadline ] = useState<boolean>(false);
+    const [ taskIsEdited, setTaskIsEdited ] = useState<boolean>(false);
+    const [ taskIsReady, setTaskIsReady ] = useState<boolean>(false);
+    const [ eventId, setEventId ] = useState<string>(event || '');
+
 
 
     // FORM DISPATCH
@@ -53,12 +59,93 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     const [state, dispatch] = useFormState(editTaskHere, initialState);
 
 
-    // API ROUTES
-
-    
-
 
     // HANDLERS
+
+    const handleTaskCacheUpdate = (field: keyof TaskWithRelations, value: any) => {
+        if (field === 'mindset') {
+            const mindset = mindsets.filter(el => el.name === value)[0];
+            setTaskCache(task => ({...task, mindset: mindset}));
+        } else {
+            setTaskCache(prevTask => ({ ...prevTask, [field]: value }));
+        }
+    }
+    const handleTimeChanges = (event: React.ChangeEvent<HTMLSelectElement>, 
+        type: ('startTime' | 'endTime' | 'startDate' | 'endDate')
+    ) => {
+        let dateTime = type.includes('start') ? taskCache?.startTime : taskCache?.endTime;
+        const inputValue = event.target.value;
+
+        if (dateTime === null) {
+            dateTime = new Date();
+            if (type.includes('Date')) {
+                const [year, month, day] = inputValue.split('-');
+                dateTime.setFullYear(Number(year), Number(month) - 1, Number(day));
+                dateTime.setHours(0, 0, 0, 0); // Set to the nearest hour (midnight)
+            } else {
+                const [hours, minutes] = inputValue.split(':');
+                dateTime.setHours(Number(hours));
+                dateTime.setMinutes(Number(minutes));
+                dateTime.setSeconds(0, 0);
+            }
+        } else {
+            if (type.includes('Date')) {
+                const [year, month, day] = inputValue.split('-');
+                dateTime.setFullYear(Number(year), Number(month) - 1, Number(day));
+            } else {
+                const [hours, minutes] = inputValue.split(':');
+                dateTime.setHours(Number(hours));
+                dateTime.setMinutes(Number(minutes));
+            }
+        }
+
+        if (type.includes('start')) {
+            // When user changes start, only change end, don't change duration
+            const newDuration = taskCache.duration || 60; // using existing value OR the default 60 minutes
+            console.log('new duration', newDuration);
+            setTaskCache(task => ({
+                ...task, 
+                startTime: dateTime, 
+                duration: !task.duration && (!task.endTime || (task.startTime && task.endTime < task.startTime)) ? newDuration // automatically fill in endTime
+                    : task.duration, 
+                endTime: addMinutesToDate(dateTime, newDuration) // change end 
+                    // : !task.endTime || (task.startTime && task.endTime < task.startTime) ? addMinutesToDate(dateTime, newDuration) // automatically fill in endTime
+                    // : task.endTime,
+            }));
+        } else {
+            // When user changes end, only change duration, don't change start
+            setTaskCache(task => ({
+                ...task, 
+                endTime: dateTime,
+                duration: task.startTime && task.fixed && minutesBetweenDates(task.startTime, dateTime) > 0 ? minutesBetweenDates(task.startTime, dateTime) 
+                    : task.duration, // automatically fill in endTime
+            }));
+        }
+    }
+    const handleDurationChange = (event: React.ChangeEvent<HTMLSelectElement>, unit: 'minutes' | 'hours') => {
+        // When user changes duration, only change end, don't change start
+        const durationInMinutes = 
+            unit === 'hours' ? (taskCache?.duration || 0) % 60 + Number(event.target.value) * 60 :
+            (taskCache?.duration || 0) - (taskCache?.duration || 0) % 60 + Number(event.target.value);
+        setTaskCache(taskCache => ({...taskCache, 
+            duration: durationInMinutes,
+            endTime: taskCache.fixed && taskCache.startTime && durationInMinutes > 0 ? addMinutesToDate(taskCache.startTime, durationInMinutes) : taskCache.endTime,
+        }));
+    }
+    const handleTaskSubmit = () => {
+        // Callback to parent component, with updated cache
+        (isNewTask && onTaskCreate) ? onTaskCreate(taskCache) : 
+        onTaskUpdate ? onTaskUpdate(taskCache) : 
+        ()=>{};
+        // Organise task in 
+        // organiseTask(taskCache);
+        router.back();
+    };
+    const handleDeleteTask = (taskId: string) => {
+        onTaskDelete && onTaskDelete(taskId);
+        router.back();
+    }
+
 
 
     // HOOKS
@@ -73,14 +160,6 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
             setIsNewTask(true);
         }
     }, [taskId]);
-    // Update taskCache when task prop changes
-    // useEffect(() => {
-    //     if (task) {
-    //         setTaskCache(task);
-    //         // Load and update mindset colour
-    //         setMindsetColour(task.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
-    //     }
-    // }, [task]);
     
     // Update mindset colour for whole card when mindset is selected
     useEffect(() => {
@@ -100,32 +179,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
             && (taskCache?.duration > 0 || (taskCache?.startTime && taskCache?.endTime))
         ) ? setTaskIsReady(true) : setTaskIsReady(false);
     }, [taskCache]);
-    // Toggle between adding and editing a task, based on search parameters
-    // useEffect(() => {
-
-    //     const taskId = searchParams.get('task');
-    //     if (taskId === 'new') {
-    //         setIsNewTask(true);
-    //         setTaskCache({} as TaskWithRelations);
-    //     } else if (taskId) {
-    //         // Fetch task if searchParams change, and task isn't passed as prop
-    //         const fetchTaskAndUpdateCache = async (taskId: string) => {
-    //             const response = await fetch(`/task/${taskId}`);
-    //             const data = await response.json();
-    //             setTaskCache(data.task);
-    //         }
-
-    //         fetchTaskAndUpdateCache(taskId)
-    //             .catch(console.error);
-    //     };
-
-    //     console.log('TaskCard: Set taskCache = task if searchParams available');
-    // }, [searchParams]);
 
     
-    return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'>
-        <div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl text-sm text-black overflow-hidden'>
-            <TaskForm />
-        </div>
-    </div>);
+    return <TaskForm />;
 }

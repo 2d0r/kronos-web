@@ -1,8 +1,8 @@
 'use client';
 
 import { FC, useState, useEffect } from 'react';
-import BottomBar from '@/components/bottom-bar';
-import TopBar from '@/components/top-bar';
+import BottomBar from '@/components/ui/bottom-bar';
+import TopBar from '@/components/ui/top-bar';
 import { ActionType, EventWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
 import SearchBar from '@/components/search';
 import Menu from '@/components/menu';
@@ -13,7 +13,7 @@ import { Event } from '@prisma/client';
 import CalendarComponent from '@/components/calendar/calendar-hexaflexa';
 import TaskBrowser from '@/components/browser/task-browser';
 import { MindsetWithRelations } from '@/lib/definitions';
-import Button from './button';
+import Button from './buttons/button';
 import { deleteAllEvents } from '@/lib/actions';
 import { addDaysToDate } from '@/utils/dateUtils';
 import { organiseTimespan } from '@/lib/organise-timespan';

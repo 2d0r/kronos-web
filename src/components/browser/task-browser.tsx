@@ -1,16 +1,16 @@
 'use client';
 
-import { Mindset, Priority, Status, Task, TaskType } from '@prisma/client';
+import { Mindset, Status, TaskType } from '@prisma/client';
 import { FC, useEffect, useState } from 'react';
-import { Dropdown } from '@/components/tasks/form-fields';
+import { Dropdown } from '@/components/form-fields';
 import { ActionType, DEFAULT_MINDSET_LIST, TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
 import '@/app/globals.css';
 import { adjustLightness } from '@/utils/colourUtils';
 import { History } from 'lucide-react';
 import Link from 'next/link';
 import TaskCard from '@/components/tasks/task-card';
-import TaskDisplay from '@/components/browser/task-display';
-import { fetchTask, fetchUpdatedTaskEvents } from '@/lib/data';
+import TaskDisplay from '@/components/browser/task-list';
+import { fetchTask } from '@/lib/data';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
@@ -76,22 +76,6 @@ const TaskBrowser: FC<{
         setLogbookView(newLogbookView);
         setSort(newSort);
     }
-    // const handleTaskEdit = (newTask: TaskWithRelations) => {
-    //     const newTasksCache = tasksCache.map(task => {
-    //         return task.id === newTask.id ? {...task, ...newTask} : task;
-    //     });
-    //     setTasksCache(newTasksCache);
-    //     onTasksUpdate && onTasksUpdate(newTasksCache); // Send cache to parent component
-    // }
-    // const handleTaskCreate = (newTask: TaskWithRelations) => {
-    //     const newTasksCache = [...tasksCache, {
-    //         ...newTask,
-    //         status: 'toDo' as Status,
-    //         type: 'task' as TaskType,
-    //     }];
-    //     setTasksCache(newTasksCache);
-    //     onTasksUpdate && onTasksUpdate(newTasksCache); // Send cache to parent component
-    // }
     const handleTaskDelete = async (taskId: string) => {
         await fetch(`/task/${taskId}`, {
             method: 'DELETE'

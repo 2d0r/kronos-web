@@ -3,13 +3,11 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { SearchParamProps, URLSearchParamsKronos } from '@/lib/definitions';
-import { useRouter } from 'next/navigation';
+import { URLSearchParamsKronos } from '@/lib/definitions';
 
 export default function AddTaskButton({searchParams, mindsetColour}: {searchParams: URLSearchParamsKronos, mindsetColour?: string}) {
     const pathname = usePathname();
     const [showTaskCard, setShowAddTask] = useState(false);
-    const router = useRouter();
 
     useEffect(() => {
         setShowAddTask(searchParams?.task ? true : false);

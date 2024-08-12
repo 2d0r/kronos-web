@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import BottomBar from '@/components/bottom-bar';
-import TopBar from '@/components/top-bar';
+import BottomBar from '@/components/ui/bottom-bar';
+import TopBar from '@/components/ui/top-bar';
 import { NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
 import SearchBar from '@/components/search';
 import Menu from '@/components/menu';
@@ -32,9 +32,7 @@ const TimelineCard: FC<TimelineCardProps> = async ({
         <TopBar searchParams={searchParams} back={back}><SearchBar placeholder='Search events, dates...'/></TopBar>
         {showMenu && <Menu mindsetColour={mindsetColour}/>}
         <div className={clsx(cardClassName, 'bg-white max-h-[70vh] rounded-3xl shadow-xl w-fit p-4 flex items-center justify-start')}>
-            {/* <TaskCacheProvider tasks={tasks || []}> */}
-                {children}
-            {/* </TaskCacheProvider> */}
+            {children}
         </div>
         <BottomBar searchParams={searchParams}/>
     </div>);

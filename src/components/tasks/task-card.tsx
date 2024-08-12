@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
-import Button from '@/components/button';
-import { Dropdown, InputField, MultiSelectionField } from './form-fields';
+import Button from '@/components/buttons/button';
+import { Dropdown, InputField, MultiSelectionField } from '@/components/form-fields';
 import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, DEFAULT_MINDSET, URLSearchParamsKronos, MIN_TASK_DURATION, ActionType } from '@/lib/definitions';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -11,8 +11,8 @@ import { DayOfWeek, Event, Mindset, TimeOfDay } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { editTaskPrisma, createTaskPrisma } from '@/lib/actions';
 import { parseISO } from 'date-fns';
-import NotesEditor from '@/components/notes-editor';
-import ChecklistEditor from '@/components/checklist-editor';
+import NotesEditor from '@/components/notes-editor/notes-editor';
+import ChecklistEditor from '@/components/notes-editor/checklist-editor';
 import {v4 as uuidv4} from 'uuid';
 import { organiseTask } from '@/lib/organise-task';
 import EventSection from './event-section';

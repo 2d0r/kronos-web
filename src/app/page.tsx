@@ -1,8 +1,8 @@
 import React from 'react';
 import { getMindsets, fetchTaskWithRelations, getCurrentMindsetColour } from '@/lib/data';
-import TopBar from '@/components/top-bar';
-import EventCard from '@/components/tasks/event-card';
-import BottomBar from '@/components/bottom-bar';
+import TopBar from '@/components/ui/top-bar';
+import EventCard from '@/components/event-card';
+import BottomBar from '@/components/ui/bottom-bar';
 import { EventWithRelations, NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from '@/lib/definitions';
 import TransportControls from '@/components/buttons/transport-controls';
 import Menu from '@/components/menu';

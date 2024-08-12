@@ -1,11 +1,11 @@
 import prisma from '@/lib/db';
 
 type Params = {
-    task: string
+    taskId: string
 }
 
 export async function GET(req: Request, context: { params: Params }) {
-    const taskId = context.params.task;
+    const taskId = context.params.taskId;
     try {
         const now = new Date();
         const events = await prisma.event.findMany({

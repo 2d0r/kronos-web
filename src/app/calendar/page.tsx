@@ -1,5 +1,5 @@
 import CalendarComponent from '@/components/calendar/calendar-hexaflexa';
-import TimelineCard from '@/components/timeline-board';
+import TimelineCard from '@/components/ui/timeline-board';
 import { NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from '@/lib/definitions';
 import { getEvents, getMindsetsWithRelations, getCurrentMindsetColour } from '@/lib/data';
 
