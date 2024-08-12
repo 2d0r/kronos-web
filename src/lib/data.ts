@@ -28,7 +28,7 @@ export async function getTasks() {
 //   return newTasks;
 // }
 
-export async function fetchTasksWithRelations() {
+export async function getTasksWithRelations() {
   try {
     const tasks: TaskWithRelations[] = await prisma.task.findMany({
       include: { 
@@ -195,7 +195,7 @@ export async function getEvents() {
   }
 }
 
-export async function fetchEventsWithRelations() {
+export async function getEventsWithRelations() {
   try {
     const events: EventWithRelations[] = await prisma.event.findMany({
         include: {

@@ -7,7 +7,7 @@ import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/dateUtils';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
-export default function TaskDisplay ({
+export default function TaskList ({
     mindsetFilter, typeFilter, tableView, sort, logbookFilter, tasksCache, mindsets, onTaskDeleted, onTaskStatusUpdated,
 } : {
     mindsetFilter: string, 

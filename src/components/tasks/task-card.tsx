@@ -10,7 +10,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { DayOfWeek, Event, Mindset, TimeOfDay } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { editTaskPrisma, createTaskPrisma } from '@/lib/actions';
-import { parseISO } from 'date-fns';
+import { getDate, parseISO } from 'date-fns';
 import NotesEditor from '@/components/notes-editor/notes-editor';
 import ChecklistEditor from '@/components/notes-editor/checklist-editor';
 import {v4 as uuidv4} from 'uuid';
@@ -18,6 +18,7 @@ import { organiseTask } from '@/lib/organise-task';
 import EventSection from './event-section';
 import { addMinutesToDate, minutesBetweenDates } from '@/utils/dateUtils';
 import '@/app/globals.css';
+import { ArrowRight } from 'lucide-react';
 
 
 export default function TaskCard({task, mindsets, onTaskUpdate} : {
@@ -265,7 +266,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                     >Scheduled
                 </button>
                 {taskCache.fixed && (<>
-                    <div className='flex items-center gap-2'>
+                    <div className='flex items-start gap-2'>
                     <div className='flex flex-col gap-2'>
                         <InputField 
                             fieldName='startTime'
@@ -288,7 +289,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             onChange={(event: any) => handleTimeChanges(event, 'startDate')}
                         />
                     </div>
-                    {'→'}
+                    <ArrowRight height={18} className='my-2' />
                     <div className='flex flex-col justify-start gap-2'>
                         <InputField 
                             fieldName='endTime'
@@ -300,16 +301,18 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             }
                             onChange={(event: any) => handleTimeChanges(event, 'endTime')}
                         />
-                        <InputField 
-                            fieldName='endDate'
-                            inputType='date'
-                            colour={mindsetColour}
-                            state={state}
-                            value={taskCache.endTime instanceof Date ? 
-                                new Date(taskCache.endTime).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)
-                            }
-                            onChange={(event: any) => handleTimeChanges(event, 'endDate')}
-                        />
+                        {taskCache.startTime && taskCache.endTime && getDate(taskCache.startTime) !== getDate(taskCache.endTime) &&
+                            <InputField 
+                                fieldName='endDate'
+                                inputType='date'
+                                colour={mindsetColour}
+                                state={state}
+                                value={taskCache.endTime instanceof Date ? 
+                                    new Date(taskCache.endTime).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)
+                                }
+                                onChange={(event: any) => handleTimeChanges(event, 'endDate')}
+                            />
+                        }
                     </div>
                     </div>
                 </>)}
@@ -409,7 +412,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                 
                 {/* Preferred times and days */}
                 {!taskCache.fixed && (<>
-                    {(!taskCache.repeat || taskCache.repeatTimespan !== 'hour') && (<>
+                    {(!taskCache.repeat || taskCache.repeatTimespan !== 'hour') && (<div>
                         <MultiSelectionField
                             fieldName='preferredTimeOfDay'
                             prompt='Preferred daytimes'
@@ -421,8 +424,8 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             selected={taskCache.preferredTimeOfDay || []}
                             onChange={(value: string[]) => handleTaskCacheUpdate('preferredTimeOfDay', value as TimeOfDay[])}
                         />
-                    </>)}
-                    {(!taskCache.repeat || (taskCache.repeatTimespan !== 'hour' && taskCache.repeatTimespan !== 'day')) && (<>
+                    </div>)}
+                    {(!taskCache.repeat || (taskCache.repeatTimespan !== 'hour' && taskCache.repeatTimespan !== 'day')) && (<div>
                         <MultiSelectionField 
                             fieldName='preferredDayOfWeek'
                             prompt='Preferred days'
@@ -434,7 +437,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             selected={taskCache.preferredDayOfWeek || []}
                             onChange={(value: string[]) => handleTaskCacheUpdate('preferredDayOfWeek', value as DayOfWeek[])}
                         />
-                    </>)}
+                    </div>)}
                 </>)}
                 {taskCache.repeat && (<>
                     {/* <div className={'divider'}></div> */}

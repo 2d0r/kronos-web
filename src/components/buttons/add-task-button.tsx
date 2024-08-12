@@ -1,17 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { URLSearchParamsKronos } from '@/lib/definitions';
 
-export default function AddTaskButton({searchParams, mindsetColour}: {searchParams: URLSearchParamsKronos, mindsetColour?: string}) {
+export default function AddTaskButton({mindsetColour}: {mindsetColour?: string}) {
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [showTaskCard, setShowAddTask] = useState(false);
 
     useEffect(() => {
-        setShowAddTask(searchParams?.task ? true : false);
-    }, [searchParams?.task]);
+        setShowAddTask(searchParams.get('task') ? true : false);
+    }, [searchParams]);
 
     return (
         <Link

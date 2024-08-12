@@ -18,10 +18,10 @@ import { deleteAllEvents } from '@/lib/actions';
 import { addDaysToDate } from '@/utils/dateUtils';
 import { organiseTimespan } from '@/lib/organise-timespan';
 import { fetchEvents, fetchTask, fetchTasks, fetchUpdatedTaskEvents } from '@/lib/data';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface TestViewProps {
     children?: JSX.Element | JSX.Element[];
-    searchParams: URLSearchParamsKronos;
     back?: boolean;
     mindsets: MindsetWithRelations[];
     mindsetColour: string;
@@ -30,7 +30,7 @@ interface TestViewProps {
 }
 
 const TestView: FC<TestViewProps> = ({
-    searchParams, back, mindsets, mindsetColour, tasks, events,
+    back, mindsets, mindsetColour, tasks, events,
 }) => {
 
     const [ tasksCache, setTasksCache ] = useState<TaskWithRelations[]>(tasks);
@@ -39,12 +39,9 @@ const TestView: FC<TestViewProps> = ({
 
     // MODALS
 
-    const showMenu = searchParams?.menu;
-    const showTaskCard = !!searchParams.task;
-
-
-    // DATA FETCH
-
+    // const showTaskCard = !!searchParams.task;
+    const searchParams = useSearchParams();
+    const showTaskCard = !!searchParams.get('task');
 
     // HANDLERS
 
@@ -88,14 +85,12 @@ const TestView: FC<TestViewProps> = ({
     }
 
 
-
     return (<div className={clsx('pt-[10vh] pb-[10vh] overflow-scroll w-screen h-screen flex flex-col gap-8 items-center justify-start')} style={{
         backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.5)}, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.7)})`
     }}>
-        <TopBar searchParams={searchParams} back={back}>
+        <TopBar back={back}>
             {/* <SearchBar placeholder='Search events, dates...'/> */}
         </TopBar>
-        {showMenu && <Menu mindsetColour={mindsetColour}/>}
         <div className={clsx('max-h-none z-[39] bg-white rounded-3xl shadow-xl w-fit p-4 flex flex-col gap-4 items-center justify-start')}>
             <div className='h-[60vh] w-[80vw]'>
                 <CalendarComponent 
@@ -110,7 +105,6 @@ const TestView: FC<TestViewProps> = ({
                 tasks={tasksCache} 
                 mindsets={mindsets} 
                 mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}
-                searchParams={searchParams}
                 parentName='TestView'
             />
             <div className='container w-full flex flex-row gap-8 p-4 justify-center'>
@@ -132,8 +126,9 @@ const TestView: FC<TestViewProps> = ({
                 // task={taskToEdit} 
                 mindsets={mindsets}
                 onTaskUpdate={(taskId, action) => handleTaskUpdate(taskId, action)}
-        />}
-        <BottomBar searchParams={searchParams} mindsetColour={mindsetColour} />
+            />
+        }
+        <BottomBar mindsetColour={mindsetColour} />
     </div>)
 }
 

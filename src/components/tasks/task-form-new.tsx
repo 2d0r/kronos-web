@@ -5,7 +5,7 @@ import { Dropdown, InputField, MultiSelectionField } from '@/components/form-fie
 import { Link } from 'lucide-react';
 import { NEUTRAL_MINDSET_COLOUR, TaskWithRelations } from '@/lib/definitions';
 import { addMinutesToDate, minutesBetweenDates } from '@/utils/dateUtils';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { TimeOfDay } from '@prisma/client';
 

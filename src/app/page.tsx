@@ -34,7 +34,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
     return (<div className='w-screen h-screen' style={{
         backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour, 0.5)}, ${adjustLightness(mindsetColour, 0.7)})`
     }}>
-        <TopBar searchParams={searchParams}>
+        <TopBar>
             {/* <SearchBar placeholder="Search tasks, projects, dates..." /> */}
         </TopBar>
         { showTaskCard && <TaskCard mindsets={mindsets} onTaskUpdate={() => {}} />}
@@ -67,7 +67,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
             }
 
         </div>
-        <BottomBar searchParams={searchParams} mindsetColour={mindsetColour} />
+        <BottomBar mindsetColour={mindsetColour} />
         
     </div>);
 }

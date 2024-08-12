@@ -9,33 +9,33 @@ import { adjustLightness } from '@/utils/colourUtils';
 import { History } from 'lucide-react';
 import Link from 'next/link';
 import TaskCard from '@/components/tasks/task-card';
-import TaskDisplay from '@/components/browser/task-list';
+import TaskList from '@/components/browser/task-list';
 import { fetchTask } from '@/lib/data';
+import { useSearchParams } from 'next/navigation';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
 const TaskBrowser: FC<{
     tasks: TaskWithRelations[], 
     mindsets: Mindset[], 
-    mindsetColour: string, 
-    searchParams: URLSearchParamsKronos,
+    mindsetColour: string,
     onTasksUpdate?: (tasks: TaskWithRelations[]) => void,
     parentName?: string,
-}> = ({tasks, mindsets, mindsetColour, searchParams, onTasksUpdate, parentName}) => {
+}> = ({tasks, mindsets, mindsetColour, onTasksUpdate, parentName}) => {
+
+    const searchParams = useSearchParams();
 
     const [ tasksCache, setTasksCache ] = useState<TaskWithRelations[]>(tasks);
     const [ taskTypeFilter, setTaskTypeFilter ] = useState<TaskType>('task');
     const [ mindsetFilter, setMindsetFilter ] = useState<string>('All');
     const [ tableView, setTableView ] = useState<boolean>(false);
-    const [ logbookView, setLogbookView ] = useState<boolean>(searchParams?.logbook);
-    const [ sort, setSort ] = useState<SortItem>(searchParams?.logbook ? ['Date', 'Descending'] : ['Priority', 'Descending']);
+    const [ logbookView, setLogbookView ] = useState<boolean>(!!searchParams.get('logbook'));
+    const [ sort, setSort ] = useState<SortItem>(searchParams.get('logbook') ? ['Date', 'Descending'] : ['Priority', 'Ascending']);
 
 
     // MODALS
 
-    const showTaskCard = !!searchParams.task;
-    const taskToEditId = searchParams.task;
-    const taskToEdit = taskToEditId === 'new' ? {} as TaskWithRelations : tasksCache.filter(el => el.id === taskToEditId)[0];
+    const showTaskCard = !!searchParams.get('task');
 
 
     // HANDLERS
@@ -101,25 +101,21 @@ const TaskBrowser: FC<{
 
     // HOOKS
 
-    useEffect(() => {
-        setTasksCache(tasks);
-    }, [tasks]);
     // Update states for logbook
     useEffect(() => {
         (logbookView) && setSort(['Date', 'Descending']);
     }, [logbookView]);
     // Update logbookView based on searchaparams
     useEffect(() => {
-        const newLogbookView = searchParams?.logbook;
+        const newLogbookView = !!searchParams.get('logbook');
         const newSort : SortItem = newLogbookView ? ['Date', 'Descending'] : ['Priority', 'Descending'];
         setLogbookView(newLogbookView);
-    }, [searchParams.logbook]);
+    }, [searchParams]);
 
     return(
         <div className='flex flex-col items-center gap-4'>
             {(showTaskCard && parentName !== 'TestView') &&
             <TaskCard 
-                task={taskToEdit} 
                 mindsets={mindsets}
                 onTaskUpdate={handleTaskUpdate}
             />}
@@ -150,7 +146,7 @@ const TaskBrowser: FC<{
                     onClick={() => handleTaskTypeFilter('goal')}
                 >Goals</button>
             </div>
-            {/* Filter and sort bar */}
+            {/* Filter and sort */}
             { taskTypeFilter !== 'goal' && 
             <div className='flex gap-4 items-center'>
                 <Dropdown 
@@ -187,8 +183,10 @@ const TaskBrowser: FC<{
                     <History color={logbookView ? 'black' : 'lightgrey'}/>
                 </Link>
             </div>}
+
+            {/* Task list */}
             <div className='flex h-2/3 w-full items-start justify-center gap-6'>
-                <TaskDisplay 
+                <TaskList 
                     mindsetFilter={mindsetFilter}
                     typeFilter={taskTypeFilter}
                     tableView={tableView}

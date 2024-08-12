@@ -1,4 +1,4 @@
-import { fetchEventsWithRelations, getMindsets, getEventMindset } from '@/lib/data';
+import { getEventsWithRelations, getMindsets, getEventMindset } from '@/lib/data';
 import { TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
 import BottomBar from '@/components/ui/bottom-bar';
 import Menu from '@/components/menu';
@@ -18,7 +18,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
     const showTaskCard = searchParams?.task;
     const showMenu = searchParams?.menu;
 
-    const events = await fetchEventsWithRelations();
+    const events = await getEventsWithRelations();
     const eventQueue = events.filter(event => event.endTime >= new Date());
     const [currentEvent, nextEvent] = eventQueue.length > 1 ? eventQueue : [eventQueue[0], {} as Event];
     const taskQueue = eventQueue.map(event => event.task as TaskWithRelations);
@@ -31,7 +31,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         style={{
             backgroundImage: `linear-gradient(to bottom left, ${adjustLightness(eventMindset.colour, 0.2)}, ${adjustLightness(eventMindset.colour, -0.2)})`
         }}>
-        <TopBar searchParams={searchParams}/>
+        <TopBar/>
         {showTaskCard && <TaskCard mindsets={mindsets} onTaskUpdate={() => {}}/>}
         {showMenu && <Menu />}
         <div className='w-full h-full content-center justify-center flex flex-row text-center'>
@@ -68,7 +68,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         {(eventQueue.length > 1 && minutesBetweenDates(new Date(), nextEvent.startTime) < 30) && 
             <EventCard event={nextEvent} task={taskQueue[1]} mindset={nextEventMindset} nextTask={true}  className='fixed bottom-[-10px] mb-[-45px] drop-shadow-2xl drop-shadow-white'/>
         }
-        <BottomBar searchParams={searchParams}/>
+        <BottomBar/>
     </div> 
     );
 }
