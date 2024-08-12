@@ -79,7 +79,6 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
             dateToEdit.setHours(0, 0, 0, 0); // Set to the nearest hour (midnight)
         } else {
             const [hours, minutes] = inputValue.split(':');
-            console.log('Debug: hours, dateTime', Number(hours), dateToEdit );
             dateToEdit.setHours(Number(hours));
             dateToEdit.setMinutes(Number(minutes));
             dateToEdit.setSeconds(0, 0);
@@ -166,7 +165,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
     }, [taskCache.mindset]);
     // Signal task as ready to submit once the compulsory fields are filled
     useEffect(() => {
-        console.log('taskCache', taskCache);
+        // console.log('taskCache', taskCache);
         // Check if task was edited
         (task && task !== taskCache) ? setTaskIsEdited(true) : setTaskIsEdited(false);
         // Check if new task has enough valid inputs to be added
@@ -178,8 +177,6 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
             && (taskCache.duration > 0 || (taskCache.startTime && taskCache.endTime))
         ) ? setTaskIsReady(true) : setTaskIsReady(false);
     }, [taskCache]);
-
-    console.log('Debug startTime type', Object.prototype.toString.call(taskCache.startTime), taskCache.startTime);
 
     
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'>

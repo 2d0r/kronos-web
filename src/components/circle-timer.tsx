@@ -59,7 +59,7 @@ const CircleTimer:FC<{
             {renderTime}
         </CountdownCircleTimer>
         <div className='w-full max-w-[400px] px-6 flex justify-between items-center'>
-            <Link href='/timeline'>
+            <Link href='/'>
                 <div className='cursor-pointer ' onClick={handleExit}>
                     <img src='../icons/close.svg' className='h-8 w-8' />
                 </div>

@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Event, Mindset, Task } from '@prisma/client';
+import { Mindset, Task } from '@prisma/client';
 import { dateToHHMM, getLocalStartAndEnd, minutesToDisplayDuration } from '@/utils/dateUtils';
 import clsx from 'clsx';
-import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
+import { EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 
 interface EventCardProps {
-    event: Event;
+    event: EventWithRelations;
     task: Task;
     mindset: Mindset;
     className?: string;

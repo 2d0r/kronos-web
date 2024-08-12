@@ -11,7 +11,7 @@ import clsx from 'clsx';
 import { Mindset } from '@prisma/client';
 import { useSearchParams } from 'next/navigation';
 
-interface TimelineCardProps {
+interface TimelineBoardProps {
     children?: JSX.Element | JSX.Element[];
     back?: boolean;
     cardClassName?: string;
@@ -21,7 +21,7 @@ interface TimelineCardProps {
     tasks?: TaskWithRelations[];
 }
 
-const TimelineCard: FC<TimelineCardProps> = async ({
+const TimelineBoard: FC<TimelineBoardProps> = ({
     children, back, cardClassName, timelineClassName, mindsets, mindsetColour, tasks,
 }) => {
 
@@ -41,4 +41,4 @@ const TimelineCard: FC<TimelineCardProps> = async ({
     </div>);
 }
 
-export default TimelineCard;
+export default TimelineBoard;

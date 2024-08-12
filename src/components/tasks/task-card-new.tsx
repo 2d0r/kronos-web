@@ -167,7 +167,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
     }, [taskCache.mindset]);
     // Signal task as ready to submit once the compulsory fields are filled
     useEffect(() => {
-        console.log('taskCache', taskCache);
+        // console.log('taskCache', taskCache);
         // Check if task was edited
         (task && task !== taskCache) ? setTaskIsEdited(true) : setTaskIsEdited(false);
         // Check if new task has enough valid inputs to be added

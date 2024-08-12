@@ -1,6 +1,7 @@
+'use client';
+
 import React from 'react';
 import AddTaskButton from '@/components/buttons/add-task-button';
-import { SearchParamProps, URLSearchParamsKronos } from '@/lib/definitions';
 
 export default function BottomBar({mindsetColour}: {
     mindsetColour?: string

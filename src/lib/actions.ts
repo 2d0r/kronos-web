@@ -209,7 +209,6 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
   
 
   revalidatePath('/');
-  // redirect('/timeline');
 }
 
 export async function editTaskPrisma(prevState: State, formData: FormData) {
@@ -340,7 +339,6 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
 
 
   revalidatePath('/');
-  // redirect('/timeline');
   if (typeof window !== "undefined") {
     window.history.back();
   }

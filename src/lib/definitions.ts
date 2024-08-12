@@ -12,6 +12,7 @@ export const MIN_TASK_DURATION = 10;
 export const HOURS_IN_A_WEEK = 168;
 export const MAX_REP_OFFSET = 1/4;
 export const MAX_OFFSET = 120;
+export const QUEUE_LENGTH = 10;
 
 // Mindsets
 export const DEFAULT_MINDSET = 'maintain';

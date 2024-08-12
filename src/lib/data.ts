@@ -21,13 +21,6 @@ export async function getTasks() {
   }
 }
 
-// export const fetchTasksViaRoute = async () => {
-//   const response = await fetch('/task');
-//   const data = await response.json();
-//   const newTasks = data.tasks;
-//   return newTasks;
-// }
-
 export async function getTasksWithRelations() {
   try {
     const tasks: TaskWithRelations[] = await prisma.task.findMany({
@@ -49,7 +42,7 @@ export async function getTasksWithRelations() {
   }
 }
 
-export async function fetchTaskWithRelations(taskId: string) {
+export async function getTaskWithRelations(taskId: string) {
   try {
     const task: TaskWithRelations = await prisma.task.findUnique({
       where: {
@@ -209,6 +202,33 @@ export async function getEventsWithRelations() {
   }
 }
 
+export const getUpcomingEvents = async (count: number) => {
+  try {
+    const events: EventWithRelations[] = await prisma.event.findMany({
+        include: {
+            task: true
+        },
+        where: {
+            OR: [
+            {
+              startTime: { gte: new Date() },
+            },
+            {
+              endTime: { gte: new Date() },
+            }
+          ]
+        },
+        orderBy: {
+          startTime: 'asc',
+        }
+    });
+    return events;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error(`Failed to get the next ${count} events.`);
+  }
+}
+
 export async function findEventIdsInTimespan(start: Date, end?: Date) {
   try {
     const events = await prisma.event.findMany({
@@ -346,7 +366,7 @@ export async function getTaskMindset(task: Task) {
   }
 }
 
-export async function fetchMindsetList() {
+export async function getMindsetList() {
   try {
     const mindsetNames = await prisma.mindset.findMany({
       select: {
@@ -397,24 +417,34 @@ export async function getCurrentMindsetColour() {
     });
     if (nearestEvents.length === 0) {
       return NEUTRAL_MINDSET_COLOUR;
-    } 
+    }
+    // Sort them by start time
+    nearestEvents.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
     const nearestMindsetId = nearestEvents[0].task.mindsetId;
     const nearestMindset = await getMindsetById(nearestMindsetId);
     return nearestMindset?.colour;
   } catch (error) {
-    console.log('Failed to get mindset 🔴', error);
-
+    console.log('Failed to get current mindset colour ❌', error);
   } 
   
   
 }
 
 
+// DATA FETCH
+
 export const fetchEvents = async () => {
   const response = await fetch('/event');
   const data = await response.json();
   const newEvents = data.events;
-  return newEvents;
+  return newEvents as EventWithRelations[];
+}
+export const fetchUpcomingEvents = async (count?: number) => {
+  // const response = await fetch(`/event?count=${count}`);
+  const response = await fetch(`/event/upcoming/${count || ''}`);
+  const data = await response.json();
+  const upcomingEvents = data.events;
+  return upcomingEvents as EventWithRelations[];
 }
 export const fetchTasks = async () => {
   const response = await fetch('/task');
@@ -423,7 +453,7 @@ export const fetchTasks = async () => {
   return newTasks;
 }
 export const fetchTask = async (taskId: string) => {
-  const response = await fetch(`/task/${taskId}`);
+  const response = await fetch(`/task/api/${taskId}`);
   const data = await response.json();
   return data.task;
 }
@@ -431,4 +461,9 @@ export const fetchUpdatedTaskEvents = async (taskId: string) => {
   const response = await fetch(`/event/${taskId}`);
   const data = await response.json();
   return data.events;
+}
+export const fetchTaskOfEvent = async (eventId: string) => {
+  const response = await fetch(`/task/event/${eventId}`);
+  const data = await response.json();
+  return data.task;
 }

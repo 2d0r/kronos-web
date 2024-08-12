@@ -256,3 +256,25 @@ export const getStartAndEndOfDay = (day: Date): [Date, Date] => {
         new Date(new Date(day).setUTCHours(23,59,59,999))
     ];
 }
+
+export function convertPropsToDate(obj: any): any {
+    const result: Record<string, any> = { ...obj };
+
+    for (const key in result) {
+        if (result.hasOwnProperty(key)) {
+            const value = result[key];
+
+            // Check if the value is a string that can be converted to a valid Date
+            if (typeof value === 'string' || typeof value === 'number') {
+                const date = new Date(value);
+                
+                // Check if the Date object is valid
+                if (!isNaN(date.getTime())) {
+                    result[key] = date;
+                }
+            }
+        }
+    }
+
+    return result;
+}
