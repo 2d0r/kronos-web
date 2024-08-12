@@ -1,6 +1,4 @@
 import { Mindset, Task } from '@prisma/client';
-import { addMinutesToDate } from './dateUtils';
-import { scheduleEventForTask } from '@/app/lib/actions';
 
 interface Sortable {
     [key: string]: any;
@@ -42,4 +40,14 @@ export function sortTasksByPriority (
 
 export function getTaskColour(task: Task, mindsets: Mindset[]): string {
     return mindsets.filter(el => el.id === task.mindsetId)[0].colour;
+}
+
+export const createNewDateObjectsForProps = (object: any) => {
+    for (let prop in object) {
+        // Check if property is a date object, or a string that can be converted into Date
+        if (Object.prototype.toString.call(new Date(object[prop])) === '[object Date]' && !isNaN(new Date(object[prop]).getMonth())) {
+            object[prop] = new Date(object[prop]);
+        }
+    }
+    return object;
 }

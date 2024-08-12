@@ -163,28 +163,28 @@ export function SelectionField(
         const hidden = !checked && !isFocused && selectedOptions.length > 0 && collapse;
 
         return (<div 
-                className={clsx('flex items-center',
-                    hidden && 'hidden'
-                )}
-                key={idx}>
-                <input
-                    id={item}
-                    name={fieldName}
-                    type={type}
-                    value={item}
-                    className={`opacity-0 absolute focus:!border-none`}
-                    aria-describedby='task-error'
-                    onChange={handleSelect}
-                    checked={checked}
-                />
-                <label
-                    htmlFor={item}
-                    className={'flex cursor-pointer items-center gap-1.5 pr-4 text-sm font-regular'}
-                    style={{ color: checked ? colour : adjustLightness(colour, 0.6) }}
-                >
-                {capitalise(item)}
-                </label>
-      </div>)
+            className={clsx('flex items-center',
+                hidden && 'hidden'
+            )}
+            key={idx}>
+            <input
+                id={item}
+                name={fieldName}
+                type={type}
+                value={item}
+                className={`opacity-0 absolute focus:!border-none`}
+                aria-describedby='task-error'
+                onChange={handleSelect}
+                checked={checked}
+            />
+            <label
+                htmlFor={item}
+                className={'flex cursor-pointer items-center gap-1.5 pr-4 text-sm font-regular'}
+                style={{ color: checked ? colour : adjustLightness(colour, 0.6) }}
+            >
+            {capitalise(item)}
+            </label>
+        </div>)
     })
 
     return (<div className={clsx(
@@ -246,10 +246,7 @@ export function MultiSelectionField(
             (type === 'checkbox' && selectedOptions.includes(item));
         const hidden = false; // if not selected and field is not in focus
         return (hidden ? <></> :
-            <div className={'flex items-center overflow-hidden'} 
-                style={{ color: colour }}
-                key={idx}
-            >
+            <div className={'flex items-center overflow-hidden'} style={{ color: colour }} key={idx}>
                 <input
                     id={item}
                     name={fieldName}
@@ -267,7 +264,8 @@ export function MultiSelectionField(
                 >
                     {fieldName === 'preferredDayOfWeek' ? capitalise(item.slice(0, 2)) : capitalise(item)}
                 </label>
-            </div>);
+            </div>
+        );
     })
 
     return (<fieldset>

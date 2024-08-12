@@ -4,7 +4,7 @@ import { DayOfWeek, Event, Task, Timespan } from '@prisma/client';
 import { DAYS_OF_WEEK_DICT, DEFAULT_TIME_ZONE, MAX_REP_OFFSET, PRIORITY_ORDER, TaskWithRelations } from '@/lib/definitions';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates } from './dateUtils';
 import { addDays } from 'date-fns';
-import { createTimespan, getIntersectingTimespans, scheduleEventForTask, updateTimespan } from '@/app/lib/actions';
+import { createTimespan, getIntersectingTimespans, scheduleEventForTask, updateTimespan } from '@/lib/actions';
 import { getTimezoneOffset } from 'date-fns-tz';
 
 // Can only calculate for tasks that had their first session already scheduled

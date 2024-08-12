@@ -192,6 +192,13 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         deadline: endRepeatDate ? endRepeatDate : deadline,
       },
     });
+
+    try {
+      await organiseTask(newTask as TaskWithRelations);
+    } catch (error) {
+      console.log('Failed to organise task ❌', error);
+    }
+
   } catch (error) {
     console.log('Failed to create task ❌', error);
     return {
@@ -199,11 +206,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     };
   }
 
-  // try {
-  //   await organiseTask(newTask as TaskWithRelations);
-  // } catch (error) {
-  //   console.log('Failed to organise task ❌', error);
-  // }
+  
 
   revalidatePath('/');
   // redirect('/timeline');
@@ -320,6 +323,13 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
         deadline: deadline !== null ? deadline : endRepeatDate,
       },
     });
+
+    try {
+      await organiseTask(newTask as TaskWithRelations);
+    } catch (error) {
+      console.log('Failed to organise task ❌', error);
+    }
+
   } catch (error) {
     console.log('Failed to create task ❌', error);
     return {
@@ -327,11 +337,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
     };
   }
 
-  // try {
-  //     await organiseTask(newTask as TaskWithRelations);
-  // } catch (error) {
-  //   console.log('Failed to organise task ❌', error);
-  // }
+
 
   revalidatePath('/');
   // redirect('/timeline');

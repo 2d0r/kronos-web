@@ -114,8 +114,6 @@ const TaskBrowser: FC<{
         const newSort : SortItem = newLogbookView ? ['Date', 'Descending'] : ['Priority', 'Descending'];
         setLogbookView(newLogbookView);
     }, [searchParams.logbook]);
-    useEffect(() => {
-    }, [tasksCache]);
 
     return(
         <div className='flex flex-col items-center gap-4'>

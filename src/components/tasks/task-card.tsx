@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useFormState } from 'react-dom';
 import Button from '@/components/buttons/button';
 import { Dropdown, InputField, MultiSelectionField } from '@/components/form-fields';
-import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, DEFAULT_MINDSET, URLSearchParamsKronos, MIN_TASK_DURATION, ActionType } from '@/lib/definitions';
+import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, ActionType } from '@/lib/definitions';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { DayOfWeek, Event, Mindset, TimeOfDay } from '@prisma/client';
@@ -17,6 +17,7 @@ import {v4 as uuidv4} from 'uuid';
 import { organiseTask } from '@/lib/organise-task';
 import EventSection from './event-section';
 import { addMinutesToDate, minutesBetweenDates } from '@/utils/dateUtils';
+import '@/app/globals.css';
 
 
 export default function TaskCard({task, mindsets, onTaskUpdate} : {
@@ -67,30 +68,20 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
     const handleTimeChanges = (event: React.ChangeEvent<HTMLSelectElement>, 
         type: ('startTime' | 'endTime' | 'startDate' | 'endDate')
     ) => {
-        let dateTime = type.includes('start') ? taskCache.startTime : taskCache.endTime;
+        let dateToEdit = type.includes('start') ? taskCache.startTime : taskCache.endTime;
+        dateToEdit = dateToEdit === null ? new Date() : new Date(dateToEdit);
         const inputValue = event.target.value;
 
-        if (dateTime === null) {
-            dateTime = new Date();
-            if (type.includes('Date')) {
-                const [year, month, day] = inputValue.split('-');
-                dateTime.setFullYear(Number(year), Number(month) - 1, Number(day));
-                dateTime.setHours(0, 0, 0, 0); // Set to the nearest hour (midnight)
-            } else {
-                const [hours, minutes] = inputValue.split(':');
-                dateTime.setHours(Number(hours));
-                dateTime.setMinutes(Number(minutes));
-                dateTime.setSeconds(0, 0);
-            }
+        if (type.includes('Date')) {
+            const [year, month, day] = inputValue.split('-');
+            dateToEdit.setFullYear(Number(year), Number(month) - 1, Number(day));
+            dateToEdit.setHours(0, 0, 0, 0); // Set to the nearest hour (midnight)
         } else {
-            if (type.includes('Date')) {
-                const [year, month, day] = inputValue.split('-');
-                dateTime.setFullYear(Number(year), Number(month) - 1, Number(day));
-            } else {
-                const [hours, minutes] = inputValue.split(':');
-                dateTime.setHours(Number(hours));
-                dateTime.setMinutes(Number(minutes));
-            }
+            const [hours, minutes] = inputValue.split(':');
+            console.log('Debug: hours, dateTime', Number(hours), dateToEdit );
+            dateToEdit.setHours(Number(hours));
+            dateToEdit.setMinutes(Number(minutes));
+            dateToEdit.setSeconds(0, 0);
         }
 
         if (type.includes('start')) {
@@ -99,10 +90,10 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
             console.log('new duration', newDuration);
             setTaskCache(task => ({
                 ...task, 
-                startTime: dateTime, 
+                startTime: dateToEdit, 
                 duration: !task.duration && (!task.endTime || (task.startTime && task.endTime < task.startTime)) ? newDuration // automatically fill in endTime
                     : task.duration, 
-                endTime: addMinutesToDate(dateTime, newDuration) // change end 
+                endTime: addMinutesToDate(dateToEdit, newDuration) // change end 
                     // : !task.endTime || (task.startTime && task.endTime < task.startTime) ? addMinutesToDate(dateTime, newDuration) // automatically fill in endTime
                     // : task.endTime,
             }));
@@ -110,8 +101,8 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
             // When user changes end, only change duration, don't change start
             setTaskCache(task => ({
                 ...task, 
-                endTime: dateTime,
-                duration: task.startTime && task.fixed && minutesBetweenDates(task.startTime, dateTime) > 0 ? minutesBetweenDates(task.startTime, dateTime) 
+                endTime: dateToEdit,
+                duration: task.startTime && task.fixed && minutesBetweenDates(task.startTime, dateToEdit) > 0 ? minutesBetweenDates(task.startTime, dateToEdit) 
                     : task.duration, // automatically fill in endTime
             }));
         }
@@ -146,17 +137,25 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
 
     // HOOKS
 
+    // Fetch task using id from searchParams, initialise taskCache 
     useEffect(() => {
         if (taskId && taskId !== 'new') {
+            setIsNewTask(false);
             fetch(`/task/${taskId}`)
                 .then((response) => response.json())
-                .then((data) => setTaskCache(data.task));
-            setIsNewTask(false);
+                .then((data) => setTaskCache(
+                    {
+                        ...data.task, 
+                        startTime: data.task.startTime ? new Date(data.task.startTime) : null, 
+                        endTime: data.task.endTime ? new Date(data.task.endTime) : null,
+                        // firstSessionStartTime: new Date(data.task.firstSessionStartTime),
+                        // latestSessionStartTime: new Date(data.task.latestSessionStartTime),
+                    }));
         } else if (taskId === 'new') {
             setIsNewTask(true);
             setTaskCache(prevCache => ({
                 ...prevCache, id: uuidv4(),
-            }))
+            }));
         }
     }, [taskId]);
     
@@ -178,6 +177,8 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
             && (taskCache.duration > 0 || (taskCache.startTime && taskCache.endTime))
         ) ? setTaskIsReady(true) : setTaskIsReady(false);
     }, [taskCache]);
+
+    console.log('Debug startTime type', Object.prototype.toString.call(taskCache.startTime), taskCache.startTime);
 
     
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'>
@@ -202,7 +203,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
         </div>
         <div className='w-full flex overflow-hidden'>
             {/* Settings panel */}
-            <div className='w-[350px] h-[70vh] p-4 border-r-[0.5px] flex flex-col gap-4 overflow-y-scroll'>
+            <div className='w-[350px] h-[70vh] py-2 border-r-[0.5px] flex flex-col overflow-y-scroll task-input-fields'>
                 <Dropdown 
                     fieldName='mindset'
                     prompt='Pick a mindset'
@@ -250,6 +251,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                 </div>
 
                 {/* Scheduled */}
+                <div>
                 <button 
                     type='button'
                     className='w-full flex my-2 font-medium'
@@ -311,8 +313,10 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                     </div>
                     </div>
                 </>)}
-                <div className={'divider'}></div>
+                </div>
+                {/* <div className='divider'></div> */}
 
+                <div>
                 {/* Repeat? */}
                 <button 
                     type='button'
@@ -371,10 +375,11 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                         />
                     </div>
                 </div>)}
+                </div>
 
                 {/* Ideal start */}
                 {!taskCache.fixed && (<>
-                <div className='divider'></div>
+                {/* <div className='divider'></div> */}
                 <div className='flex'>
                     <button 
                         type='button'
@@ -432,7 +437,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                     </>)}
                 </>)}
                 {taskCache.repeat && (<>
-                    <div className={'divider'}></div>
+                    {/* <div className={'divider'}></div> */}
                     <div className='flex flex-col gap-2'>
                         <button 
                             type='button'
@@ -518,7 +523,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                 </>)}
                 
                 {(taskCache.fixed && !taskCache.repeat) && (<>
-                    <div className='divider h-[1px] w-full bg-black/20'></div>
+                    {/* <div className='divider h-[1px] w-full bg-black/20'></div> */}
                     <div className='flex h-8 gap-2 items-center'>
                         <button
                             type='button' 
