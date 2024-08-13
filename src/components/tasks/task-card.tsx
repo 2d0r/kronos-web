@@ -14,14 +14,13 @@ import { getDate, parseISO } from 'date-fns';
 import NotesEditor from '@/components/notes-editor/notes-editor';
 import ChecklistEditor from '@/components/notes-editor/checklist-editor';
 import {v4 as uuidv4} from 'uuid';
-import { organiseTask } from '@/lib/organise-task';
 import EventSection from './event-section';
 import { addMinutesToDate, minutesBetweenDates } from '@/utils/dateUtils';
 import '@/app/globals.css';
 import { ArrowRight } from 'lucide-react';
 
 
-export default function TaskCard({task, mindsets, onTaskUpdate} : {
+export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
     task?: TaskWithRelations, 
     mindsets: Mindset[],
     onTaskUpdate: (taskId: string, action: ActionType) => void,
@@ -165,9 +164,9 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
     }, [taskCache.mindset]);
     // Signal task as ready to submit once the compulsory fields are filled
     useEffect(() => {
-        // console.log('taskCache', taskCache);
+        console.log('taskCache', taskCache);
         // Check if task was edited
-        (task && task !== taskCache) ? setTaskIsEdited(true) : setTaskIsEdited(false);
+        (initialTask && initialTask !== taskCache) ? setTaskIsEdited(true) : setTaskIsEdited(false);
         // Check if new task has enough valid inputs to be added
         (
             taskCache.name 
@@ -298,7 +297,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                             }
                             onChange={(event: any) => handleTimeChanges(event, 'endTime')}
                         />
-                        {taskCache.startTime && taskCache.endTime && getDate(taskCache.startTime) !== getDate(taskCache.endTime) &&
+                        {/* {taskCache.startTime && taskCache.endTime && getDate(taskCache.startTime) !== getDate(taskCache.endTime) && */}
                             <InputField 
                                 fieldName='endDate'
                                 inputType='date'
@@ -308,8 +307,9 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                                     new Date(taskCache.endTime).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)
                                 }
                                 onChange={(event: any) => handleTimeChanges(event, 'endDate')}
+                                hidden={!taskCache.startTime || !taskCache.endTime || getDate(taskCache.startTime) === getDate(taskCache.endTime)}
                             />
-                        }
+                        {/* } */}
                     </div>
                     </div>
                 </>)}
@@ -566,7 +566,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                 onClick={() => {
                     // if(task?.id) deleteTaskPrisma(task.id);
                     // closeModalAndRefetchTasks();
-                    task?.id && handleDeleteTask(task.id);
+                    initialTask?.id && handleDeleteTask(initialTask.id);
                 }}
                 >Delete task
             </button>
@@ -575,7 +575,7 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
                     <button 
                         type='reset' 
                         className='text-gray-400'
-                        onClick={() => task && setTaskCache(task)}
+                        onClick={() => initialTask && setTaskCache(initialTask)}
                         >
                         Cancel changes
                     </button> : <></>
@@ -591,10 +591,11 @@ export default function TaskCard({task, mindsets, onTaskUpdate} : {
         </div>
 
         {/* Data to be sent to form without direct input */}
-            <input type='hidden' name='id' id='id'  value={taskCache.id || ''} />
-            <input type='hidden' name='type' id='type'  value={'task'} />
-            <input type='hidden' name='repeat' id='repeat' value={String(taskCache.repeat) || 'false'} />
-            {/* task.fixed is sent based on startTime and endTime */}
+        <input type='hidden' name='id' id='id'  value={taskCache.id || ''} />
+        <input type='hidden' name='type' id='type'  value={'task'} />
+        <input type='hidden' name='repeat' id='repeat' value={String(taskCache.repeat) || 'false'} />
+        <input type='hidden' name='repeat' id='repeat' value={String(taskCache.repeat) || 'false'} />
+        {/* task.fixed is sent based on startTime and endTime */}
     </form>
     </div>
     </div>);

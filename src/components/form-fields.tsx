@@ -12,17 +12,14 @@ function capitalise(text: string) {
 }
 
 export function InputField(
-    { fieldName, placeholder, inputType, label, onChange = () => {}, className, tail, colour = NEUTRAL_MINDSET_COLOUR, state, value } : { 
-        fieldName: string, 
-        placeholder?: string, 
+    { fieldName, placeholder, inputType, label, onChange = () => {}, className, tail, colour = NEUTRAL_MINDSET_COLOUR, state, value, hidden = false } : { 
+        fieldName: string, label?: string,
+        placeholder?: string, value?: string, tail?: string, 
         inputType: string,
-        label?: string,
         onChange?: any,
-        className?: string,
-        tail?: string,
-        colour?: string,
-        state: any,
-        value?: string,
+        className?: string, colour?: string,
+        state: any,  
+        hidden?: boolean,
     }
 ) {
 
@@ -58,6 +55,7 @@ export function InputField(
                         aria-describedby='task-error'
                         min='0'
                         step={inputType === 'time' ? '60' : ['duration', 'totalDuration'].includes(fieldName) ? '5' : '1'}
+                        hidden={hidden}
                     />
                 </div>
                 <div className={tail ? 'mr-2' : ''}>{tail}</div>

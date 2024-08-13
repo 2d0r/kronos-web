@@ -1,12 +1,9 @@
 'use client';
 
-import { FC, useState, useEffect } from 'react';
+import { FC, useState } from 'react';
 import BottomBar from '@/components/ui/bottom-bar';
 import TopBar from '@/components/ui/top-bar';
-import { ActionType, EventWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
-import SearchBar from '@/components/search';
-import Menu from '@/components/menu';
-import { adjustLightness } from '@/utils/colourUtils';
+import { ActionType, EventWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations } from '@/lib/definitions';import { adjustLightness } from '@/utils/colourUtils';
 import TaskCard from '@/components/tasks/task-card';
 import clsx from 'clsx';
 import { Event } from '@prisma/client';
@@ -17,8 +14,8 @@ import Button from './buttons/button';
 import { deleteAllEvents } from '@/lib/actions';
 import { addDaysToDate } from '@/utils/dateUtils';
 import { organiseTimespan } from '@/lib/organise-timespan';
-import { fetchEvents, fetchTask, fetchTasks, fetchUpdatedTaskEvents } from '@/lib/data';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { fetchEvents, fetchTask, fetchTasks } from '@/lib/data';
+import { useSearchParams } from 'next/navigation';
 
 interface TestViewProps {
     children?: JSX.Element | JSX.Element[];
@@ -39,9 +36,9 @@ const TestView: FC<TestViewProps> = ({
 
     // MODALS
 
-    // const showTaskCard = !!searchParams.task;
     const searchParams = useSearchParams();
     const showTaskCard = !!searchParams.get('task');
+
 
     // HANDLERS
 
@@ -57,8 +54,6 @@ const TestView: FC<TestViewProps> = ({
                 const editedTask = await fetchTask(taskId);
                 setTasksCache(prevCache => ([ ...prevCache.filter(task => task.id !== taskId), editedTask ]));
         }
-        const newEvents = await fetchUpdatedTaskEvents(taskId);
-        setEventsCache(prevEvents => [...prevEvents, ...newEvents]);
     }
     const handleDeleteAllEvents = async () => {
         await deleteAllEvents();
@@ -97,8 +92,7 @@ const TestView: FC<TestViewProps> = ({
                     events={eventsCache} 
                     mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR} 
                     mindsets={mindsets} 
-                    startWeekToday={true} 
-                    parentName='TestView'
+                    startWeekToday={true}
                 />
             </div>
             <TaskBrowser 
@@ -118,12 +112,10 @@ const TestView: FC<TestViewProps> = ({
                     onClick={handleDeleteAllEvents}
                     >Delete all events
                 </Button>
-                {/* <Button className='rounded-md bg-gray-400 from-neutral-950 p-6 w-1/4' onClick={() => handleOrganise(7)}>Organise for 7 days</Button> */}
             </div>
         </div>
         {showTaskCard && 
             <TaskCard 
-                // task={taskToEdit} 
                 mindsets={mindsets}
                 onTaskUpdate={(taskId, action) => handleTaskUpdate(taskId, action)}
             />

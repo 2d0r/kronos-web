@@ -8,8 +8,11 @@ import { HfTimegridConfig, utcDateToString, HfEvent } from '@hexaflexa/timegrid'
 import './calendar-hexaflexa.css';
 import { Event } from '@prisma/client';
 import { eventsToHf } from '@/utils/dateUtils';
-import { useRouter } from 'next/navigation';
-import { MindsetWithRelations } from '@/lib/definitions';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { ActionType, MindsetWithRelations } from '@/lib/definitions';
+import TaskCard from '../tasks/task-card';
+import { fetchUpdatedTaskEvents } from '@/lib/data';
+import { getTimegridConfig } from '@/utils/calendarUtils';
 defineCustomElements();
 
 const CalendarComponent: React.FC<{ 
@@ -17,73 +20,37 @@ const CalendarComponent: React.FC<{
     mindsetColour: string, 
     mindsets: MindsetWithRelations[],
     startWeekToday?: boolean,
-    onEventsUpdate?: (events: Event[]) => void,
-    parentName?: string,
 }> = ({ 
-    events, mindsetColour, mindsets, startWeekToday = false, onEventsUpdate, parentName }) => {
+    events, mindsetColour, mindsets, startWeekToday = false }) => {
 
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const showTask = !!searchParams.get('task');
 
     const timezone = 'Europe/Bucharest' // Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    const eventColours = events.map(event => {
-        const eventMindset = mindsets.filter(mindset => mindset.tasks.some(task => {
-        return Object.values(task).includes(event.taskId);
-        }));
-        return eventMindset[0]?.colour;
-    });
-    const [ eventsCache, setEventsCache ] = useState<Event[]>(events);
-    const [ eventsForHf, setEventsForHf ] = useState<HfEvent[]>(eventsToHf(eventsCache, eventColours, timezone));
-
-    const getTimegridConfig = (eventsForHf: HfEvent[]): HfTimegridConfig => {
-        return ({
-            daysConfig: {
-                daysCount: 7,
-                fullWeek: !startWeekToday,
-            },
-            timeFormat: 'h:mm a',
-            firstDayOfWeek: 1,
-            resources: [
-                { id: '1', title: 'Resource 1' }
-            ],
-            events: eventsForHf,
-            bodyConfig: {
-                // enableNewEvents: true,
-                switchDragResizeAction: 'none',
-                selectAction: 'tap',
-                dragResizeStates: ["none","dragResize","none","none"],
-                eventConfig: {
-                showDescription: true,
-                //   useRenderEvent(event: HfEvent, columnResourceId: string): boolean {
-                //     return true;
-                //   },
-                //   renderEvent(event: HfEvent, columnResourceId: string): string {
-                //     return `<Link href='?editTaskId=${event.id}' className='cursor-pointer w-full h-full'>${event.title}</Link>`;
-                //   }
-                },
-                timeCellWidth: 30,
-            },
-            headerDayConfig: {
-                showDateFirst: false,
-            },
-            toolbarConfig: {
-                startControls: [],
-                centerControls: ['today', 'prev', 'date', 'next'],
-                endControls: ['loading'],
-            },
-            headerResourceConfig: {
-                showTitle: false,
-                showImage: false
-            },
-        });
-    };
-    const [ timegridConfig, setTimegridConfig ] = useState<HfTimegridConfig>(getTimegridConfig(eventsForHf));
     const startDate: string = utcDateToString(new Date());
 
+    const [ eventsCache, setEventsCache ] = useState<Event[]>([]);
+    const [ timegridConfig, setTimegridConfig ] = useState<HfTimegridConfig>({});
 
-    // API ACTIONS
 
-    
+    const reloadEvents = (newEvents: Event[]) => {
+        // Make sure new events don't overlap old ones
+        const updatedIds = newEvents.map((event) => event.id); // 1. Identify the ids of the updated items
+        const filteredEvents = eventsCache.filter((event) => !updatedIds.includes(event.id)); // 2. Filter out items from the previous state that have changed
+        const newEventsCache = [...filteredEvents, ...newEvents]; // 3. Combine the filtered items with the updated items
+        setEventsCache(newEventsCache);
+        // TO DO: only keep events that haven't changed at all
+        const eventColours = newEventsCache.map(event => {
+            const eventMindset = mindsets.filter(mindset => mindset.tasks.some(task => {
+            return Object.values(task).includes(event.taskId);
+            }));
+            return eventMindset[0]?.colour;
+        });
+        const newEventsForHf = eventsToHf(newEventsCache, eventColours, timezone);
+        setTimegridConfig(getTimegridConfig(newEventsForHf, startWeekToday));
+    }
+
 
     // HANDLERS 
 
@@ -102,18 +69,22 @@ const CalendarComponent: React.FC<{
         }))
         timegridRef.current!.config = timegridConfig;
     }
+    const handleTaskUpdate = async (taskId: string, action: ActionType) => {
+        const newEvents = await fetchUpdatedTaskEvents(taskId);
+        reloadEvents(newEvents);
+    }
 
 
     // HOOKS
     
     useEffect(() => {
         document.documentElement.style.setProperty('--mindset-colour', mindsetColour);
+        reloadEvents(events);
     }, []);
+    // Debugging
     useEffect(() => {
-        const newEventsForHf = eventsToHf(events, eventColours, timezone);
-        setEventsForHf(newEventsForHf);
-        setTimegridConfig(getTimegridConfig(newEventsForHf));
-    }, [events])
+        console.log('HfEvents Today', timegridConfig.events?.filter(el => el.start.includes('2024-08-12')));
+    }, [timegridConfig])
     
     let timegridRef: RefObject<HTMLHfTimegridElement> = React.createRef();
 
@@ -134,6 +105,7 @@ const CalendarComponent: React.FC<{
                 position: 'relative'
             }}
         />
+        { showTask && <TaskCard mindsets={mindsets} onTaskUpdate={handleTaskUpdate} />}
     </>);
 }
 

@@ -175,6 +175,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
         mindsetId: matchingMindset.id,
         priority: priority,
         timeScore: timeScore,
+        fixed: !!startDateTime && !!endDateTime,
         startTime: startDateTime,
         endTime: endDateTime,
         duration: duration,
