@@ -7,19 +7,19 @@ export async function GET(req: Request) {
             include: { 
                 task: true,
             }, // Include the subtasks relation
-            where: {
-                startTime: { gte: new Date() },
-            },
+            // where: {
+            //     startTime: { gte: new Date() },
+            // },
             // orderBy: {
             //     startTime: 'asc'
             // },
         });
         return Response.json({message: 'OK', events: events});
     } catch (error) {
-        console.error('Error fetchings events via API routes', error);
+        console.error('Error fetchings events via route handler', error);
         return Response.json(
             {
-                message: 'Error fetchings events via API routes',
+                message: 'Error fetchings events via route handler',
                 error,
             },
             {

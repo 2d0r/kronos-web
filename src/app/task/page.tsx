@@ -1,5 +1,5 @@
 import { getEventsWithRelations, getMindsets, getEventMindset } from '@/lib/data';
-import { TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
+import { EventWithRelations, TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
 import BottomBar from '@/components/ui/bottom-bar';
 import Menu from '@/components/menu';
 import EventCard from '@/components/event-card';
@@ -13,14 +13,16 @@ import NotesEditor from '@/components/notes-editor/notes-editor';
 import ChecklistEditor from '@/components/notes-editor/checklist-editor';
 import CircleTimer from '@/components/circle-timer';
 import TaskCard from '@/components/tasks/task-card';
+import { useSearchParams } from 'next/navigation';
 
-export default async function Page({ searchParams }: {searchParams: URLSearchParamsKronos}) {
-    const showTaskCard = searchParams?.task;
-    const showMenu = searchParams?.menu;
+export default async function Page() {
+    const searchParams = useSearchParams();
+    const showTaskCard = searchParams.get('task');
+    const showMenu = searchParams.get('menu');
 
     const events = await getEventsWithRelations();
     const eventQueue = events.filter(event => event.endTime >= new Date());
-    const [currentEvent, nextEvent] = eventQueue.length > 1 ? eventQueue : [eventQueue[0], {} as Event];
+    const [currentEvent, nextEvent] = eventQueue.length > 1 ? eventQueue : [eventQueue[0], {} as EventWithRelations];
     const taskQueue = eventQueue.map(event => event.task as TaskWithRelations);
     const currentTask = taskQueue[0];
     const eventMindset = await getEventMindset(currentEvent);
@@ -66,7 +68,7 @@ export default async function Page({ searchParams }: {searchParams: URLSearchPar
         </div>
         {/* Next task */}
         {(eventQueue.length > 1 && minutesBetweenDates(new Date(), nextEvent.startTime) < 30) && 
-            <EventCard event={nextEvent} task={taskQueue[1]} mindset={nextEventMindset} nextTask={true}  className='fixed bottom-[-10px] mb-[-45px] drop-shadow-2xl drop-shadow-white'/>
+            <EventCard event={nextEvent} mindset={nextEventMindset} nextEvent={true}  className='fixed bottom-[-10px] mb-[-45px] drop-shadow-2xl drop-shadow-white'/>
         }
         <BottomBar/>
     </div> 

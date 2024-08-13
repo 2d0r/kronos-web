@@ -86,7 +86,6 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
         if (type.includes('start')) {
             // When user changes start, only change end, don't change duration
             const newDuration = taskCache.duration || 60; // using existing value OR the default 60 minutes
-            console.log('new duration', newDuration);
             setTaskCache(task => ({
                 ...task, 
                 startTime: dateToEdit, 
@@ -126,11 +125,10 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
     };
     const handleDeleteTask = async (taskId: string) => {
         await fetch(`/task/${taskId}`, {
-            method: 'DELETE'
-        }).then(() => {
-            onTaskUpdate(taskId, 'delete');
-            router.back();
+            method: 'DELETE' // Deletes all linked events and then the task
         });
+        onTaskUpdate(taskId, 'delete');
+        router.back();
     }
 
 
@@ -164,7 +162,6 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
     }, [taskCache.mindset]);
     // Signal task as ready to submit once the compulsory fields are filled
     useEffect(() => {
-        console.log('taskCache', taskCache);
         // Check if task was edited
         (initialTask && initialTask !== taskCache) ? setTaskIsEdited(true) : setTaskIsEdited(false);
         // Check if new task has enough valid inputs to be added
@@ -175,6 +172,7 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
             && taskCache.priority
             && (taskCache.duration > 0 || (taskCache.startTime && taskCache.endTime))
         ) ? setTaskIsReady(true) : setTaskIsReady(false);
+        // console.log('taskCache', taskCache);
     }, [taskCache]);
 
     
@@ -233,7 +231,7 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
                         tail='hrs'
                         colour={mindsetColour}
                         state={state}
-                        value={String(Math.floor(taskCache.duration / 60)) || ''}
+                        value={String(Math.floor(taskCache.duration / 60) || 0)}
                         onChange={(event: any) => {handleDurationChange(event, 'hours')}}
                     />
                     <InputField 
@@ -242,7 +240,7 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
                         tail='min'
                         colour={mindsetColour}
                         state={state}
-                        value={String(taskCache.duration % 60) || ''}
+                        value={String(taskCache.duration % 60 || 0)}
                         onChange={(event: any) => {handleDurationChange(event, 'minutes')}}
                     />
                 </div>
@@ -566,7 +564,7 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
                 onClick={() => {
                     // if(task?.id) deleteTaskPrisma(task.id);
                     // closeModalAndRefetchTasks();
-                    initialTask?.id && handleDeleteTask(initialTask.id);
+                    !isNewTask && handleDeleteTask(taskCache.id);
                 }}
                 >Delete task
             </button>
@@ -593,7 +591,6 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
         {/* Data to be sent to form without direct input */}
         <input type='hidden' name='id' id='id'  value={taskCache.id || ''} />
         <input type='hidden' name='type' id='type'  value={'task'} />
-        <input type='hidden' name='repeat' id='repeat' value={String(taskCache.repeat) || 'false'} />
         <input type='hidden' name='repeat' id='repeat' value={String(taskCache.repeat) || 'false'} />
         {/* task.fixed is sent based on startTime and endTime */}
     </form>

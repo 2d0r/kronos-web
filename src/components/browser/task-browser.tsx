@@ -16,16 +16,15 @@ import { useSearchParams } from 'next/navigation';
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
 const TaskBrowser: FC<{
-    tasks: TaskWithRelations[], 
+    initialTasks: TaskWithRelations[], 
     mindsets: Mindset[], 
     mindsetColour: string,
-    onTasksUpdate?: (tasks: TaskWithRelations[]) => void,
     parentName?: string,
-}> = ({tasks, mindsets, mindsetColour, onTasksUpdate, parentName}) => {
+}> = ({initialTasks, mindsets, mindsetColour, parentName}) => {
 
     const searchParams = useSearchParams();
 
-    const [ tasksCache, setTasksCache ] = useState<TaskWithRelations[]>(tasks);
+    const [ tasksCache, setTasksCache ] = useState<TaskWithRelations[]>(initialTasks);
     const [ taskTypeFilter, setTaskTypeFilter ] = useState<TaskType>('task');
     const [ mindsetFilter, setMindsetFilter ] = useState<string>('All');
     const [ tableView, setTableView ] = useState<boolean>(false);
@@ -40,16 +39,6 @@ const TaskBrowser: FC<{
 
     // HANDLERS
 
-    const handleTaskStatusUpdated = (taskId: string, status: Status) => {
-        setTasksCache((tasksCache) => {
-            return tasksCache.map(task => {
-                if (task.id === taskId) {
-                    return { ...task, status: status }
-                } 
-                return task;
-            });
-        });
-    };
     const handleTaskTypeFilter = (type: TaskType) => {
         setMindsetFilter('All'); // reset bucket when changing tab
         type === 'goal' && setTableView(false);
@@ -76,14 +65,6 @@ const TaskBrowser: FC<{
         setLogbookView(newLogbookView);
         setSort(newSort);
     }
-    const handleTaskDelete = async (taskId: string) => {
-        await fetch(`/task/${taskId}`, {
-            method: 'DELETE'
-        });
-        const newTasksCache = tasksCache.filter(task => task.id !== taskId)
-        setTasksCache(newTasksCache);
-        onTasksUpdate && onTasksUpdate(newTasksCache); // Send cache to parent component
-    }
     const handleTaskUpdate = async (taskId: string, action: ActionType) => {
         switch(action) {
             case 'create':
@@ -94,13 +75,13 @@ const TaskBrowser: FC<{
                     setTasksCache(prevCache => prevCache.filter(task => task.id !== taskId));
             case 'edit':
                 const editedTask = await fetchTask(taskId);
+                console.log('editedTask', editedTask);
                 setTasksCache(prevCache => ([ ...prevCache.filter(task => task.id !== taskId), editedTask ]));
         }
     }
 
 
     // HOOKS
-
     // Update states for logbook
     useEffect(() => {
         (logbookView) && setSort(['Date', 'Descending']);
@@ -115,10 +96,7 @@ const TaskBrowser: FC<{
     return(
         <div className='flex flex-col items-center gap-4'>
             {(showTaskCard && parentName !== 'TestView') &&
-            <TaskCard 
-                mindsets={mindsets}
-                onTaskUpdate={handleTaskUpdate}
-            />}
+            <TaskCard mindsets={mindsets} onTaskUpdate={handleTaskUpdate} />}
             {/* Tab bar */}
             <div className='flex gap-4 items-center justify-center'>
                 <button 
@@ -186,16 +164,17 @@ const TaskBrowser: FC<{
 
             {/* Task list */}
             <div className='flex h-2/3 w-full items-start justify-center gap-6'>
-                <TaskList 
-                    mindsetFilter={mindsetFilter}
-                    typeFilter={taskTypeFilter}
-                    tableView={tableView}
-                    sort={sort}
-                    logbookFilter={logbookView}
+                <TaskList
                     tasksCache={tasksCache}
+                    onTaskUpdate={handleTaskUpdate}
                     mindsets={mindsets}
-                    onTaskDeleted={handleTaskDelete}
-                    onTaskStatusUpdated={handleTaskStatusUpdated}
+                    filters={{
+                        mindsetFilter: mindsetFilter,
+                        typeFilter: taskTypeFilter,
+                        tableView: tableView,
+                        sort: sort,
+                        logbookFilter: logbookView,
+                    }}
                 />
             </div>
         </div>

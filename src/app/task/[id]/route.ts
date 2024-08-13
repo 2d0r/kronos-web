@@ -24,10 +24,10 @@ export async function GET(req: Request, context: { params: Params }) {
         });
         return Response.json({message: 'OK', task});
     } catch (error) {
-        console.error('Error fetchings tasks via API routes', error);
+        console.error('Error fetchings tasks via route handler', error);
         return Response.json(
             {
-                message: 'Error fetchings tasks via API routes',
+                message: 'Error fetchings tasks via route handler',
                 error,
             },
             {
@@ -37,7 +37,7 @@ export async function GET(req: Request, context: { params: Params }) {
     }
 }
 
-export async function DELETE(req: Request, context: { params: Params }) {
+export async function DELETE (req: Request, context: { params: Params }) {
     const id= context.params.id;
     try {
         await prisma.event.deleteMany({
@@ -62,10 +62,10 @@ export async function DELETE(req: Request, context: { params: Params }) {
         });
         return Response.json({message: 'Deleted task via API route'});
     } catch (error) {
-        console.error('Error deleting task via API routes', error);
+        console.error('Error deleting task via route handler', error);
         return Response.json(
             {
-                message: 'Error deleting task via API routes',
+                message: 'Error deleting task via route handler',
                 error,
             },
             {
@@ -84,10 +84,10 @@ export async function PUT(req: Request, context: { params: Params }) {
         });
         return Response.json({message: 'Updated task via API route', task: updatedTask});
     } catch (error) {
-        console.error('Error updating task via API routes', error);
+        console.error('Error updating task via route handler', error);
         return Response.json(
             {
-                message: 'Error updating task via API routes',
+                message: 'Error updating task via route handler',
                 error,
             },
             {
@@ -96,3 +96,19 @@ export async function PUT(req: Request, context: { params: Params }) {
         );
     }
 }
+
+export async function PATCH (req: Request, context: { params: Params }) {
+    const { id } = context.params;
+    const body = await req.json();
+    const { status } = body;
+
+    const updatedTask = await prisma.task.update({
+        where: {
+            id: id,
+        },
+        data: {
+            status: status,
+        }
+    });
+    return Response.json({ message: 'Updated task status', task: updatedTask.name, status: updatedTask.status});
+};

@@ -14,7 +14,7 @@ export default async function Page() {
     return (<>
         <TimelineBoard back={true} mindsets={mindsets} mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}>
             <TaskBrowser 
-                tasks={tasks} 
+                initialTasks={tasks} 
                 mindsets={mindsets} 
                 mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}
             />

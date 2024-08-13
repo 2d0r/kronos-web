@@ -265,13 +265,9 @@ export function convertPropsToDate(obj: any): any {
             const value = result[key];
 
             // Check if the value is a string that can be converted to a valid Date
-            if (typeof value === 'string' || typeof value === 'number') {
-                const date = new Date(value);
-                
-                // Check if the Date object is valid
-                if (!isNaN(date.getTime())) {
-                    result[key] = date;
-                }
+                // Strings like 'Test 2' seem to be parsed as a date; Removing the space resolves this
+            if (typeof value === 'string' && Date.parse(value.replace(' ', ''))) { 
+                result[key] = new Date(value);
             }
         }
     }

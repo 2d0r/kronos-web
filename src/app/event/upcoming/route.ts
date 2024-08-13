@@ -1,23 +1,18 @@
 import prisma from '@/lib/db';
 
-type Params = {
-    count: string,
-}
-
-export async function GET(req: Request, context: { params: Params }) {
-    const count = context.params.count;
-    // const { searchParams } = new URL(req.url);
-    // const count = searchParams.get('count'); // Example filter parameter
+export async function GET(req: Request) {
 
     try {
         const events = await prisma.event.findMany({
             include: { 
                 task: true,
             }, // Include the subtasks relation
+            where: {
+                endTime: { gte: new Date() },
+            },
             orderBy: {
                 startTime: 'asc'
             },
-            take: count ? Number(count) : undefined,
         });
         return Response.json({message: 'OK', events: events});
     } catch (error) {

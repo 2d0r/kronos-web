@@ -3,7 +3,7 @@
 import { Status } from '@prisma/client';
 import { FC, useState } from 'react';
 import Checkbox from './checkbox';
-import { TaskWithRelations } from '@/lib/definitions';
+import { ActionType, TaskWithRelations } from '@/lib/definitions';
 import Link from 'next/link';
 
 const ToDoItem: FC<{
@@ -11,8 +11,9 @@ const ToDoItem: FC<{
     className?: string, 
     size?: ('small' | 'regular'), 
     onTaskStatusUpdated: (taskId: string, status: Status) => void,
-    onTaskDelete: (taskId: string) => void,
-}> = ({task, className, size = 'regular', onTaskStatusUpdated, onTaskDelete}) => {
+    onTaskUpdate: (taskId: string, action: ActionType) => void,
+}> = ({task, className, size = 'regular', onTaskStatusUpdated, onTaskUpdate}) => {
+    
     const [ showEdit, setShowEdit ] = useState<boolean>(false);
 
     const handleHoverIn = () => {
@@ -21,9 +22,13 @@ const ToDoItem: FC<{
     const handleHoverOut = () => {
         setShowEdit(false);
     }
-    const handleTaskDelete = () => {
-        onTaskDelete(task.id);
+    const handleTaskDelete = async (taskId: string) => {
+        await fetch(`/task/${taskId}`, {
+            method: 'DELETE'
+        });
+        onTaskUpdate(taskId, 'delete');
     }
+
 
     return (<div className='w-full flex items-center gap-3 justify-between' onMouseOver={handleHoverIn} onMouseOut={handleHoverOut}>
         <div className={'flex gap-2 items-center ' + className}>
@@ -39,7 +44,7 @@ const ToDoItem: FC<{
                 className='text-sm text-gray-400 cursor-pointer'
             >{showEdit && 'Edit'}</Link>
             <button 
-                onClick={handleTaskDelete}
+                onClick={() => handleTaskDelete(task.id)}
                 className='text-sm text-gray-400 cursor-pointer'
             >{showEdit && 'Delete'}</button>
         </div>

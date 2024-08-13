@@ -441,7 +441,8 @@ export const fetchEvents = async () => {
 }
 export const fetchUpcomingEvents = async (count?: number) => {
   // const response = await fetch(`/event?count=${count}`);
-  const response = await fetch(`/event/upcoming/${count || ''}`);
+  const address = count ? `/event/upcoming/${count}` : '/event/upcoming/'
+  const response = await fetch(address);
   const data = await response.json();
   const upcomingEvents = data.events;
   return upcomingEvents as EventWithRelations[];
@@ -453,7 +454,7 @@ export const fetchTasks = async () => {
   return newTasks;
 }
 export const fetchTask = async (taskId: string) => {
-  const response = await fetch(`/task/api/${taskId}`);
+  const response = await fetch(`/task/${taskId}`);
   const data = await response.json();
   return data.task;
 }
@@ -466,4 +467,9 @@ export const fetchTaskOfEvent = async (eventId: string) => {
   const response = await fetch(`/task/event/${eventId}`);
   const data = await response.json();
   return data.task;
+}
+export const fetchMindsets = async () => {
+  const response = await fetch(`/mindset`);
+  const data = await response.json();
+  return data.mindsets;
 }
