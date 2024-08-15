@@ -16,12 +16,13 @@ import { getTimegridConfig } from '@/utils/calendarUtils';
 defineCustomElements();
 
 const CalendarComponent: React.FC<{ 
-    events: Event[], 
+    initialEvents: Event[], 
+    newEvents?: Event[],
     mindsetColour: string, 
     mindsets: MindsetWithRelations[],
     startWeekToday?: boolean,
 }> = ({ 
-    events, mindsetColour, mindsets, startWeekToday = false }) => {
+    initialEvents, mindsetColour, mindsets, startWeekToday = false, newEvents }) => {
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -33,17 +34,24 @@ const CalendarComponent: React.FC<{
     const [ eventsCache, setEventsCache ] = useState<Event[]>([]);
     const [ timegridConfig, setTimegridConfig ] = useState<HfTimegridConfig>({});
 
-
-    const reloadEvents = (newEvents: Event[]) => {
-        // Make sure new events don't overlap old ones
-        const updatedIds = newEvents.map((event) => event.id); // 1. Identify the ids of the updated items
-        const filteredEvents = eventsCache.filter((event) => !updatedIds.includes(event.id)); // 2. Filter out items from the previous state that have changed
-        const newEventsCache = [...filteredEvents, ...newEvents]; // 3. Combine the filtered items with the updated items
-        setEventsCache(newEventsCache);
+    const reloadEvents = (newEvents: Event[], replace: boolean = false) => {
+        let newEventsCache: Event[] = [];
+        if (!replace) {
+            // Make sure new events don't overlap old ones
+            const updatedIds = newEvents.map((event) => event.id); // 1. Identify the ids of the updated items
+            const filteredEvents = eventsCache.filter((event) => !updatedIds.includes(event.id)); // 2. Filter out items from the previous state that have changed
+            newEventsCache = [...filteredEvents, ...newEvents]; // 3. Combine the filtered items with the updated items
+            setEventsCache(newEventsCache);
+        }
+        else {
+            newEventsCache = newEvents;
+            setEventsCache(newEvents);
+        }
+        
         // TO DO: only keep events that haven't changed at all
         const eventColours = newEventsCache.map(event => {
             const eventMindset = mindsets.filter(mindset => mindset.tasks.some(task => {
-            return Object.values(task).includes(event.taskId);
+                return Object.values(task).includes(event.taskId);
             }));
             return eventMindset[0]?.colour;
         });
@@ -79,12 +87,15 @@ const CalendarComponent: React.FC<{
     
     useEffect(() => {
         document.documentElement.style.setProperty('--mindset-colour', mindsetColour);
-        reloadEvents(events);
+        reloadEvents(initialEvents);
     }, []);
     // Debugging
+    // useEffect(() => {
+    //     console.log('HfEvents Today', timegridConfig.events?.filter(el => el.start.includes('2024-08-15')));
+    // }, [timegridConfig]);
     useEffect(() => {
-        console.log('HfEvents Today', timegridConfig.events?.filter(el => el.start.includes('2024-08-12')));
-    }, [timegridConfig])
+        initialEvents && reloadEvents(initialEvents, true);
+    }, [initialEvents]);
     
     let timegridRef: RefObject<HTMLHfTimegridElement> = React.createRef();
 

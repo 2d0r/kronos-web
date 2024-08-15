@@ -75,7 +75,6 @@ const TaskBrowser: FC<{
                     setTasksCache(prevCache => prevCache.filter(task => task.id !== taskId));
             case 'edit':
                 const editedTask = await fetchTask(taskId);
-                console.log('editedTask', editedTask);
                 setTasksCache(prevCache => ([ ...prevCache.filter(task => task.id !== taskId), editedTask ]));
         }
     }
@@ -92,6 +91,9 @@ const TaskBrowser: FC<{
         const newSort : SortItem = newLogbookView ? ['Date', 'Descending'] : ['Priority', 'Descending'];
         setLogbookView(newLogbookView);
     }, [searchParams]);
+    useEffect(() => {
+        initialTasks && setTasksCache(initialTasks);
+    }, [initialTasks]);
 
     return(
         <div className='flex flex-col items-center gap-4'>

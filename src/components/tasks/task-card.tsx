@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useFormState } from 'react-dom';
+import { useState, useEffect, FormEvent } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import Button from '@/components/buttons/button';
 import { Dropdown, InputField, MultiSelectionField } from '@/components/form-fields';
 import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, ActionType } from '@/lib/definitions';
@@ -49,10 +49,11 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
 
     // FORM DISPATCH
 
-    const initialState = { message: null, errors: {} };
+    const initialState = { message: null, errors: {}, success: false, };
     // Set up to edit task or to create new task
     const editTaskHere : any = isNewTask ? createTaskPrisma : editTaskPrisma;
-    const [state, dispatch] = useFormState(editTaskHere, initialState);
+    const [state, formAction] = useFormState(editTaskHere, initialState);
+    const { pending } = useFormStatus();
 
 
     // HANDLERS
@@ -117,9 +118,10 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
     }
     const handleTaskSubmit = () => {
         // Tasks database is being created/edited in parallel, via form action
-        // We just have to signal the parent component to update its task and event list
-        onTaskUpdate(taskCache.id, isNewTask ? 'create' : 'edit');
-        // Organise task in 
+
+        // We wait 1 sec for formAction and then signal the parent component to update its tasks and events
+        setTimeout(() => onTaskUpdate(taskCache.id, isNewTask ? 'create' : 'edit'), 1000);
+        
         // organiseTask(taskCache);
         router.back();
     };
@@ -175,10 +177,18 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
         // console.log('taskCache', taskCache);
     }, [taskCache]);
 
+    // Send onTaskUpdate every second, until state is successful
+    // useEffect(() => {
+    //     if (state.success === false) { 
+    //         const formSubmitInterval = setInterval(() => onTaskUpdate(taskCache.id, isNewTask ? 'create' : 'edit'), 1000);
+    //         return () => clearInterval(formSubmitInterval);
+    //     }
+    // }, [state])
+
     
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'>
     <div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl text-sm text-black overflow-hidden'>
-    <form action={dispatch}>
+    <form action={formAction}>
         {/* Top bar */}
         <div className='w-full h-16 flex justify-between items-center p-4 border-b-[0.5px]'>
             <div className='w-8 h-8'></div>

@@ -49,7 +49,6 @@ export default function Timeline({ mindsets } : TimelineProps) {
         // Update mindset colour
         setMindsetColour(newMindsetQueue[0].colour || NEUTRAL_MINDSET_COLOUR);
     }
-    // setInterval(handleEventsUpdate, 300000); // every 5 minutes
 
     const handleTaskUpdate = async (taskId: string, action: ActionType) => {
         handleEventsUpdate();
@@ -59,8 +58,9 @@ export default function Timeline({ mindsets } : TimelineProps) {
     // HOOKS
 
     useEffect(() => {
-        console.log('timeline: handleEventsUpdate on load');
         handleEventsUpdate();
+        const timePassingInterval = setInterval(handleEventsUpdate, 300000); // every 5 minutes
+        return () => clearInterval(timePassingInterval);
     }, []);
     // useEffect(() => {
     //     console.log('eventQueue', eventQueue);
@@ -81,7 +81,7 @@ export default function Timeline({ mindsets } : TimelineProps) {
             }
             {/* Later event */}
             {!!eventQueue.length && (
-                <div className='w-screen h-1/4 bottom-0 left-0 absolute overflow-clip flex items-end justify-center'>
+                <div className='w-screen h-1/6 bottom-0 left-0 absolute overflow-clip flex items-end justify-center'>
                 {(eventQueue.length > 1 && !showMenu) ?
                     <EventCard event={eventQueue[1]} nextEvent={true} mindset={mindsetQueue[1]} 
                     /> : showMenu ? <EventCard event={eventQueue[0]} nextEvent={true} mindset={mindsetQueue[0]} 

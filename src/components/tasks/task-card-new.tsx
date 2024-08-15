@@ -102,7 +102,6 @@ export default function TaskCard({task, mindsets, onTaskUpdate, onTaskCreate, on
         if (type.includes('start')) {
             // When user changes start, only change end, don't change duration
             const newDuration = taskCache.duration || 60; // using existing value OR the default 60 minutes
-            console.log('new duration', newDuration);
             setTaskCache(task => ({
                 ...task, 
                 startTime: dateTime, 

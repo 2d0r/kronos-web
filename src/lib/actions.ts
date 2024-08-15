@@ -74,9 +74,9 @@ export type State = {
     totalDuration?: number[];
     totalRepetitions?: number[];
     endRepeatDate?: number[];
-
   };
   message?: string | null;
+  success?: boolean;
 };
 
 const CreateTask = FormSchema.omit({ date: true });
@@ -120,6 +120,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Missing Fields. Failed to Create Task.',
+      success: false,
     };
   }
 
@@ -200,10 +201,14 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
       console.log('Failed to organise task ❌', error);
     }
 
+    return {
+      success: true, message: 'Successfully created task'
+    }
+
   } catch (error) {
     console.log('Failed to create task ❌', error);
     return {
-      message: 'Database Error: Failed to create task.',
+      success: false, message: 'Database Error: Failed to create task.',
     };
   }
 
@@ -250,6 +255,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Missing Fields. Failed to Create Task.',
+      success: false,
     };
   }
 
@@ -275,7 +281,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
   );
   if (!matchingMindset) {
     //  Handle error - invalid mindset
-    return { message: 'Invalid mindset selected.' };
+    return { message: 'Invalid mindset selected.', success: false };
   }
 
   // Calculate timeScore
@@ -330,10 +336,16 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
       console.log('Failed to organise task ❌', error);
     }
 
-  } catch (error) {
-    console.log('Failed to create task ❌', error);
     return {
-      message: 'Database Error: Failed to create task.',
+      success: true,
+      message: 'Successfully edited task'
+    }
+
+  } catch (error) {
+    console.log('Failed to edit task ❌', error);
+    return {
+      message: 'Database Error: Failed to edit task.',
+      success: false,
     };
   }
 
@@ -568,13 +580,13 @@ export async function deleteFlexEventsInTimespan(timespan: [Date, Date]) {
   }
 }
 
-export async function deleteEventsOfTask(taskId: string, timespan: [Date, Date]) {
+export async function deleteEventsOfTask(taskId: string, timespan?: [Date, Date]) {
   try {
     await prisma.event.deleteMany({
       where: {
         taskId: taskId,
-        startTime: { gte: timespan[0], lt: timespan[1] },
-        endTime: { gte: timespan[0] },
+        startTime: timespan && { gte: timespan[0], lt: timespan[1] },
+        endTime: timespan && { gte: timespan[0] },
       },
     });
   } catch (error) {

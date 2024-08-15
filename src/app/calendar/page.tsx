@@ -12,7 +12,7 @@ export default async function Page() {
     <TimelineBoard back={true} mindsets={mindsets} mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}>
       <>
         <div className='h-[60vh] w-[80vw]'>
-          <CalendarComponent events={events} mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR} mindsets={mindsets}/>
+          <CalendarComponent initialEvents={events} mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR} mindsets={mindsets}/>
         </div>
       </>
     </TimelineBoard>

@@ -6,7 +6,6 @@ import { ActionType, TaskWithRelations } from '@/lib/definitions';
 import Checkbox from './checkbox';
 import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/dateUtils';
 import { useEffect, useState } from 'react';
-import { fetchMindsets } from '@/lib/data';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
@@ -30,6 +29,8 @@ export default function TaskList ({
     const [ taskList, setTaskList ] = useState<TaskWithRelations[]>([]);
 
     const updateTaskList = (newTaskList: TaskWithRelations[], filters: Filters) => {
+
+        if (!newTaskList || !newTaskList.length) return;
 
         const { typeFilter, mindsetFilter, logbookFilter } = filters;
 
@@ -59,7 +60,6 @@ export default function TaskList ({
         setTaskList(sortedTasks);
     }
 
-    
 
 
     // HANDLERS
@@ -85,6 +85,7 @@ export default function TaskList ({
         updateTaskList(tasksCache, filters);
     }, []);
     useEffect(() => {
+        console.log('taskList/useEffect - taskCache', tasksCache);
         updateTaskList(tasksCache, filters);
     }, [tasksCache, filters]);
 

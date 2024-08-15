@@ -9,8 +9,6 @@ import { organiseTimespan } from '@/lib/organise-timespan';
 
 export async function organiseTask(newTask: TaskWithRelations, timespan?: [Date, Date]) {
 
-    console.log('inside organise task')
-
     // GET TIMESPAN TO ORGANISE
     let timespanToOrganise: [Date, Date] = [new Date(), new Date()];
     if (timespan) {
@@ -25,7 +23,7 @@ export async function organiseTask(newTask: TaskWithRelations, timespan?: [Date,
 
     // FIXED TASK => Schedule event right away
     if (newTask.fixed && newTask.startTime) {
-        await deleteEventsOfTask(newTask.id, timespanToOrganise);
+        await deleteEventsOfTask(newTask.id); //To do: specify timespanToOrganise
         await scheduleEventForTask(newTask, newTask.startTime);
         return;
     }

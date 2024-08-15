@@ -14,7 +14,7 @@ import Button from './buttons/button';
 import { deleteAllEvents } from '@/lib/actions';
 import { addDaysToDate } from '@/utils/dateUtils';
 import { organiseTimespan } from '@/lib/organise-timespan';
-import { fetchEvents, fetchTask, fetchTasks } from '@/lib/data';
+import { fetchEvents, fetchTask, fetchTasks, fetchUpcomingEvents, fetchUpdatedTaskEvents } from '@/lib/data';
 import { useSearchParams } from 'next/navigation';
 
 interface TestViewProps {
@@ -32,6 +32,7 @@ const TestView: FC<TestViewProps> = ({
 
     const [ tasksCache, setTasksCache ] = useState<TaskWithRelations[]>(tasks);
     const [ eventsCache, setEventsCache ] = useState<Event[]>(events);
+    const [ newEventsCache, setNewEventsCache ] = useState<Event[]>([]);
     
 
     // MODALS
@@ -47,13 +48,21 @@ const TestView: FC<TestViewProps> = ({
             case 'create':
                 const newTask = await fetchTask(taskId);
                 setTasksCache(prevCache => ([ ...prevCache, newTask ]));
+                break;
             case 'delete':
-                if (tasksCache.length)
-                    setTasksCache(prevCache => prevCache.filter(task => task.id !== taskId));
+                if (tasksCache.length) {
+                    setTasksCache(prevCache => prevCache.filter(task => task?.id !== taskId));
+                }
+                break;
             case 'edit':
                 const editedTask = await fetchTask(taskId);
+                // console.log('testView/hadnleTaskUpdate/edit', editedTask.name);
                 setTasksCache(prevCache => ([ ...prevCache.filter(task => task.id !== taskId), editedTask ]));
+                break;
         }
+        // Get new events and pass them to the Calendar Component
+        const newEvents = await fetchEvents();
+        setEventsCache(newEvents);
     }
     const handleDeleteAllEvents = async () => {
         await deleteAllEvents();
@@ -89,14 +98,14 @@ const TestView: FC<TestViewProps> = ({
         <div className={clsx('max-h-none z-[39] bg-white rounded-3xl shadow-xl w-fit p-4 flex flex-col gap-4 items-center justify-start')}>
             <div className='h-[60vh] w-[80vw]'>
                 <CalendarComponent 
-                    events={eventsCache} 
+                    initialEvents={eventsCache}
                     mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR} 
                     mindsets={mindsets} 
                     startWeekToday={true}
                 />
             </div>
             <TaskBrowser 
-                tasks={tasksCache} 
+                initialTasks={tasksCache} 
                 mindsets={mindsets} 
                 mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}
                 parentName='TestView'
