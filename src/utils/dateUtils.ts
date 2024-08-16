@@ -257,6 +257,11 @@ export const getStartAndEndOfDay = (day: Date): [Date, Date] => {
     ];
 }
 
+/**
+ * 
+ * @param obj Any object with potential date props saved as string
+ * @returns The same object, after converting all valid date props into Date objects
+ */
 export function convertPropsToDate(obj: any): any {
     const result: Record<string, any> = { ...obj };
 
@@ -273,4 +278,17 @@ export function convertPropsToDate(obj: any): any {
     }
 
     return result;
+}
+
+/**
+ * 
+ * @param date date object to covert
+ * @returns local date formatted as string 'yyyy-MM-dd' for HTML input
+ */
+export function dateToHtmlInput(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const day = String(date.getDate()).padStart(2, '0');
+  
+    return `${year}-${month}-${day}`;
 }

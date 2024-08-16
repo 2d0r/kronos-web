@@ -15,7 +15,7 @@ import NotesEditor from '@/components/notes-editor/notes-editor';
 import ChecklistEditor from '@/components/notes-editor/checklist-editor';
 import {v4 as uuidv4} from 'uuid';
 import EventSection from './event-section';
-import { addMinutesToDate, minutesBetweenDates } from '@/utils/dateUtils';
+import { addMinutesToDate, dateToHtmlInput, minutesBetweenDates } from '@/utils/dateUtils';
 import '@/app/globals.css';
 import { ArrowRight } from 'lucide-react';
 
@@ -288,7 +288,7 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
                             colour={mindsetColour}
                             state={state}
                             value={taskCache.startTime instanceof Date ? 
-                                new Date(taskCache.startTime).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)
+                                dateToHtmlInput(new Date(taskCache.startTime)) : dateToHtmlInput(new Date())
                             }
                             onChange={(event: any) => handleTimeChanges(event, 'startDate')}
                         />
@@ -312,7 +312,7 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
                                 colour={mindsetColour}
                                 state={state}
                                 value={taskCache.endTime instanceof Date ? 
-                                    new Date(taskCache.endTime).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)
+                                    dateToHtmlInput(new Date(taskCache.endTime)) : dateToHtmlInput(new Date())
                                 }
                                 onChange={(event: any) => handleTimeChanges(event, 'endDate')}
                                 hidden={!taskCache.startTime || !taskCache.endTime || getDate(taskCache.startTime) === getDate(taskCache.endTime)}
