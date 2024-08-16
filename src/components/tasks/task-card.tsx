@@ -565,7 +565,6 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
                     <ChecklistEditor checklist={taskCache.checklist || ''} taskId={taskCache.id} className={'task-card'} />
                 </div>
             </div>
-            
         </div>
         {/* Bottom bar */}
         <div className='flex justify-between items-center gap-4 p-4 h-12 border-t-[0.5px]'>

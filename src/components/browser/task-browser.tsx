@@ -1,7 +1,7 @@
 'use client';
 
 import { Mindset, Status, TaskType } from '@prisma/client';
-import { FC, useEffect, useState } from 'react';
+import { FC, Suspense, useEffect, useState } from 'react';
 import { Dropdown } from '@/components/form-fields';
 import { ActionType, DEFAULT_MINDSET_LIST, TaskWithRelations } from '@/lib/definitions';
 import '@/app/globals.css';
@@ -12,6 +12,7 @@ import TaskCard from '@/components/tasks/task-card';
 import TaskList from '@/components/browser/task-list';
 import { fetchTask } from '@/lib/data';
 import { useSearchParams } from 'next/navigation';
+import { TaskCardSkeleton } from '@/components/ui/skeletons';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
@@ -105,7 +106,8 @@ const TaskBrowser: FC<{
     return(
         <div className='flex flex-col items-center gap-4'>
             {(showTaskCard && parentName !== 'TestView') &&
-            <TaskCard mindsets={mindsets} onTaskUpdate={handleTaskUpdate} />}
+                <TaskCard mindsets={mindsets} onTaskUpdate={handleTaskUpdate} />
+            }
             {/* Tab bar */}
             <div className='flex gap-4 items-center justify-center'>
                 <button 
