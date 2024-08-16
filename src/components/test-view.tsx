@@ -103,6 +103,7 @@ const TestView: FC<TestViewProps> = ({
                     mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR} 
                     mindsets={mindsets} 
                     startWeekToday={true}
+                    ownTaskCard={false}
                 />
             </div>
             <TaskBrowser 

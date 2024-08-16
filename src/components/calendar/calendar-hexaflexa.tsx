@@ -21,8 +21,9 @@ const CalendarComponent: React.FC<{
     mindsetColour: string, 
     mindsets: MindsetWithRelations[],
     startWeekToday?: boolean,
-}> = ({ 
-    initialEvents, mindsetColour, mindsets, startWeekToday = false, newEvents }) => {
+    ownTaskCard?: boolean,
+}> = ({
+    initialEvents, mindsetColour, mindsets, startWeekToday = false, newEvents, ownTaskCard = true }) => {
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -116,7 +117,7 @@ const CalendarComponent: React.FC<{
                 position: 'relative'
             }}
         />
-        { showTask && <TaskCard mindsets={mindsets} onTaskUpdate={handleTaskUpdate} />}
+        { showTask && ownTaskCard && <TaskCard mindsets={mindsets} onTaskUpdate={handleTaskUpdate} />}
     </>);
 }
 
