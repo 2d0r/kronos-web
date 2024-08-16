@@ -18,6 +18,9 @@ import EventSection from './event-section';
 import { addMinutesToDate, dateToHtmlInput, minutesBetweenDates } from '@/utils/date-utils';
 import '@/app/globals.css';
 import { ArrowRight } from 'lucide-react';
+import NotesEditor2 from '../notes-editor/notes-editor-2';
+import Tiptap from '../notes-editor/tiptap';
+import NotesEditor3 from '../notes-editor/notes-editor-3';
 
 
 export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
@@ -530,8 +533,7 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
                     </div>
                 </>)}
                 
-                {(taskCache.fixed && !taskCache.repeat) && (<>
-                    {/* <div className='divider h-[1px] w-full bg-black/20'></div> */}
+                {(taskCache.fixed && !taskCache.repeat) && (
                     <div className='flex h-8 gap-2 items-center'>
                         <button
                             type='button' 
@@ -549,20 +551,24 @@ export default function TaskCard({task: initialTask, mindsets, onTaskUpdate} : {
                             value={String(taskCache.totalDuration) || ''}
                         />}
                     </div>
-                </>)}
+                )}
                 
             </div>
 
             {/* Notes and checklist panel */}
-            <div className='w-[350px] flex flex-col task-card'>
+            <div className='w-[400px] h-[70vh] flex flex-col task-card'>
                 <div className=''>
                     <EventSection event={taskCache.events?.filter(el => el.id === eventId)[0] || {} as Event} mindsetColour={mindsetColour} />
                 </div>
-                <div className='h-[25vh] border-b-[0.5px] overflow-y-scroll'>
+                <div className='h-full border-b-[0.5px] overflow-y-scroll'>
                     <NotesEditor notes={taskCache.notes || ''} taskId={taskCache.id} className={'task-card'} />
+                    {/* <Tiptap /> */}
+                    {/* <NotesEditor3 notes={taskCache.checklist || ''} taskId={taskCache.id} className={'task-card'} /> */}
                 </div>
-                <div className='h-[25vh]'>
-                    <ChecklistEditor checklist={taskCache.checklist || ''} taskId={taskCache.id} className={'task-card'} />
+                <div className='min-h-1/6 flex flex-col gap-1 p-4'>
+                    <span className='text-gray-300 text-md font-medium'>Task Relations</span>
+                    <span className='text-gray-300 text-xs'>Coming soon</span>
+                    {/* <ChecklistEditor checklist={taskCache.checklist || ''} taskId={taskCache.id} className={'task-card'} /> */}
                 </div>
             </div>
         </div>

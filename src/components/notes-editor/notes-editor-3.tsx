@@ -19,12 +19,12 @@ const CustomTaskItem = TaskItem.extend({
   content: 'inline*',
 })
 
-const ChecklistEditor: FC<{ 
-    checklist: string, 
+const NotesEditor3: FC<{ 
+    notes: string, 
     onChange?: (richText: string) => void,
     taskId: string,
     className?: string,
-}> = ({ checklist, onChange, taskId, className }) => {
+}> = ({ notes, onChange, taskId, className }) => {
 
     const placeholder = `
         <ul data-type="taskList">
@@ -36,7 +36,7 @@ const ChecklistEditor: FC<{
 
     const editor = useEditor({
         extensions: [
-            CustomDocument,
+            Document,
             Paragraph,
             Text,
             TaskList,
@@ -46,9 +46,9 @@ const ChecklistEditor: FC<{
                 placeholder: placeholder,
             }),
         ],
-        content: checklist,
+        content: notes,
         onUpdate({ editor }) {
-            updateTaskField(taskId, 'checklist', editor.getHTML());
+            updateTaskField(taskId, 'notes', editor.getHTML());
         },
         immediatelyRender: false,
     });
@@ -66,4 +66,4 @@ const ChecklistEditor: FC<{
     </>)
 }
 
-export default ChecklistEditor;
+export default NotesEditor3;

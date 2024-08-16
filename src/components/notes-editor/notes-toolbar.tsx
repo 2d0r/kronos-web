@@ -1,10 +1,11 @@
-import { Editor } from '@tiptap/react';
+import { Editor, useCurrentEditor } from '@tiptap/react';
 import { FC } from 'react';
 import ToolbarButton from '@/components/buttons/toolbar-button';
 import { Bold, CircleCheck, HeadingIcon, Italic, List } from 'lucide-react';
 import clsx from 'clsx';
 
 const Toolbar:FC<{ editor: Editor | null, hidden?: boolean, className?: string }> = ({editor, hidden, className}) => {
+
     if (!editor) {
       return null
     }

@@ -51,7 +51,6 @@ model Task {
   completion               Int?        @default(0)
   deadline                 DateTime?
   notes                    String?
-  checklist                String?
   tasksBefore              Task[]      @relation("TaskCausality")
   tasksAfter               Task[]      @relation("TaskCausality")
   tasksRightBefore         Task[]      @relation("TaskChain")

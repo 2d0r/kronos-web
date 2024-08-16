@@ -218,7 +218,7 @@ ul[data-type="taskList"] {
   @apply: focus-visible:!border-none focus-visible:!outline-none focus:!ring-transparent;
 }
 .task-input-fields > div {
-  @apply px-4 py-2 border-b-[0.5px] border-b-black/5;
+  @apply px-4 py-2 border-b-[0.5px] border-b-black/5 min-h-[3.125rem];
 }
 .task-card {
   .tiptap input[type="checkbox"] {
