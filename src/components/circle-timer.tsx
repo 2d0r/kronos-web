@@ -2,7 +2,7 @@
 
 import PauseSVG from '@/components/svg/pause-svg';
 import PlaySVG from '@/components/svg/play-svg';
-import { minutesToTimerDisplay } from '@/utils/dateUtils';
+import { minutesToTimerDisplay } from '@/utils/date-utils';
 import Link from 'next/link';
 import { FC, useState } from 'react';
 import { CountdownCircleTimer } from "react-countdown-circle-timer";

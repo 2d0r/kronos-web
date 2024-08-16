@@ -3,7 +3,7 @@
 import { FC, useState } from 'react';
 import BottomBar from '@/components/ui/bottom-bar';
 import TopBar from '@/components/ui/top-bar';
-import { ActionType, EventWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations } from '@/lib/definitions';import { adjustLightness } from '@/utils/colourUtils';
+import { ActionType, EventWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations } from '@/lib/definitions';import { adjustLightness } from '@/utils/colour-utils';
 import TaskCard from '@/components/tasks/task-card';
 import clsx from 'clsx';
 import { Event } from '@prisma/client';
@@ -12,9 +12,9 @@ import TaskBrowser from '@/components/browser/task-browser';
 import { MindsetWithRelations } from '@/lib/definitions';
 import Button from './buttons/button';
 import { deleteAllEvents } from '@/lib/actions';
-import { addDaysToDate } from '@/utils/dateUtils';
+import { addDaysToDate } from '@/utils/date-utils';
 import { organiseTimespan } from '@/lib/organise-timespan';
-import { fetchEvents, fetchTask, fetchTasks, fetchUpcomingEvents, fetchUpdatedTaskEvents } from '@/lib/data';
+import { fetchEvents, fetchTask, fetchTasks, fetchUpcomingEvents, fetchEventsOfTask } from '@/lib/data';
 import { useSearchParams } from 'next/navigation';
 
 interface TestViewProps {

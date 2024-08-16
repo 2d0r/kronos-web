@@ -2,9 +2,9 @@
 
 import { Priority, TaskType, Task, Mindset, Status } from '@prisma/client';
 import ToDoItem from './to-do-item';
-import { ActionType, TaskWithRelations } from '@/lib/definitions';
+import { ActionType, PRIORITY_ORDER, TaskWithRelations } from '@/lib/definitions';
 import Checkbox from './checkbox';
-import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/dateUtils';
+import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/date-utils';
 import { useEffect, useState } from 'react';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
@@ -44,14 +44,9 @@ export default function TaskList ({
             filteredTasks = filteredTasks.filter(task => task.mindsetId === mindsetId);
         }
         // Sort tasks
-        const priorityOrder = {
-            [Priority['veryHigh']]: 0,
-            [Priority['high']]: 1,
-            [Priority['medium']]: 2,
-            [Priority['low']]: 3
-        }
+        
         const { sort } = filters;
-        let sortedTasks = sort ? sort[0] === 'Priority' ? filteredTasks.sort((a, b) => a.timeScore - b.timeScore).sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
+        let sortedTasks = sort ? sort[0] === 'Priority' ? filteredTasks.sort((a, b) => a.timeScore - b.timeScore).sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority])
             : sort[0] === 'Duration' ? filteredTasks.sort((a, b) => a.duration - b.duration)
             : sort[0] === 'Date' ? filteredTasks.filter(el => el.startTime !== null).sort((a, b) => (a.startTime?.getTime() || 0) - (b.startTime?.getTime() || 0)).concat(filteredTasks.filter(task => task.startTime === null))
             : filteredTasks : filteredTasks;

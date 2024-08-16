@@ -1,5 +1,5 @@
 import { Task } from '@prisma/client';
-import { calcRepeatIntervalInMinutes, hoursBetweenDates } from '@/utils/dateUtils';
+import { calcRepeatIntervalInMinutes, hoursBetweenDates } from '@/utils/date-utils';
 import { HOURS_IN_A_WEEK } from '@/lib/definitions';
 
 // A score relative to a week - how much time in a week this task takes up

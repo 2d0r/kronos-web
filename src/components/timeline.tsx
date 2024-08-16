@@ -10,7 +10,7 @@ import TransportControls from './buttons/transport-controls';
 import { Mindset } from '@prisma/client';
 import { fetchUpcomingEvents } from '@/lib/data';
 import { ActionType, EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
-import { convertPropsToDate } from '@/utils/dateUtils';
+import { convertPropsToDate } from '@/utils/date-utils';
 
 interface TimelineProps {
     mindsets: Mindset[];

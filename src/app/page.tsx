@@ -3,7 +3,7 @@ import { getMindsets, getCurrentMindsetColour } from '@/lib/data';
 import TopBar from '@/components/ui/top-bar';
 import BottomBar from '@/components/ui/bottom-bar';
 import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
-import { adjustLightness } from '@/utils/colourUtils';
+import { adjustLightness } from '@/utils/colour-utils';
 import Timeline from '@/components/timeline';
 
 export default async function Page() {

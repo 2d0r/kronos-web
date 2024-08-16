@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from '@/lib/db';
-import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates, getStartAndEndOfDay } from '@/utils/dateUtils';
+import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates, getStartAndEndOfDay } from '@/utils/date-utils';
 import { getEvents, getTasksByIds, getTasksToSchedule } from '@/lib/data';
 import { deleteEventsById, deleteFlexEventsInTimespan } from '@/lib/actions';
 import { DEFAULT_TIMES_OF_DAY, eventsToSchedule,TaskWithRelations } from '@/lib/definitions';
@@ -100,9 +100,7 @@ export async function organiseTimespan({
                 // console.log('taskSessionsToSchedule', taskSessionsToSchedule); // ✅
                 eventsToScheduleDict[task.id] = taskSessionsToSchedule;
             } else {
-                return {
-                    message: 'Error: task is missing repetition data.'
-                }
+                console.error('Database error: task is missing repetition data.');
             }
         });
     }
@@ -350,5 +348,6 @@ export async function organiseTimespan({
         }
     });
 
+    // Update organised timespan in the db
     updateOrganisedTimespans(timespan);
 }

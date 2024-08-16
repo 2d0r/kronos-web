@@ -7,16 +7,14 @@ import TopBar from '@/components/ui/top-bar';
 import clsx from 'clsx';
 import React from 'react';
 import { Task, Event } from '@prisma/client';
-import { dateToHHMM, minutesBetweenDates, minutesToDisplayDuration } from '@/utils/dateUtils';
-import { adjustLightness } from '@/utils/colourUtils';
+import { dateToHHMM, minutesBetweenDates, minutesToDisplayDuration } from '@/utils/date-utils';
+import { adjustLightness } from '@/utils/colour-utils';
 import NotesEditor from '@/components/notes-editor/notes-editor';
 import ChecklistEditor from '@/components/notes-editor/checklist-editor';
 import CircleTimer from '@/components/circle-timer';
 import TaskCard from '@/components/tasks/task-card';
-import { useSearchParams } from 'next/navigation';
 
-export default async function Page() {
-    const searchParams = useSearchParams();
+export default async function Page({ searchParams }: { searchParams: URLSearchParamsKronos}) {
     const showTaskCard = searchParams.get('task');
     const showMenu = searchParams.get('menu');
 

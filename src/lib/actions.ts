@@ -12,6 +12,7 @@ import { calculatePriorityScores } from '@/lib/priority-score';
 import { calculateTimeScore } from '@/lib/time-score';
 import { v4 as uuidv4 } from 'uuid';
 import { organiseTask } from '@/lib/organise-task';
+import { addDays } from 'date-fns';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -196,7 +197,7 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
     });
 
     try {
-      await organiseTask(newTask as TaskWithRelations);
+      await organiseTask(newTask as TaskWithRelations, [new Date(), addDays(new Date(), 7)]);
     } catch (error) {
       console.log('Failed to organise task ❌', error);
     }
@@ -331,7 +332,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
     });
 
     try {
-      await organiseTask(newTask as TaskWithRelations);
+      await organiseTask(newTask as TaskWithRelations, [new Date(), addDays(new Date(), 7)]);
     } catch (error) {
       console.log('Failed to organise task ❌', error);
     }

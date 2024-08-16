@@ -2,7 +2,7 @@ import React from 'react';
 import { DeleteTask } from '@/components/tasks/delete-task';
 import { getTaskMindset } from '@/lib/data';
 import { Task } from '@prisma/client';
-import { dateToDDMMYYYY } from '@/utils/dateUtils';
+import { dateToDDMMYYYY } from '@/utils/date-utils';
 
 interface TaskCardProps {
     task: Task

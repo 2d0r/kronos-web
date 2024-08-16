@@ -1,4 +1,4 @@
-import { dateToDDMMYYYY, dateToHHMM, getLocalStartAndEnd, getMinutesBetweenLocalAndUTC } from '@/utils/dateUtils';
+import { dateToDDMMYYYY, dateToHHMM, getLocalStartAndEnd, getMinutesBetweenLocalAndUTC } from '@/utils/date-utils';
 import { Event } from '@prisma/client';
 import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import React from 'react';

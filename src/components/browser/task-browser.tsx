@@ -5,7 +5,7 @@ import { FC, useEffect, useState } from 'react';
 import { Dropdown } from '@/components/form-fields';
 import { ActionType, DEFAULT_MINDSET_LIST, TaskWithRelations } from '@/lib/definitions';
 import '@/app/globals.css';
-import { adjustLightness } from '@/utils/colourUtils';
+import { adjustLightness } from '@/utils/colour-utils';
 import { History } from 'lucide-react';
 import Link from 'next/link';
 import TaskCard from '@/components/tasks/task-card';

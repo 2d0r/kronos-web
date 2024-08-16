@@ -7,12 +7,12 @@ import { HfTimegrid, defineCustomElements } from '@hexaflexa/timegrid-react';
 import { HfTimegridConfig, utcDateToString, HfEvent } from '@hexaflexa/timegrid';
 import './calendar-hexaflexa.css';
 import { Event } from '@prisma/client';
-import { eventsToHf } from '@/utils/dateUtils';
+import { eventsToHf } from '@/utils/date-utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ActionType, MindsetWithRelations } from '@/lib/definitions';
 import TaskCard from '../tasks/task-card';
-import { fetchUpdatedTaskEvents } from '@/lib/data';
-import { getTimegridConfig } from '@/utils/calendarUtils';
+import { fetchEventsOfTask } from '@/lib/data';
+import { getTimegridConfig } from '@/utils/calendar-utils';
 defineCustomElements();
 
 const CalendarComponent: React.FC<{ 
@@ -78,7 +78,7 @@ const CalendarComponent: React.FC<{
         timegridRef.current!.config = timegridConfig;
     }
     const handleTaskUpdate = async (taskId: string, action: ActionType) => {
-        const newEvents = await fetchUpdatedTaskEvents(taskId);
+        const newEvents = await fetchEventsOfTask(taskId);
         reloadEvents(newEvents);
     }
 

@@ -1,4 +1,7 @@
-import { Mindset, Task } from '@prisma/client';
+import { fetchEventsOfTask } from '@/lib/data';
+import { Event, Mindset, Task } from '@prisma/client';
+import { calcRepeatIntervalInMinutes, minutesBetweenDates } from './date-utils';
+import { TaskWithRelations } from '@/lib/definitions';
 
 interface Sortable {
     [key: string]: any;
@@ -51,3 +54,11 @@ export const createNewDateObjectsForProps = (object: any) => {
     }
     return object;
 }
+
+export const getTaskRepeatPhase = (task: TaskWithRelations, organiseFrom?: Date,) => {
+    const taskRepeatIntervalInMinutes = calcRepeatIntervalInMinutes(task);
+    if (task.firstSessionStartTime) {
+        return minutesBetweenDates(task.firstSessionStartTime, organiseFrom || new Date()) % taskRepeatIntervalInMinutes;
+    }
+    return 0;
+} 

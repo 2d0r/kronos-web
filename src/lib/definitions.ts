@@ -48,12 +48,12 @@ export const DAYS_OF_WEEK_DICT : { [key: string]: number } = {
     'Friday': 5,
     'Saturday': 6,
 }
-export const PRIORITY_ORDER: {[key: string]: number} = {
-    'veryHigh': 4,
-    'high': 3,
-    'medium': 2,
-    'low': 1,
-}
+export const PRIORITY_ORDER = {
+    [Priority['veryHigh']]: 0,
+    [Priority['high']]: 1,
+    [Priority['medium']]: 2,
+    [Priority['low']]: 3
+};
 
 // TYPES
 

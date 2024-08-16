@@ -5,7 +5,7 @@ import {
 } from '@/lib/definitions';
 import {
     getCurrentTimeOfDay
-} from '@/utils/dateUtils';
+} from '@/utils/date-utils';
 import { Task, Mindset } from '@prisma/client';
 import { getCurrentTask } from '@/lib/data';
 

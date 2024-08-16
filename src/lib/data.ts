@@ -458,7 +458,7 @@ export const fetchTask = async (taskId: string) => {
   const data = await response.json();
   return data.task;
 }
-export const fetchUpdatedTaskEvents = async (taskId: string) => {
+export const fetchEventsOfTask = async (taskId: string) => {
   const response = await fetch(`/event/${taskId}`);
   const data = await response.json();
   return data.events;

@@ -2,10 +2,10 @@
 
 import clsx from 'clsx';
 import React, { useEffect, useRef, useState } from 'react';
-import { camelcaseToTitlecase } from '@/utils/textUtils';
+import { camelcaseToTitlecase } from '@/utils/text-utils';
 import '@/app/globals.css';
 import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
-import { adjustLightness } from '@/utils/colourUtils';
+import { adjustLightness } from '@/utils/colour-utils';
 
 function capitalise(text: string) {
     return text[0].toUpperCase() + text.slice(1);

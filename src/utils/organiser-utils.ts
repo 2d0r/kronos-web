@@ -1,11 +1,13 @@
 // If repeating: Go to its next occurrence -> go to a time that divides perfectly by timespan
 
 import { DayOfWeek, Event, Task, Timespan } from '@prisma/client';
-import { DAYS_OF_WEEK_DICT, DEFAULT_TIME_ZONE, MAX_REP_OFFSET, PRIORITY_ORDER, TaskWithRelations } from '@/lib/definitions';
-import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates } from './dateUtils';
+import { DAYS_OF_WEEK_DICT, DEFAULT_TIME_ZONE, EventWithRelations, MAX_REP_OFFSET, PRIORITY_ORDER, TaskWithRelations } from '@/lib/definitions';
+import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates } from './date-utils';
 import { addDays } from 'date-fns';
 import { createTimespan, getIntersectingTimespans, scheduleEventForTask, updateTimespan } from '@/lib/actions';
 import { getTimezoneOffset } from 'date-fns-tz';
+import { fetchEventsOfTask, findEventsInTimespan } from '@/lib/data';
+import { getTaskRepeatPhase } from './task-utils';
 
 // Can only calculate for tasks that had their first session already scheduled
 export const getIdealReps = (task: Task, timespan: [Date, Date], idealFirstRepTime?: Date): Date[] => {
@@ -418,4 +420,53 @@ export const updateOrganisedTimespans = async (organisedTimespan: [Date, Date]) 
     }
     
 
+}
+
+export const countFreeTimeInTimespan = async (timespan: [Date, Date], events?: EventWithRelations[]) => {
+    let cursor = timespan[0];// Set a cursor at start
+    let minutesCounter = 0; // Define a timer
+
+    events = events || await findEventsInTimespan(timespan[0], timespan[1]) || [];
+    const sortedEvents = events.sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
+    
+    sortedEvents.forEach((event, idx) => { // Loop through events, sorted chronologically
+        // Measure time between cursor and event start
+        const freeMinutes = minutesBetweenDates(cursor, event.startTime);
+        if (freeMinutes > 0) minutesCounter += freeMinutes;
+        // Move cursor to end of event
+        cursor = event.endTime;
+        
+        // If last event, measure between end of event and end of timespan
+        if (idx === sortedEvents.length - 1) {
+            const freeMinutes = minutesBetweenDates(event.endTime, timespan[1]);
+            if (freeMinutes > 0) minutesCounter += freeMinutes;
+        }
+    });
+        
+    return minutesCounter;
+}
+
+export const countEventsOfTaskToBeScheduled = (task: TaskWithRelations, timespanToOrganise: [Date, Date], unit: ('count' | 'duration')) => {
+    // COUNT EVENTS THAT NEED SCHEDULING
+    const timespanInMinutes = minutesBetweenDates(timespanToOrganise[0], timespanToOrganise[1]);
+
+    // Return duration of one-time task
+    if (task.repeat === false) {
+        return unit === 'duration' ? task.duration : 1;
+    }
+
+    // For repeating tasks, estimate number of sessions that fit in the given timespan
+    if ( task.repeatUnit === 'sessions' && task.repeatFrequency && task.repeatTimespanMultiplier && task.repeatTimespan ) {
+        const taskRepeatIntervalInMinutes = calcRepeatIntervalInMinutes(task);
+        
+        // Find where we are between the task's sessions, by dividing the time before its first event by its repeatTimespan
+        const repeatPhase = getTaskRepeatPhase(task, timespanToOrganise[0]);
+        // Substract frequency phase from timespan, to accurately estimate how many sessions fit in this timespan
+        const taskSessionsToSchedule = Math.round((timespanInMinutes - repeatPhase) / taskRepeatIntervalInMinutes);
+        // console.log('taskSessionsToSchedule', taskSessionsToSchedule); // ✅
+        return unit === 'duration' ? task.duration * taskSessionsToSchedule : taskSessionsToSchedule;
+    } else {
+        console.error('Database error: Task is missing repetition data.');
+        return 0;
+    }
 }

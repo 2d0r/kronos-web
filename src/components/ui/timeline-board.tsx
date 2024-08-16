@@ -6,7 +6,7 @@ import TopBar from '@/components/ui/top-bar';
 import { NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
 import SearchBar from '@/components/search';
 import Menu from '@/components/menu';
-import { adjustLightness } from '@/utils/colourUtils';
+import { adjustLightness } from '@/utils/colour-utils';
 import clsx from 'clsx';
 import { Mindset } from '@prisma/client';
 import { useSearchParams } from 'next/navigation';
