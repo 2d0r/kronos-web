@@ -44,6 +44,7 @@ const TestView: FC<TestViewProps> = ({
     // HANDLERS
 
     const handleTaskUpdate = async (taskId: string, action: ActionType) => {
+        console.log('test-view/handleTaskUpdate - action:', action);
         switch(action) {
             case 'create':
                 const newTask = await fetchTask(taskId);
@@ -109,6 +110,7 @@ const TestView: FC<TestViewProps> = ({
                 mindsets={mindsets} 
                 mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}
                 parentName='TestView'
+                onTaskUpdate={handleTaskUpdate}
             />
             <div className='container w-full flex flex-row gap-8 p-4 justify-center'>
                 <Button 

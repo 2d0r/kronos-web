@@ -3,7 +3,7 @@
 import { Mindset, Status, TaskType } from '@prisma/client';
 import { FC, useEffect, useState } from 'react';
 import { Dropdown } from '@/components/form-fields';
-import { ActionType, DEFAULT_MINDSET_LIST, TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
+import { ActionType, DEFAULT_MINDSET_LIST, TaskWithRelations } from '@/lib/definitions';
 import '@/app/globals.css';
 import { adjustLightness } from '@/utils/colourUtils';
 import { History } from 'lucide-react';
@@ -20,7 +20,8 @@ const TaskBrowser: FC<{
     mindsets: Mindset[], 
     mindsetColour: string,
     parentName?: string,
-}> = ({initialTasks, mindsets, mindsetColour, parentName}) => {
+    onTaskUpdate?: (taskId: string, action: ActionType) => void,
+}> = ({initialTasks, mindsets, mindsetColour, parentName, onTaskUpdate}) => {
 
     const searchParams = useSearchParams();
 
@@ -66,6 +67,7 @@ const TaskBrowser: FC<{
         setSort(newSort);
     }
     const handleTaskUpdate = async (taskId: string, action: ActionType) => {
+        console.log('task-browser/handleTaskUpdate - action:', taskId, action);
         switch(action) {
             case 'create':
                 const newTask = await fetchTask(taskId);
@@ -77,6 +79,7 @@ const TaskBrowser: FC<{
                 const editedTask = await fetchTask(taskId);
                 setTasksCache(prevCache => ([ ...prevCache.filter(task => task.id !== taskId), editedTask ]));
         }
+        onTaskUpdate && onTaskUpdate(taskId, action);
     }
 
 
@@ -92,8 +95,12 @@ const TaskBrowser: FC<{
         setLogbookView(newLogbookView);
     }, [searchParams]);
     useEffect(() => {
+        console.log('task-browser/useEffect[initialTasks]', initialTasks)
         initialTasks && setTasksCache(initialTasks);
     }, [initialTasks]);
+    useEffect(() => {
+        console.log('task-browser/useEffect[taskCache] - tasksCache:', tasksCache);
+    }, [tasksCache])
 
     return(
         <div className='flex flex-col items-center gap-4'>
@@ -167,7 +174,7 @@ const TaskBrowser: FC<{
             {/* Task list */}
             <div className='flex h-2/3 w-full items-start justify-center gap-6'>
                 <TaskList
-                    tasksCache={tasksCache}
+                    initialTasks={tasksCache}
                     onTaskUpdate={handleTaskUpdate}
                     mindsets={mindsets}
                     filters={{

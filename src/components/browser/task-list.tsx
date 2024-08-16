@@ -18,9 +18,9 @@ type Filters = {
 }
 
 export default function TaskList ({
-    tasksCache, onTaskUpdate, filters, mindsets,
+    initialTasks, onTaskUpdate, filters, mindsets,
 } : {
-    tasksCache: TaskWithRelations[],
+    initialTasks: TaskWithRelations[],
     filters: Filters,
     onTaskUpdate: (taskId: string, action: ActionType) => void,
     mindsets: Mindset[],
@@ -30,12 +30,12 @@ export default function TaskList ({
 
     const updateTaskList = (newTaskList: TaskWithRelations[], filters: Filters) => {
 
-        if (!newTaskList || !newTaskList.length) return;
-
         const { typeFilter, mindsetFilter, logbookFilter } = filters;
 
+        console.log('task-list/updateTaskList - newTaskList:', newTaskList);
+
         // Filter tasks
-        let filteredTasks = newTaskList.filter(task => task.type === typeFilter);
+        let filteredTasks = newTaskList.filter(task => !!task).filter(task => task.type === typeFilter);
         // Filter by status (for logbook)
         filteredTasks = filteredTasks.filter(task => logbookFilter ? task.status === 'done' : task.status !== 'done');
         // Filter by mindset
@@ -65,29 +65,35 @@ export default function TaskList ({
     // HANDLERS
 
     const handleTaskStatusUpdate = async (taskId: string, status: Status) => {
-        await fetch(`/task/${taskId}`, {
+        const response = await fetch(`/task/${taskId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ status: status }),
         });
+        const data = await response.json();
+        const updatedTask = data.task;
         onTaskUpdate(taskId, 'edit');
+        updateTaskList([...taskList.filter(task => task.id !== taskId), updatedTask], filters);
     }
-    const handleTaskUpdate = (taskId: string, action: ActionType) => {
-        onTaskUpdate(taskId, action);
+    const handleTaskDelete = (taskId: string) => {
+        onTaskUpdate(taskId, 'delete');
+        updateTaskList(taskList.filter(task => task.id !== taskId), filters);
     }
 
     
     // HOOKS
 
     useEffect(() => {
-        updateTaskList(tasksCache, filters);
+        console.log('task-list/useEffect[]', initialTasks);
+        updateTaskList(initialTasks, filters);
     }, []);
+    // Update taskList when new filters come from browser
     useEffect(() => {
-        console.log('taskList/useEffect - taskCache', tasksCache);
-        updateTaskList(tasksCache, filters);
-    }, [tasksCache, filters]);
+        console.log('task-list/useEffect[taskCache]', initialTasks);
+        updateTaskList(initialTasks, filters);
+    }, [initialTasks, filters]);
 
 
     const { tableView, typeFilter } = filters;
@@ -97,7 +103,7 @@ export default function TaskList ({
             return (<div className='flex flex-col gap-2 w-full max-w-1/2 items-start justify-start py-2'>
                 {taskList.map((task: TaskWithRelations) => {
                     return(
-                        <ToDoItem key={task.id} task={task} onTaskStatusUpdated={handleTaskStatusUpdate} onTaskUpdate={handleTaskUpdate}/>
+                        <ToDoItem key={task.id} task={task} onTaskStatusUpdated={handleTaskStatusUpdate} onTaskDelete={handleTaskDelete}/>
                     );
                 })}
                 { taskList.length === 0 &&
@@ -119,7 +125,7 @@ export default function TaskList ({
                                 <span className='text-lg'>{task.name}</span>
                                 <span className='text-sm'>{task.notes}</span>
                                 <div className='w-full flex flex-col gap-2 items-start'>
-                                    { tasksCache.filter(subtask => subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
+                                    { initialTasks.filter(subtask => subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
                                         return(<div className={'flex gap-2 items-center text-sm'} key={innerTask.id}>
                                             <Checkbox taskId={innerTask.id} status={innerTask.status} type={innerTask.type}
                                                 height='20' width='20' fill='white'

@@ -11,8 +11,8 @@ const ToDoItem: FC<{
     className?: string, 
     size?: ('small' | 'regular'), 
     onTaskStatusUpdated: (taskId: string, status: Status) => void,
-    onTaskUpdate: (taskId: string, action: ActionType) => void,
-}> = ({task, className, size = 'regular', onTaskStatusUpdated, onTaskUpdate}) => {
+    onTaskDelete: (taskId: string) => void,
+}> = ({task, className, size = 'regular', onTaskStatusUpdated, onTaskDelete}) => {
     
     const [ showEdit, setShowEdit ] = useState<boolean>(false);
 
@@ -26,7 +26,7 @@ const ToDoItem: FC<{
         await fetch(`/task/${taskId}`, {
             method: 'DELETE'
         });
-        onTaskUpdate(taskId, 'delete');
+        onTaskDelete(taskId);
     }
 
 
