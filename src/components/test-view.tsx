@@ -16,24 +16,20 @@ import { addDaysToDate } from '@/utils/date-utils';
 import { organiseTimespan } from '@/lib/organise-timespan';
 import { fetchEvents, fetchTask, fetchTasks, fetchUpcomingEvents, fetchEventsOfTask } from '@/lib/data';
 import { useSearchParams } from 'next/navigation';
+import { useTasks, setTasks, useEvents, setEvents, useMindsets } from '@/store/store';
+import { useDispatch } from 'react-redux';
 
 interface TestViewProps {
     children?: JSX.Element | JSX.Element[];
     back?: boolean;
-    mindsets: MindsetWithRelations[];
     mindsetColour: string;
-    tasks: TaskWithRelations[];
-    events: EventWithRelations[];
 }
 
 const TestView: FC<TestViewProps> = ({
-    back, mindsets, mindsetColour, tasks, events,
+    back, mindsetColour,
 }) => {
 
-    const [ tasksCache, setTasksCache ] = useState<TaskWithRelations[]>(tasks);
-    const [ eventsCache, setEventsCache ] = useState<Event[]>(events);
-    const [ newEventsCache, setNewEventsCache ] = useState<Event[]>([]);
-    
+    const dispatch = useDispatch();
 
     // MODALS
 
@@ -43,32 +39,10 @@ const TestView: FC<TestViewProps> = ({
 
     // HANDLERS
 
-    const handleTaskUpdate = async (taskId: string, action: ActionType) => {
-        console.log('test-view/handleTaskUpdate - action:', action);
-        switch(action) {
-            case 'create':
-                const newTask = await fetchTask(taskId);
-                setTasksCache(prevCache => ([ ...prevCache, newTask ]));
-                break;
-            case 'delete':
-                if (tasksCache.length) {
-                    setTasksCache(prevCache => prevCache.filter(task => task?.id !== taskId));
-                }
-                break;
-            case 'edit':
-                const editedTask = await fetchTask(taskId);
-                // console.log('testView/hadnleTaskUpdate/edit', editedTask.name);
-                setTasksCache(prevCache => ([ ...prevCache.filter(task => task.id !== taskId), editedTask ]));
-                break;
-        }
-        // Get new events and pass them to the Calendar Component
-        const newEvents = await fetchEvents();
-        setEventsCache(newEvents);
-    }
     const handleDeleteAllEvents = async () => {
         await deleteAllEvents();
         const newEvents = await fetchEvents();
-        setEventsCache(newEvents);
+        dispatch(setEvents(newEvents));
     }
     const handleOrganise = async (daysAhead: number = 30) => {
         const currentTime = new Date();
@@ -83,9 +57,9 @@ const TestView: FC<TestViewProps> = ({
         });
         setTimeout(async () => {
             const newEvents = await fetchEvents();
-            setEventsCache(newEvents);
+            dispatch(setEvents(newEvents));
             const newTasks = await fetchTasks();
-            setTasksCache(newTasks);
+            dispatch(setTasks(newTasks));
         }, 1000);
     }
 
@@ -99,19 +73,14 @@ const TestView: FC<TestViewProps> = ({
         <div className={clsx('max-h-none z-[39] bg-white rounded-3xl shadow-xl w-fit p-4 flex flex-col gap-4 items-center justify-start')}>
             <div className='h-[60vh] w-[80vw]'>
                 <CalendarComponent 
-                    initialEvents={eventsCache}
                     mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR} 
-                    mindsets={mindsets} 
                     startWeekToday={true}
                     ownTaskCard={false}
                 />
             </div>
             <TaskBrowser 
-                initialTasks={tasksCache} 
-                mindsets={mindsets} 
                 mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}
                 parentName='TestView'
-                onTaskUpdate={handleTaskUpdate}
             />
             <div className='container w-full flex flex-row gap-8 p-4 justify-center'>
                 <Button 
@@ -126,12 +95,6 @@ const TestView: FC<TestViewProps> = ({
                 </Button>
             </div>
         </div>
-        {showTaskCard && 
-            <TaskCard 
-                mindsets={mindsets}
-                onTaskUpdate={(taskId, action) => handleTaskUpdate(taskId, action)}
-            />
-        }
         <BottomBar mindsetColour={mindsetColour} />
     </div>)
 }

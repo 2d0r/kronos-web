@@ -40,7 +40,7 @@ model Task {
   repeatUnit               RepeatUnit  @default(sessions)
   repeatFrequency          Int?
   repeatTimespanMultiplier Int         @default(1)
-  repeatTimespan           TimeSpan?
+  repeatTimespan           TimeUnit?
   timeSpent                Int         @default(0)
   firstSessionStartTime    DateTime?
   latestSessionStartTime   DateTime?
@@ -100,7 +100,7 @@ enum Priority {
   low
 }
 
-enum TimeSpan {
+enum TimeUnit {
   hour
   day
   week

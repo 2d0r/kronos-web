@@ -1,13 +1,13 @@
 'use client';
 
-import { Priority, TaskType, Task, Mindset, Status } from '@prisma/client';
-import ToDoItem from './to-do-item';
-import { ActionType, PRIORITY_ORDER, TaskWithRelations } from '@/lib/definitions';
-import Checkbox from './checkbox';
-import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/date-utils';
 import { useEffect, useState } from 'react';
-
-type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
+import { TaskType, Task, Mindset, Status } from '@prisma/client';
+import ToDoItem from './to-do-item';
+import Checkbox from './checkbox';
+import { PRIORITY_ORDER, SortItem, TaskWithRelations } from '@/lib/definitions';
+import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/date-utils';
+import { useTasks, setTasks } from '@/store/store';
+import { useDispatch } from 'react-redux';
 
 type Filters = {
     mindsetFilter: string, 
@@ -18,14 +18,14 @@ type Filters = {
 }
 
 export default function TaskList ({
-    initialTasks, onTaskUpdate, filters, mindsets,
+    filters, mindsets,
 } : {
-    initialTasks: TaskWithRelations[],
     filters: Filters,
-    onTaskUpdate: (taskId: string, action: ActionType) => void,
     mindsets: Mindset[],
 }) {
 
+    const tasks = useTasks();
+    const dispatch = useDispatch();
     const [ taskList, setTaskList ] = useState<TaskWithRelations[]>([]);
 
     const updateTaskList = (newTaskList: TaskWithRelations[], filters: Filters) => {
@@ -56,7 +56,6 @@ export default function TaskList ({
     }
 
 
-
     // HANDLERS
 
     const handleTaskStatusUpdate = async (taskId: string, status: Status) => {
@@ -69,26 +68,24 @@ export default function TaskList ({
         });
         const data = await response.json();
         const updatedTask = data.task;
-        onTaskUpdate(taskId, 'edit');
-        updateTaskList([...taskList.filter(task => task.id !== taskId), updatedTask], filters);
+        dispatch(setTasks([...taskList.filter(task => task.id !== taskId), updatedTask]));
     }
     const handleTaskDelete = (taskId: string) => {
-        onTaskUpdate(taskId, 'delete');
-        updateTaskList(taskList.filter(task => task.id !== taskId), filters);
+        dispatch(setTasks(tasks.filter(task => task.id !== taskId)));
     }
 
     
     // HOOKS
 
     useEffect(() => {
-        console.log('task-list/useEffect[]', initialTasks);
-        updateTaskList(initialTasks, filters);
+        console.log('task-list/useEffect[]', tasks);
+        updateTaskList(tasks, filters);
     }, []);
-    // Update taskList when new filters come from browser
+    // Update taskList when tasks are updated in store, or filters updated in TaskBrowser
     useEffect(() => {
-        console.log('task-list/useEffect[taskCache]', initialTasks);
-        updateTaskList(initialTasks, filters);
-    }, [initialTasks, filters]);
+        updateTaskList(tasks, filters);
+        console.log('task-list/useEffect[tasks, filters]', tasks);
+    }, [tasks, filters]);
 
 
     const { tableView, typeFilter } = filters;
@@ -120,7 +117,7 @@ export default function TaskList ({
                                 <span className='text-lg'>{task.name}</span>
                                 <span className='text-sm'>{task.notes}</span>
                                 <div className='w-full flex flex-col gap-2 items-start'>
-                                    { initialTasks.filter(subtask => subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
+                                    { taskList.filter(subtask => subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
                                         return(<div className={'flex gap-2 items-center text-sm'} key={innerTask.id}>
                                             <Checkbox taskId={innerTask.id} status={innerTask.status} type={innerTask.type}
                                                 height='20' width='20' fill='white'

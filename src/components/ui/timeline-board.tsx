@@ -3,12 +3,11 @@
 import { FC } from 'react';
 import BottomBar from '@/components/ui/bottom-bar';
 import TopBar from '@/components/ui/top-bar';
-import { NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
+import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import SearchBar from '@/components/search';
 import Menu from '@/components/menu';
 import { adjustLightness } from '@/utils/colour-utils';
 import clsx from 'clsx';
-import { Mindset } from '@prisma/client';
 import { useSearchParams } from 'next/navigation';
 
 interface TimelineBoardProps {
@@ -16,13 +15,11 @@ interface TimelineBoardProps {
     back?: boolean;
     cardClassName?: string;
     timelineClassName?: string;
-    mindsets?: Mindset[];
     mindsetColour?: string;
-    tasks?: TaskWithRelations[];
 }
 
 const TimelineBoard: FC<TimelineBoardProps> = ({
-    children, back, cardClassName, timelineClassName, mindsets, mindsetColour, tasks,
+    children, back, cardClassName, timelineClassName, mindsetColour,
 }) => {
 
     // Modals

@@ -13,20 +13,18 @@ import TaskList from '@/components/browser/task-list';
 import { fetchTask } from '@/lib/data';
 import { useSearchParams } from 'next/navigation';
 import { TaskCardSkeleton } from '@/components/ui/skeletons';
+import { useMindsets } from '@/store/store';
 
 type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
 
 const TaskBrowser: FC<{
-    initialTasks: TaskWithRelations[], 
-    mindsets: Mindset[], 
     mindsetColour: string,
     parentName?: string,
-    onTaskUpdate?: (taskId: string, action: ActionType) => void,
-}> = ({initialTasks, mindsets, mindsetColour, parentName, onTaskUpdate}) => {
+}> = ({mindsetColour, parentName}) => {
 
     const searchParams = useSearchParams();
-
-    const [ tasksCache, setTasksCache ] = useState<TaskWithRelations[]>(initialTasks);
+    const mindsets = useMindsets();
+    
     const [ taskTypeFilter, setTaskTypeFilter ] = useState<TaskType>('task');
     const [ mindsetFilter, setMindsetFilter ] = useState<string>('All');
     const [ tableView, setTableView ] = useState<boolean>(false);
@@ -67,21 +65,6 @@ const TaskBrowser: FC<{
         setLogbookView(newLogbookView);
         setSort(newSort);
     }
-    const handleTaskUpdate = async (taskId: string, action: ActionType) => {
-        console.log('task-browser/handleTaskUpdate - action:', taskId, action);
-        switch(action) {
-            case 'create':
-                const newTask = await fetchTask(taskId);
-                setTasksCache(prevCache => ([ ...prevCache, newTask ]));
-            case 'delete':
-                if (tasksCache.length)
-                    setTasksCache(prevCache => prevCache.filter(task => task.id !== taskId));
-            case 'edit':
-                const editedTask = await fetchTask(taskId);
-                setTasksCache(prevCache => ([ ...prevCache.filter(task => task.id !== taskId), editedTask ]));
-        }
-        onTaskUpdate && onTaskUpdate(taskId, action);
-    }
 
 
     // HOOKS
@@ -95,19 +78,9 @@ const TaskBrowser: FC<{
         const newSort : SortItem = newLogbookView ? ['Date', 'Descending'] : ['Priority', 'Descending'];
         setLogbookView(newLogbookView);
     }, [searchParams]);
-    useEffect(() => {
-        console.log('task-browser/useEffect[initialTasks]', initialTasks)
-        initialTasks && setTasksCache(initialTasks);
-    }, [initialTasks]);
-    useEffect(() => {
-        console.log('task-browser/useEffect[taskCache] - tasksCache:', tasksCache);
-    }, [tasksCache])
 
     return(
         <div className='flex flex-col items-center gap-4'>
-            {(showTaskCard && parentName !== 'TestView') &&
-                <TaskCard mindsets={mindsets} onTaskUpdate={handleTaskUpdate} />
-            }
             {/* Tab bar */}
             <div className='flex gap-4 items-center justify-center'>
                 <button 
@@ -135,6 +108,7 @@ const TaskBrowser: FC<{
                     onClick={() => handleTaskTypeFilter('goal')}
                 >Goals</button>
             </div>
+
             {/* Filter and sort */}
             { taskTypeFilter !== 'goal' && 
             <div className='flex gap-4 items-center'>
@@ -160,7 +134,6 @@ const TaskBrowser: FC<{
                         <img src={sort[1] === 'Ascending' ? './icons/sort-desc.svg' : './icons/sort-asc.svg'} />
                     </div>
                 </div>
-                
                 <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
                     <img src={ tableView === false ? './icons/table-rows.svg' : './icons/list-bulleted.svg'} />
                 </div>
@@ -176,8 +149,6 @@ const TaskBrowser: FC<{
             {/* Task list */}
             <div className='flex h-2/3 w-full items-start justify-center gap-6'>
                 <TaskList
-                    initialTasks={tasksCache}
-                    onTaskUpdate={handleTaskUpdate}
                     mindsets={mindsets}
                     filters={{
                         mindsetFilter: mindsetFilter,

@@ -2,24 +2,20 @@
 
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import TaskCard from './tasks/task-card';
 import EventCard from './event-card';
 import Link from 'next/link';
 import Menu from './menu';
 import TransportControls from './buttons/transport-controls';
 import { Mindset } from '@prisma/client';
 import { fetchUpcomingEvents } from '@/lib/data';
-import { ActionType, EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
+import { EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { convertPropsToDate } from '@/utils/date-utils';
+import { useMindsets } from '@/store/store';
 
-interface TimelineProps {
-    mindsets: Mindset[];
-}
+export default function Timeline() {
 
-export default function Timeline({ mindsets } : TimelineProps) {
-
+    const mindsets = useMindsets();
     const searchParams = useSearchParams();
-    const showTaskCard = !!searchParams.get('task');
     const showMenu = !!searchParams.get('menu');
 
     const [ eventQueue, setEventQueue ] = useState<EventWithRelations[]>([]);
@@ -50,10 +46,6 @@ export default function Timeline({ mindsets } : TimelineProps) {
         setMindsetColour(newMindsetQueue[0].colour || NEUTRAL_MINDSET_COLOUR);
     }
 
-    const handleTaskUpdate = async (taskId: string, action: ActionType) => {
-        handleEventsUpdate();
-    }
-
 
     // HOOKS
 
@@ -62,9 +54,6 @@ export default function Timeline({ mindsets } : TimelineProps) {
         const timePassingInterval = setInterval(handleEventsUpdate, 300000); // every 5 minutes
         return () => clearInterval(timePassingInterval);
     }, []);
-    // useEffect(() => {
-    //     console.log('eventQueue', eventQueue);
-    // }, [eventQueue]);
 
     return (<>
         <div className='w-full h-full flex flex-col items-center justify-center'>
@@ -91,6 +80,5 @@ export default function Timeline({ mindsets } : TimelineProps) {
             }
             { showMenu && <Menu mindsetColour={mindsetColour} /> }
         </div>
-        { showTaskCard && <TaskCard mindsets={mindsets} onTaskUpdate={handleTaskUpdate} /> }
     </>)
 }

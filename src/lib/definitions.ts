@@ -1,4 +1,4 @@
-import { Status, TimeSpan, Priority, TimeOfDay, DayOfWeek, RepeatUnit, Prisma, Mindset, TimespanType } from '@prisma/client';
+import { Status, TimeUnit, Priority, TimeOfDay, DayOfWeek, RepeatUnit, Prisma, Mindset, TimespanType } from '@prisma/client';
 import { Url } from 'next/dist/shared/lib/router/router';
 import { ReactElement } from 'react';
 
@@ -55,27 +55,39 @@ export const PRIORITY_ORDER = {
     [Priority['low']]: 3
 };
 
+
+
 // TYPES
 
+export type ActionType = ('edit' | 'create' | 'delete');
+export type CheckboxStatus = ('checked' | 'blank');
+export type eventsToSchedule = {
+    taskId: string,
+    count: number,
+}[];
+export type EventWithRelations = Prisma.EventGetPayload<{
+    include: { 
+        task: true,
+    }
+}>;
 export type Frequency = {
     times: number,
     timeRange: string,
-}
-
-export type Task = {
-    id: string;
-    name: string;
-    mindset: string;
-    status: string;
-}
-
-export type User = {
-    id: string;
-    name: string;
-    email: string;
-    password: string;
 };
-
+export type MindsetField = {
+    id: string;
+    name: string;
+};
+export type MindsetWithRelations = Prisma.MindsetGetPayload<{
+    include: {
+        tasks: true
+    }
+}>;
+export type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
+export type StatusField = {
+    id: string;
+    name: string;
+}
 export type TaskChain = {
     prevTask: string[],
     nextTask: string[],
@@ -83,18 +95,7 @@ export type TaskChain = {
     nextTaskCausal: string[],
     // causal links act like blocked by in Jira: task B can only be done if task A was done
     // TO DO: 
-}
-
-export type MindsetField = {
-    id: string;
-    name: string;
-}
-
-export type StatusField = {
-    id: string;
-    name: string;
-}
-
+};
 export type TaskWithRelations = Prisma.TaskGetPayload<{
     include: { 
         tasksBefore: true,
@@ -106,21 +107,16 @@ export type TaskWithRelations = Prisma.TaskGetPayload<{
         mindset: true,
         events: true,
     }
-}>
+}>;
+export type User = {
+    id: string;
+    name: string;
+    email: string;
+    password: string;
+};
 
-export type EventWithRelations = Prisma.EventGetPayload<{
-    include: { 
-        task: true,
-    }
-}>
 
-export type MindsetWithRelations = Prisma.MindsetGetPayload<{
-    include: {
-        tasks: true
-    }
-}>
 
-export type CheckboxStatus = ('checked' | 'blank');
 
 // Enums
 
@@ -129,7 +125,7 @@ const getEnumValues = (enumType: Record<string, string>) => {
 }
 export const statusList = getEnumValues(Status);
 export const priorityList = getEnumValues(Priority);
-export const timeSpanList = getEnumValues(TimeSpan);
+export const timeSpanList = getEnumValues(TimeUnit);
 export const timeOfDayList = getEnumValues(TimeOfDay);
 export const dayOfWeekList = getEnumValues(DayOfWeek);
 export const repeatUnitList = getEnumValues(RepeatUnit);
@@ -138,58 +134,57 @@ export const timespanTypeList = getEnumValues(TimespanType);
 export let prismaEnums = {
     status: getEnumValues(Status),
     priority: getEnumValues(Priority),
-    timeSpan: getEnumValues(TimeSpan),
+    timeSpan: getEnumValues(TimeUnit),
     preferredTimeOfDay: getEnumValues(TimeOfDay),
     preferredDayOfWeek: getEnumValues(DayOfWeek),
 };
 
-// Props
 
-export type SearchParamProps = {
-    searchParams: Record<string, string>;
+
+// Prop Types
+
+export interface ContainerProps {
+    children: ReactElement | ReactElement[] | null; // Accepts single or multiple children
 };
-
-export interface ITodo {
-    _id: string
-    title: string
-    color?: string
-}
-
-export interface IEventInfo extends Event {
-    _id: string
-    description: string
-    todoId?: string
-    start: Date | undefined
-    end: Date | undefined
-}
-
-export interface EventFormData {
-    description: string
-    todoId?: string
-}
-
 export interface DatePickerEventFormData {
     description: string
     todoId?: string
     allDay: boolean
     start?: Date
     end?: Date
-}
-
-export interface ContainerProps {
-    children: ReactElement | ReactElement[] | null; // Accepts single or multiple children
-}
-
+};
+export interface EventFormData {
+    description: string
+    todoId?: string
+};
+export interface ITodo {
+    _id: string
+    title: string
+    color?: string
+};
+export interface IEventInfo extends Event {
+    _id: string
+    description: string
+    todoId?: string
+    start: Date | undefined
+    end: Date | undefined
+};
+export type SearchParamProps = {
+    searchParams: Record<string, string>;
+};
 export interface URLSearchParamsKronos extends URLSearchParams {
     menu: boolean
     eventId: string
     logbook: boolean
     task: string
-}
+};
 
-export type eventsToSchedule = {
-    taskId: string,
-    count: number,
-}[];
 
-export type ActionType = ('edit' | 'create' | 'delete');
+
+
+
+
+
+
+
+

@@ -1,20 +1,19 @@
 import React from 'react';
-import { MindsetWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
-import { getEventsWithRelations, getMindsetsWithRelations, getTasksWithRelations, getCurrentMindsetColour } from '@/lib/data';
+import { NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from '@/lib/definitions';
+import { getCurrentMindsetColour } from '@/lib/data';
 import TestView from '@/components/test-view';
+import TaskCard from '@/components/tasks/task-card';
 
-export default async function Page() {
+export default async function Page({ searchParams } : {searchParams: URLSearchParamsKronos}) {
 
-    const tasks: TaskWithRelations[] = await getTasksWithRelations(); 
-    const mindsets: MindsetWithRelations[] = await getMindsetsWithRelations();
     const mindsetColour = await getCurrentMindsetColour();
-    const events = await getEventsWithRelations();
+    const showTaskCard = searchParams.task;
 
-    return (<TestView 
-        back={true}
-        mindsets={mindsets}
-        mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}
-        tasks={tasks}
-        events={events}
-    />)
+    return (<>
+        <TestView 
+            back={true}
+            mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}
+        />
+        {showTaskCard && <TaskCard />}
+    </>)
 }
