@@ -1,13 +1,15 @@
 'use client';
 
+import { useMindsetColour } from '@/store/store';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
-export default function AddTaskButton({mindsetColour}: {mindsetColour?: string}) {
+export default function AddTaskButton() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [showTaskCard, setShowAddTask] = useState(false);
+    const mindsetColour = useMindsetColour();
 
     useEffect(() => {
         setShowAddTask(searchParams.get('task') ? true : false);

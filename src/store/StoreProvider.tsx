@@ -2,17 +2,18 @@
 
 import { Timespan } from '@prisma/client';
 import { Provider } from 'react-redux';
-import { createStore, setTasks, setEvents, setMindsets, setTimespans } from './store';
+import { createStore, setTasks, setEvents, setMindsets, setTimespans, setMindsetColour } from './store';
 import { useRef } from 'react';
 import { EventWithRelations, MindsetWithRelations, TaskWithRelations } from '@/lib/definitions';
 
 export default function StoreProvider({
-    tasks, events, mindsets, timespans,
+    tasks, events, mindsets, mindsetColour, timespans,
     children,
 }: {
     tasks: TaskWithRelations[],
     events: EventWithRelations[],
     mindsets: MindsetWithRelations[],
+    mindsetColour: string,
     timespans: Timespan[],
     children: React.ReactNode;
 }) {
@@ -22,6 +23,7 @@ export default function StoreProvider({
         storeRef.current.dispatch(setTasks(tasks));
         storeRef.current.dispatch(setEvents(events));
         storeRef.current.dispatch(setMindsets(mindsets));
+        storeRef.current.dispatch(setMindsetColour(mindsetColour));
         storeRef.current.dispatch(setTimespans(timespans)); 
         // .map(obj => convertDatePropsToLocaleStrings(obj))
     }

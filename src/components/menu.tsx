@@ -10,9 +10,11 @@ import StatsSVG from '@/components/svg/stats-svg';
 import HistorySVG from '@/components/svg/history-svg';
 import SettingsSVG from '@/components/svg/settings-svg';
 import '@/app/globals.css';
+import { useMindsetColour } from '@/store/store';
 
-export default function Menu({mindsetColour = 'black', onBlur}: {mindsetColour?: string, onBlur?: () => void}) {
+export default function Menu({onBlur}: {onBlur?: () => void}) {
     const pathname = usePathname();
+    const mindsetColour = useMindsetColour();
 
     if (pathname.endsWith('/')) {
 

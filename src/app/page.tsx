@@ -1,11 +1,11 @@
 import React from 'react';
-import { getCurrentMindsetColour } from '@/lib/data';
 import TopBar from '@/components/ui/top-bar';
 import BottomBar from '@/components/ui/bottom-bar';
 import { NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from '@/lib/definitions';
 import { adjustLightness } from '@/utils/colour-utils';
 import Timeline from '@/components/timeline';
 import TaskCard from '@/components/tasks/task-card';
+import { getCurrentMindsetColour } from '@/lib/data';
 
 export default async function Page({ searchParams } : { searchParams: URLSearchParamsKronos}) {
 
@@ -19,7 +19,7 @@ export default async function Page({ searchParams } : { searchParams: URLSearchP
                 {/* <SearchBar placeholder="Search tasks, projects, dates..." /> */}
             </TopBar>
             <Timeline />
-            <BottomBar mindsetColour={mindsetColour} />
+            <BottomBar />
             { showTaskCard && <TaskCard />}
         </div>
     );

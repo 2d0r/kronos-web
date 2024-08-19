@@ -10,21 +10,18 @@ import { eventsToHf } from '@/utils/date-utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { getTimegridConfig } from '@/utils/calendar-utils';
-import { useEvents, useTasks } from '@/store/store';
+import { useEvents, useMindsetColour, useTasks } from '@/store/store';
 defineCustomElements();
 
-const CalendarComponent: React.FC<{ 
-    mindsetColour: string, 
+const CalendarComponent: React.FC<{
     startWeekToday?: boolean,
-    ownTaskCard?: boolean,
 }> = ({
-    mindsetColour, startWeekToday = false, ownTaskCard = true }) => {
+    startWeekToday = false }) => {
 
     const events = useEvents();
     const tasks = useTasks();
-
+    const mindsetColour = useMindsetColour();
     const router = useRouter();
-    const searchParams = useSearchParams();
 
     const timezone = 'Europe/Bucharest' // Intl.DateTimeFormat().resolvedOptions().timeZone;
     const startDate: string = utcDateToString(new Date());
@@ -69,7 +66,7 @@ const CalendarComponent: React.FC<{
     useEffect(() => {
         document.documentElement.style.setProperty('--mindset-colour', mindsetColour);
         reloadEvents(events);
-        console.log('calendar/useEffect[events] - tasks:', tasks);
+        // console.log('calendar/useEffect[events] - tasks:', tasks);
     }, [events]);
     
     let timegridRef: RefObject<HTMLHfTimegridElement> = React.createRef();

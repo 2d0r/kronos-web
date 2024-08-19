@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import StoreProvider from '@/store/StoreProvider';
-import { getEventsWithRelations, getMindsetsWithRelations, getTasksWithRelations } from '@/lib/data';
+import { getCurrentMindsetColour, getEventsWithRelations, getMindsetsWithRelations, getTasksWithRelations } from '@/lib/data';
+import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,11 +21,16 @@ export default async function RootLayout({
   const tasks = await getTasksWithRelations();
   const events = await getEventsWithRelations();
   const mindsets = await getMindsetsWithRelations();
+  let mindsetColour = await getCurrentMindsetColour() || NEUTRAL_MINDSET_COLOUR;
+
+  setInterval(async () => {
+    mindsetColour = await getCurrentMindsetColour() || NEUTRAL_MINDSET_COLOUR;
+  }, 1000 * 60);
 
   return (
     <html lang='en' suppressHydrationWarning={true}  >
       <body className={inter.className}>
-        <StoreProvider tasks={tasks} events={events} mindsets={mindsets} timespans={[]} >
+        <StoreProvider tasks={tasks} events={events} mindsets={mindsets} mindsetColour={mindsetColour} timespans={[]} >
           {children}
         </StoreProvider>
       </body>

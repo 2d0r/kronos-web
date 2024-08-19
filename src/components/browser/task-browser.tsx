@@ -1,40 +1,31 @@
 'use client';
 
-import { Mindset, Status, TaskType } from '@prisma/client';
-import { FC, Suspense, useEffect, useState } from 'react';
+import { TaskType } from '@prisma/client';
+import { FC, useEffect, useState } from 'react';
 import { Dropdown } from '@/components/form-fields';
-import { ActionType, DEFAULT_MINDSET_LIST, TaskWithRelations } from '@/lib/definitions';
+import { DEFAULT_MINDSET_LIST, SortItem } from '@/lib/definitions';
 import '@/app/globals.css';
 import { adjustLightness } from '@/utils/colour-utils';
 import { History } from 'lucide-react';
 import Link from 'next/link';
-import TaskCard from '@/components/tasks/task-card';
 import TaskList from '@/components/browser/task-list';
-import { fetchTask } from '@/lib/data';
 import { useSearchParams } from 'next/navigation';
-import { TaskCardSkeleton } from '@/components/ui/skeletons';
-import { useMindsets } from '@/store/store';
-
-type SortItem = [('Priority' | 'Date' | 'Duration'), ('Ascending' | 'Descending')];
+import { useMindsetColour, useMindsets } from '@/store/store';
 
 const TaskBrowser: FC<{
-    mindsetColour: string,
     parentName?: string,
-}> = ({mindsetColour, parentName}) => {
+}> = ({parentName}) => {
 
     const searchParams = useSearchParams();
     const mindsets = useMindsets();
+    const mindsetColour = useMindsetColour();
+
     
     const [ taskTypeFilter, setTaskTypeFilter ] = useState<TaskType>('task');
     const [ mindsetFilter, setMindsetFilter ] = useState<string>('All');
     const [ tableView, setTableView ] = useState<boolean>(false);
     const [ logbookView, setLogbookView ] = useState<boolean>(!!searchParams.get('logbook'));
     const [ sort, setSort ] = useState<SortItem>(searchParams.get('logbook') ? ['Date', 'Descending'] : ['Priority', 'Ascending']);
-
-
-    // MODALS
-
-    const showTaskCard = !!searchParams.get('task');
 
 
     // HANDLERS

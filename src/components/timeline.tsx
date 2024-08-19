@@ -10,17 +10,19 @@ import { Mindset } from '@prisma/client';
 import { fetchUpcomingEvents } from '@/lib/data';
 import { EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { convertPropsToDate } from '@/utils/date-utils';
-import { useMindsets } from '@/store/store';
+import { setMindsetColour, useMindsetColour, useMindsets } from '@/store/store';
+import { useDispatch } from 'react-redux';
 
 export default function Timeline() {
 
     const mindsets = useMindsets();
+    const mindsetColour = useMindsetColour();
+    const dispatch = useDispatch();
     const searchParams = useSearchParams();
     const showMenu = !!searchParams.get('menu');
 
     const [ eventQueue, setEventQueue ] = useState<EventWithRelations[]>([]);
     const [ mindsetQueue, setMindsetQueue ] = useState<Mindset[]>([]);
-    const [ mindsetColour, setMindsetColour ] = useState<string>(NEUTRAL_MINDSET_COLOUR);
 
     // HANDLERS
 
@@ -43,7 +45,7 @@ export default function Timeline() {
         // console.log('newMindsetQueue', newMindsetQueue);
 
         // Update mindset colour
-        setMindsetColour(newMindsetQueue[0].colour || NEUTRAL_MINDSET_COLOUR);
+        dispatch(setMindsetColour(newMindsetQueue[0].colour || NEUTRAL_MINDSET_COLOUR));
     }
 
 
@@ -78,7 +80,7 @@ export default function Timeline() {
                 }
                 </div>)
             }
-            { showMenu && <Menu mindsetColour={mindsetColour} /> }
+            { showMenu && <Menu /> }
         </div>
     </>)
 }

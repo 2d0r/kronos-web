@@ -32,7 +32,7 @@ export default function TaskList ({
 
         const { typeFilter, mindsetFilter, logbookFilter } = filters;
 
-        console.log('task-list/updateTaskList - newTaskList:', newTaskList);
+        // console.log('task-list/updateTaskList - newTaskList:', newTaskList);
 
         // Filter tasks
         let filteredTasks = newTaskList.filter(task => !!task).filter(task => task.type === typeFilter);
@@ -78,13 +78,13 @@ export default function TaskList ({
     // HOOKS
 
     useEffect(() => {
-        console.log('task-list/useEffect[]', tasks);
+        // console.log('task-list/useEffect[]', tasks);
         updateTaskList(tasks.map(obj => convertPropsToDate(obj)), filters);
     }, []);
     // Update taskList when tasks are updated in store, or filters updated in TaskBrowser
     useEffect(() => {
         updateTaskList(tasks.map(obj => convertPropsToDate(obj)), filters);
-        console.log('task-list/useEffect[tasks, filters]', tasks);
+        // console.log('task-list/useEffect[tasks, filters]', tasks);
     }, [tasks, filters]);
 
 

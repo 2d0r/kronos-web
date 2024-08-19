@@ -13,20 +13,18 @@ import { deleteAllEvents } from '@/lib/actions';
 import { addDaysToDate } from '@/utils/date-utils';
 import { organiseTimespan } from '@/lib/organise-timespan';
 import { fetchEvents, fetchTasks } from '@/lib/data';
-import { setTasks, setEvents } from '@/store/store';
+import { setTasks, setEvents, useMindsetColour } from '@/store/store';
 import { useDispatch } from 'react-redux';
 
 interface TestViewProps {
     children?: JSX.Element | JSX.Element[];
     back?: boolean;
-    mindsetColour: string;
 }
 
-const TestView: FC<TestViewProps> = ({
-    back, mindsetColour,
-}) => {
+const TestView: FC<TestViewProps> = ({back}) => {
 
     const dispatch = useDispatch();
+    const mindsetColour = useMindsetColour();
 
 
     // HANDLERS
@@ -64,16 +62,9 @@ const TestView: FC<TestViewProps> = ({
         </TopBar>
         <div className={clsx('max-h-none z-[39] bg-white rounded-3xl shadow-xl w-fit p-4 flex flex-col gap-4 items-center justify-start')}>
             <div className='h-[60vh] w-[80vw]'>
-                <CalendarComponent 
-                    mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR} 
-                    startWeekToday={true}
-                    ownTaskCard={false}
-                />
+                <CalendarComponent  startWeekToday={true} />
             </div>
-            <TaskBrowser 
-                mindsetColour={mindsetColour || NEUTRAL_MINDSET_COLOUR}
-                parentName='TestView'
-            />
+            <TaskBrowser parentName='TestView' />
             <div className='container w-full flex flex-row gap-8 p-4 justify-center'>
                 <Button 
                     className='rounded-md bg-gray-400 from-neutral-950 p-6 w-1/4' 
@@ -87,7 +78,7 @@ const TestView: FC<TestViewProps> = ({
                 </Button>
             </div>
         </div>
-        <BottomBar mindsetColour={mindsetColour} />
+        <BottomBar />
     </div>)
 }
 

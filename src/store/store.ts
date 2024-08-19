@@ -1,5 +1,5 @@
-import { EventWithRelations, MindsetWithRelations, TaskWithRelations } from '@/lib/definitions';
-import { convertDatePropsToLocaleString, convertPropsToDate } from '@/utils/date-utils';
+import { EventWithRelations, MindsetWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations } from '@/lib/definitions';
+import { convertDatePropsToLocaleString } from '@/utils/date-utils';
 import { Timespan } from '@prisma/client';
 import { configureStore, createSlice, PayloadAction, } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
@@ -27,14 +27,19 @@ export const eventsSlice = createSlice({
     }
 });
 
-const initialMindsetsState: { mindsets: MindsetWithRelations[] } = { mindsets: [] };
+const initialMindsetsState: { mindsets: MindsetWithRelations[], mindsetColour: string } = { 
+    mindsets: [], mindsetColour: NEUTRAL_MINDSET_COLOUR 
+};
 export const mindsetsSlice = createSlice({
     name: 'mindsets',
     initialState: initialMindsetsState,
     reducers: {
         setMindsets: (state, action: PayloadAction<MindsetWithRelations[]>) => {
             state.mindsets = action.payload.map(obj => convertDatePropsToLocaleString(obj));
-        }
+        },
+        setMindsetColour: (state, action: PayloadAction<string>) => {
+            state.mindsetColour = action.payload;
+        },
     }
 });
 
@@ -48,7 +53,6 @@ export const timespansSlice = createSlice({
         }
     }
 });
-
 
 export const createStore = () => 
     configureStore({
@@ -69,6 +73,7 @@ export const createStore = () =>
 export const { setTasks } = tasksSlice.actions;
 export const { setEvents } = eventsSlice.actions;
 export const { setMindsets } = mindsetsSlice.actions;
+export const { setMindsetColour } = mindsetsSlice.actions;
 export const { setTimespans } = timespansSlice.actions;
 
 export type StoreType = ReturnType<typeof createStore>;
@@ -78,5 +83,6 @@ export type AppDispatch = StoreType['dispatch'];
 export const useTasks = () => useSelector((state: RootState) => state.tasks.tasks);
 export const useEvents = () => useSelector((state: RootState) => state.events.events);
 export const useMindsets = () => useSelector((state: RootState) => state.mindsets.mindsets);
+export const useMindsetColour = () => useSelector((state: RootState) => state.mindsets.mindsetColour);
 export const useTimespans = () => useSelector((state: RootState) => state.timespans.timespans);
 //.map(obj => convertPropsToDate(obj))
