@@ -1,22 +1,19 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import BottomBar from '@/components/ui/bottom-bar';
 import TopBar from '@/components/ui/top-bar';
-import { ActionType, EventWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations } from '@/lib/definitions';import { adjustLightness } from '@/utils/colour-utils';
-import TaskCard from '@/components/tasks/task-card';
+import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
+import { adjustLightness } from '@/utils/colour-utils';
 import clsx from 'clsx';
-import { Event } from '@prisma/client';
 import CalendarComponent from '@/components/calendar/calendar-hexaflexa';
 import TaskBrowser from '@/components/browser/task-browser';
-import { MindsetWithRelations } from '@/lib/definitions';
 import Button from './buttons/button';
 import { deleteAllEvents } from '@/lib/actions';
 import { addDaysToDate } from '@/utils/date-utils';
 import { organiseTimespan } from '@/lib/organise-timespan';
-import { fetchEvents, fetchTask, fetchTasks, fetchUpcomingEvents, fetchEventsOfTask } from '@/lib/data';
-import { useSearchParams } from 'next/navigation';
-import { useTasks, setTasks, useEvents, setEvents, useMindsets } from '@/store/store';
+import { fetchEvents, fetchTasks } from '@/lib/data';
+import { setTasks, setEvents } from '@/store/store';
 import { useDispatch } from 'react-redux';
 
 interface TestViewProps {
@@ -30,11 +27,6 @@ const TestView: FC<TestViewProps> = ({
 }) => {
 
     const dispatch = useDispatch();
-
-    // MODALS
-
-    const searchParams = useSearchParams();
-    const showTaskCard = !!searchParams.get('task');
 
 
     // HANDLERS

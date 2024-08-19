@@ -22,7 +22,8 @@ export default function StoreProvider({
         storeRef.current.dispatch(setTasks(tasks));
         storeRef.current.dispatch(setEvents(events));
         storeRef.current.dispatch(setMindsets(mindsets));
-        storeRef.current.dispatch(setTimespans(timespans));
+        storeRef.current.dispatch(setTimespans(timespans)); 
+        // .map(obj => convertDatePropsToLocaleStrings(obj))
     }
 
     return <Provider store={storeRef.current}>{children}</Provider>

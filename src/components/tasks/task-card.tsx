@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormState } from 'react-dom';
 import Button from '@/components/buttons/button';
 import { Dropdown, InputField, MultiSelectionField } from '@/components/form-fields';
 import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR, TaskWithRelations } from '@/lib/definitions';
@@ -14,7 +14,7 @@ import { getDate, parseISO } from 'date-fns';
 import NotesEditor from '@/components/notes-editor/notes-editor';
 import {v4 as uuidv4} from 'uuid';
 import EventSection from './event-section';
-import { addMinutesToDate, dateToHtmlInput, minutesBetweenDates } from '@/utils/date-utils';
+import { addMinutesToDate, convertPropsToDate, dateToHtmlInput, minutesBetweenDates } from '@/utils/date-utils';
 import '@/app/globals.css';
 import { ArrowRight } from 'lucide-react';
 import { useTasks, setTasks, setEvents, useEvents, useMindsets } from '@/store/store';
@@ -33,8 +33,10 @@ export default function TaskCard() {
     const tasks = useTasks();
     const events = useEvents();
     const mindsets = useMindsets();
+
+    console.log('taskCard - tasks', tasks);
+    const task = convertPropsToDate(tasks?.find(task => task.id === taskId) || null);
     const dispatch = useDispatch();
-    const task = tasks.find(task => task.id === taskId);
 
 
     // STATES

@@ -36,6 +36,10 @@ module.exports = {
   
       return config
     },
+
+    experimental: {
+      swcPlugins: [["next-superjson-plugin", {}]],
+    },
   
     // ...other config
   }

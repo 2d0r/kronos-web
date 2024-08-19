@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import StoreProvider from '@/store/StoreProvider';
-import { getEventsWithRelations, getMindsetsWithRelations, getTasks, getTasksWithRelations } from '@/lib/data';
+import { getEventsWithRelations, getMindsetsWithRelations, getTasksWithRelations } from '@/lib/data';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,7 +24,7 @@ export default async function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning={true}  >
       <body className={inter.className}>
-        <StoreProvider tasks={tasks} events={events} mindsets={mindsets} timespans={[]}>
+        <StoreProvider tasks={tasks} events={events} mindsets={mindsets} timespans={[]} >
           {children}
         </StoreProvider>
       </body>

@@ -9,7 +9,6 @@ import './calendar-hexaflexa.css';
 import { eventsToHf } from '@/utils/date-utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
-import TaskCard from '../tasks/task-card';
 import { getTimegridConfig } from '@/utils/calendar-utils';
 import { useEvents, useTasks } from '@/store/store';
 defineCustomElements();
@@ -26,7 +25,6 @@ const CalendarComponent: React.FC<{
 
     const router = useRouter();
     const searchParams = useSearchParams();
-    const showTask = !!searchParams.get('task');
 
     const timezone = 'Europe/Bucharest' // Intl.DateTimeFormat().resolvedOptions().timeZone;
     const startDate: string = utcDateToString(new Date());
@@ -35,7 +33,7 @@ const CalendarComponent: React.FC<{
 
     const reloadEvents = (events: EventWithRelations[]) => {
         const eventColours = events.map(event => {
-            const eventTask = tasks.find(task => task.events.map(event => event.id).includes(event.id));
+            const eventTask = tasks.find(task => task.events.map((event: any) => event.id).includes(event.id));
             const eventColour = eventTask?.mindset?.colour;
             return eventColour || NEUTRAL_MINDSET_COLOUR;
         });

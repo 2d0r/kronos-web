@@ -273,6 +273,8 @@ export function convertPropsToDate(obj: any): any {
                 // Strings like 'Test 2' seem to be parsed as a date; Removing the space resolves this
             if (typeof value === 'string' && Date.parse(value.replace(' ', ''))) { 
                 result[key] = new Date(value);
+            } else if (typeof value === 'object') {
+                result[key] = convertPropsToDate(value);
             }
         }
     }
@@ -291,4 +293,15 @@ export function dateToHtmlInput(date: Date) {
     const day = String(date.getDate()).padStart(2, '0');
   
     return `${year}-${month}-${day}`;
+}
+
+export function convertDatePropsToLocaleString(obj: any): any {
+    const result: Record<string, any> = { ...obj };
+    for (const key in result) {
+        const value = result[key];
+        if(value instanceof Date) {
+            result[key] = value.toLocaleString();
+        }
+    }
+    return result;
 }

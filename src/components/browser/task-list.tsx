@@ -5,7 +5,7 @@ import { TaskType, Task, Mindset, Status } from '@prisma/client';
 import ToDoItem from './to-do-item';
 import Checkbox from './checkbox';
 import { PRIORITY_ORDER, SortItem, TaskWithRelations } from '@/lib/definitions';
-import { dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/date-utils';
+import { convertPropsToDate, dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/date-utils';
 import { useTasks, setTasks } from '@/store/store';
 import { useDispatch } from 'react-redux';
 
@@ -68,10 +68,10 @@ export default function TaskList ({
         });
         const data = await response.json();
         const updatedTask = data.task;
-        dispatch(setTasks([...taskList.filter(task => task.id !== taskId), updatedTask]));
+        dispatch(setTasks([...taskList.filter(task => task.id !== taskId), updatedTask])); // .map(obj => convertDatePropsToLocaleStrings(obj))
     }
     const handleTaskDelete = (taskId: string) => {
-        dispatch(setTasks(tasks.filter(task => task.id !== taskId)));
+        dispatch(setTasks(tasks.filter(task => task.id !== taskId))); // .map(obj => convertDatePropsToLocaleStrings(obj))
     }
 
     
@@ -79,11 +79,11 @@ export default function TaskList ({
 
     useEffect(() => {
         console.log('task-list/useEffect[]', tasks);
-        updateTaskList(tasks, filters);
+        updateTaskList(tasks.map(obj => convertPropsToDate(obj)), filters);
     }, []);
     // Update taskList when tasks are updated in store, or filters updated in TaskBrowser
     useEffect(() => {
-        updateTaskList(tasks, filters);
+        updateTaskList(tasks.map(obj => convertPropsToDate(obj)), filters);
         console.log('task-list/useEffect[tasks, filters]', tasks);
     }, [tasks, filters]);
 
