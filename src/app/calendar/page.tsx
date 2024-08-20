@@ -9,11 +9,9 @@ export default async function Page({ searchParams } : {searchParams: URLSearchPa
 
   return (<>
     <TimelineBoard back={true}>
-      <>
-        <div className='h-[60vh] w-[80vw]'>
-          <CalendarComponent />
-        </div>
-      </>
+      <div className='h-[60vh] w-[80vw]'>
+        <CalendarComponent />
+      </div>
     </TimelineBoard>
     {showTaskCard && <TaskCard />}
   </>);

@@ -6,13 +6,15 @@ import React from 'react';
 import PlaySVG from '@/components/svg/play-svg';
 import ShuffleSVG from '@/components/svg/shuffle-svg';
 import { Edit2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function TransportControls ({ eventId, taskId, context, className, mindsetColour }: { 
     eventId: string | undefined, taskId: string, context?: string, className?: string, mindsetColour: string
 }) {
 
 
-    return (<div className={clsx('w-[350px] flex justify-between items-center', className)}>
+    return (<motion.div className={clsx('w-[350px] flex justify-between items-center', className)}
+    initial={{ opacity: 1 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
         { context === 'taskPage' && <>
             <Link href='/'>
                 <img src='../icons/close.svg' className='h-8 w-8' alt='icon-close' />
@@ -30,5 +32,5 @@ export default function TransportControls ({ eventId, taskId, context, className
             </Link>
         </>}
         
-    </div>);
+    </motion.div>);
 }

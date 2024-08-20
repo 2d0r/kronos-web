@@ -1,13 +1,12 @@
 'use client';
 
+import { useMindsetColour } from '@/store/store';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-// import { useDebouncedCallback } from 'use-debounce';
+import { useSearchParams } from 'next/navigation';
 
 export default function SearchBar({ placeholder }: { placeholder: string }) {
     const searchParams = useSearchParams();
-    const pathname = usePathname();
-    const { replace } = useRouter();
+    const mindsetColour = useMindsetColour();
 
     return (
         <div className="relative flex">
@@ -26,7 +25,7 @@ export default function SearchBar({ placeholder }: { placeholder: string }) {
             // }}
             defaultValue={searchParams.get('query')?.toString()}
         />
-        <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-white peer-focus:font-bold" />
+        <MagnifyingGlassIcon color={mindsetColour || 'white'} className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 peer-focus:font-bold" />
         </div>
     );
 }

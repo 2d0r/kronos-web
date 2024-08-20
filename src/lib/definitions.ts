@@ -21,7 +21,7 @@ export const FURTHEST_MINDSET = 6;
 export const DEFAULT_MINDSET_LIST = [
     'restReward', 'survive', 'maintain', 'play', 'socialise', 'learn', 'create', 'selfChallenge', 'selfCare', 'achieve'
 ] as [string, ...string[]];
-export const NEUTRAL_MINDSET_COLOUR = '#899499';
+export const NEUTRAL_MINDSET_COLOUR = '#b19870';
 
 export const CARD_SCALES = {
     small: 1,

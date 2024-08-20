@@ -10,6 +10,7 @@ import { adjustLightness } from '@/utils/colour-utils';
 import clsx from 'clsx';
 import { useSearchParams } from 'next/navigation';
 import { useMindsetColour } from '@/store/store';
+import { motion } from 'framer-motion';
 
 interface TimelineBoardProps {
     children?: JSX.Element | JSX.Element[];
@@ -32,9 +33,11 @@ const TimelineBoard: FC<TimelineBoardProps> = ({
     }}>
         <TopBar back={back}><SearchBar placeholder='Search events, dates...'/></TopBar>
         {showMenu && <Menu />}
-        <div className={clsx(cardClassName, 'bg-white max-h-[70vh] rounded-3xl shadow-xl w-fit p-4 flex items-center justify-start')}>
+        <motion.div className={clsx(cardClassName, 'bg-white max-h-[70vh] rounded-3xl shadow-xl w-fit p-4 flex items-center justify-start')}
+        initial={{ y: -300, opacity: 0, minHeight: '30vh' }} animate={{ y: 0, opacity: 1, minHeight: 'none' }} exit={{ y: -300 }}
+        transition={{ duration: 0.2 }}>
             {children}
-        </div>
+        </motion.div>
         <BottomBar />
     </div>);
 }

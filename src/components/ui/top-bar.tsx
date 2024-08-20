@@ -3,10 +3,12 @@
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { FC, useEffect, useState } from 'react';
-import { SearchParamProps, ContainerProps, URLSearchParamsKronos } from '@/lib/definitions';
 import { useRouter } from 'next/navigation';
-import { URLSearchParams } from 'url';
 import Menu from '@/components/menu';
+import { ArrowLeftIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useMindsetColour } from '@/store/store';
+import { AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface TopBarProps {
     children?: JSX.Element; // Or a more specialized type
@@ -18,6 +20,7 @@ const TopBar: FC<TopBarProps> = ({children, back}) => {
     const searchParams = useSearchParams();
     const [showMenu, setShowMenu] = useState(false);
     const router = useRouter();
+    const mindsetColour = useMindsetColour();
 
     const handleMenuClick = () => {
         setShowMenu(!showMenu);
@@ -31,17 +34,23 @@ const TopBar: FC<TopBarProps> = ({children, back}) => {
     return (<div className='top-0 fixed z-40 w-full flex justify-between items-center px-4 py-2'>
         {back === true ?
         <button onClick={() => router.back()}>
-            <img src='../icons/back.svg' className='w-8 h-8' alt='icon-back'/>
+            <ArrowLeftIcon color={mindsetColour || 'white'} width={36}/>
         </button> : <div className='w-8 h-8'></div>}
         {children}
         {pathname.endsWith('/') ? 
-        <Link className='top-[2vh] right-[2vw]' href={showMenu ? pathname : `${pathname}?menu=true`} onClick={handleMenuClick}>
-            <img src={showMenu ? '../icons/close.svg' : '../icons/menu.svg'} className='w-8 h-8'/>
-        </Link> :
-        <div onClick={handleMenuClick} className='cursor-default' >
-            <img src={showMenu ? '../icons/close.svg' : '../icons/menu.svg'} className='w-8 h-8'/>
-            {showMenu && <Menu onBlur={handleMenuClick} />}
-        </div>}
+            <Link className='top-[2vh] right-[2vw]' href={showMenu ? pathname : `${pathname}?menu=true`} onClick={handleMenuClick}>
+                {/* <img src={showMenu ? '../icons/close.svg' : '../icons/menu.svg'} className='w-8 h-8'/> */}
+                { showMenu ? <XMarkIcon color={mindsetColour || 'white'} width={36} /> : <Bars3Icon color={mindsetColour || 'white'} width={36}/>}
+            </Link> :
+            <div onClick={handleMenuClick} className='cursor-default' >
+                { showMenu ? <XMarkIcon color={mindsetColour || 'white'} width={36} /> : <Bars3Icon color={mindsetColour || 'white'} width={36}/>}
+                <AnimatePresence>
+                    {showMenu && <motion.div className='w-full h-full flex items-center justify-center'>
+                        <Menu onBlur={handleMenuClick} />
+                    </motion.div>}
+                </AnimatePresence>
+            </div>
+        }
         
     </div>);
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useMindsetColour } from '@/store/store';
 import { Url } from 'next/dist/shared/lib/router/router';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -9,14 +10,14 @@ interface MenuCardProps {
     className?: string,
     title: string,
     subtitle?: string,
-    iconURL?: string,
     iconSVG?: FC,
     href?: Url,
     children?: ReactNode
 }
 
-export default function MenuCard({className, title, subtitle, iconURL, href, children} : MenuCardProps) {
+export default function MenuCard({className, title, subtitle, href, children} : MenuCardProps) {
     const pathname = usePathname();
+    const mindsetColour = useMindsetColour();
 
     return(<>
         <Link href={href || pathname} className={
@@ -24,7 +25,7 @@ export default function MenuCard({className, title, subtitle, iconURL, href, chi
                 ${className}`
             }>
             { children }
-            <div className='flex flex-col gap-1 items-center'>
+            <div className='flex flex-col gap-1 items-center' style={{ color: mindsetColour }}>
                 <div className='text-lg'>{title}</div>
                 <div className='text-sm'>{subtitle}</div>
             </div>

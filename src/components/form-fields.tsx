@@ -38,7 +38,7 @@ export function InputField(
                 label && 'formValuesColumn', 
                 tail && 'gap-2',
             )}>
-                <div className={'relative'}>
+                <div className={'relative'} suppressHydrationWarning>
                     <input
                         id={fieldName}
                         name={fieldName}
@@ -56,6 +56,7 @@ export function InputField(
                         min='0'
                         step={inputType === 'time' ? '60' : ['duration', 'totalDuration'].includes(fieldName) ? '5' : '1'}
                         hidden={hidden}
+                        suppressHydrationWarning
                     />
                 </div>
                 <div className={tail ? 'mr-2' : ''}>{tail}</div>

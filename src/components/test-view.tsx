@@ -15,6 +15,7 @@ import { organiseTimespan } from '@/lib/organise-timespan';
 import { fetchEvents, fetchTasks } from '@/lib/data';
 import { setTasks, setEvents, useMindsetColour } from '@/store/store';
 import { useDispatch } from 'react-redux';
+import { motion } from 'framer-motion';
 
 interface TestViewProps {
     children?: JSX.Element | JSX.Element[];
@@ -60,24 +61,27 @@ const TestView: FC<TestViewProps> = ({back}) => {
         <TopBar back={back}>
             {/* <SearchBar placeholder='Search events, dates...'/> */}
         </TopBar>
-        <div className={clsx('max-h-none z-[39] bg-white rounded-3xl shadow-xl w-fit p-4 flex flex-col gap-4 items-center justify-start')}>
+        <motion.div className={clsx('max-h-none z-[39] bg-white rounded-3xl shadow-xl w-fit p-4 flex flex-col gap-4 items-center justify-start')}
+        initial={{ y: -200 }} animate={{ y: 0 }}>
             <div className='h-[60vh] w-[80vw]'>
                 <CalendarComponent  startWeekToday={true} />
             </div>
             <TaskBrowser parentName='TestView' />
             <div className='container w-full flex flex-row gap-8 p-4 justify-center'>
                 <Button 
-                    className='rounded-md bg-gray-400 from-neutral-950 p-6 w-1/4' 
+                    className='rounded-md from-neutral-950 p-6 w-1/4' 
+                    style={{ background: mindsetColour }}
                     onClick={() => handleOrganise(7)}
                     >Organise this week
                 </Button>
                 <Button 
-                    className='rounded-md bg-gray-400 from-neutral-950 p-6 w-1/4' 
+                    className='rounded-md from-neutral-950 p-6 w-1/4' 
+                    style={{ background: mindsetColour }}
                     onClick={handleDeleteAllEvents}
                     >Delete all events
                 </Button>
             </div>
-        </div>
+        </motion.div>
         <BottomBar />
     </div>)
 }

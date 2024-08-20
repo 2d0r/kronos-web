@@ -78,7 +78,8 @@ const NotesEditor: FC<{
     onUpdate({ editor }) {
       // onChange(editor.getHTML())
       updateTaskNotes(editor.getHTML(), taskId);
-    }
+    },
+    immediatelyRender: false,
   });
 
   // Show notes toolbar only when focusing on textarea

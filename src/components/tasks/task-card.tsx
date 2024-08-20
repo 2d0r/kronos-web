@@ -20,6 +20,7 @@ import { ArrowRight } from 'lucide-react';
 import { useTasks, setTasks, setEvents, useEvents, useMindsets } from '@/store/store';
 import { useDispatch } from 'react-redux';
 import { fetchEventsOfTask, fetchTask } from '@/lib/data';
+import { motion } from 'framer-motion';
 
 
 export default function TaskCard() {
@@ -34,7 +35,7 @@ export default function TaskCard() {
     const events = useEvents();
     const mindsets = useMindsets();
 
-    console.log('taskCard - tasks', tasks);
+    // console.log('taskCard - tasks', tasks);
     const task = convertPropsToDate(tasks?.find(task => task.id === taskId) || null);
     const dispatch = useDispatch();
 
@@ -206,7 +207,8 @@ export default function TaskCard() {
 
     
     return (<div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'>
-    <div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl text-sm text-black overflow-hidden'>
+    <motion.div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl text-sm text-black overflow-hidden'
+    initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }}>
     <form action={formAction}>
         {/* Top bar */}
         <div className='w-full h-16 flex justify-between items-center p-4 border-b-[0.5px]'>
@@ -624,6 +626,6 @@ export default function TaskCard() {
         <input type='hidden' name='repeat' id='repeat' value={String(taskCache.repeat) || 'false'} />
         {/* task.fixed is sent based on startTime and endTime */}
     </form>
-    </div>
+    </motion.div>
     </div>);
 }

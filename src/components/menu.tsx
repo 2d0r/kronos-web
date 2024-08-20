@@ -11,6 +11,8 @@ import HistorySVG from '@/components/svg/history-svg';
 import SettingsSVG from '@/components/svg/settings-svg';
 import '@/app/globals.css';
 import { useMindsetColour } from '@/store/store';
+import { motion } from 'framer-motion';
+import { CalendarIcon, ChartBarIcon, Cog6ToothIcon, DocumentCheckIcon, ListBulletIcon } from '@heroicons/react/24/outline';
 
 export default function Menu({onBlur}: {onBlur?: () => void}) {
     const pathname = usePathname();
@@ -18,30 +20,30 @@ export default function Menu({onBlur}: {onBlur?: () => void}) {
 
     if (pathname.endsWith('/')) {
 
-        return (<>
-            <div className='w-full flex items-center justify-center'></div>
+        return (
             <div className='w-full max-w-[1200px] h-1/2 flex p-8 gap-4'>
                 <MenuCard title='Calendar' href='/calendar'>
-                    <CalendarSVG fill={mindsetColour} height='24' width='24' />
+                    <CalendarIcon color={mindsetColour} height={24} />
                 </MenuCard>
                 <MenuCard title='Tasks & Projects' href='/browser'>
-                    <BulletListSVG fill={mindsetColour} height='24' width='24' />
+                    <ListBulletIcon color={mindsetColour} height={24} />
                 </MenuCard>
-                <MenuCard title='Stats' subtitle='Coming soon!' className='text-gray-400'>
-                    <StatsSVG fill={mindsetColour} height='24' width='24' />
+                <MenuCard title='Stats' subtitle='Coming soon!' className='opacity-60 cursor-default'>
+                    <ChartBarIcon color={mindsetColour} height={24} />
                 </MenuCard>
                 <div className='flex flex-col h-full w-full gap-4'>
-                    <MenuCard title='Logbook' iconURL='../icons/history.svg' href='/browser?logbook=true'>
-                        <HistorySVG fill={mindsetColour} height='24' width='24' />
+                    <MenuCard title='Logbook' href='/browser?logbook=true'>
+                        <DocumentCheckIcon color={mindsetColour} height={24} />
                     </MenuCard>
-                    <MenuCard title='Settings' iconURL='../icons/settings.svg' subtitle='Coming soon!' className='text-gray-400'>
-                        <SettingsSVG fill={mindsetColour} height='24' width='24' />
+                    <MenuCard title='Settings' subtitle='Coming soon!' className='opacity-60 cursor-default'>
+                        <Cog6ToothIcon color={mindsetColour} height={24} />
                     </MenuCard>
                 </div>
             </div>
-        </>);
+        );
     } else {
-        return (<div className='absolute w-screen h-screen top-0 left-0'>
+        return (<motion.div className='absolute w-screen h-screen top-0 left-0'
+        initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }}>
             <div className='absolute z-50 right-10 top-10 w-auto h-auto p-3 gap-1 flex flex-col text-black border-[0.5px] border-white rounded-3xl 
                 bg-gradient-to-br from-white to-white/50 backdrop-blur-lg shadow-lg' onBlur={onBlur} tabIndex={0}>
                 { !pathname.includes('/task') && <Link href={'/'} className='menu-link'>Timeline</Link>}
@@ -52,7 +54,7 @@ export default function Menu({onBlur}: {onBlur?: () => void}) {
                 <Link href={'/browser?logbook=true'} className='menu-link'>Logbook</Link>
                 {/* <Link href={pathname} className='menu-link'>Settings</Link> */}
             </div>
-        </div>);
+        </motion.div>);
     }
     
 }

@@ -12,6 +12,7 @@ import { EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { convertPropsToDate } from '@/utils/date-utils';
 import { setMindsetColour, useMindsetColour, useMindsets } from '@/store/store';
 import { useDispatch } from 'react-redux';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function Timeline() {
 
@@ -45,7 +46,7 @@ export default function Timeline() {
         // console.log('newMindsetQueue', newMindsetQueue);
 
         // Update mindset colour
-        dispatch(setMindsetColour(newMindsetQueue[0].colour || NEUTRAL_MINDSET_COLOUR));
+        dispatch(setMindsetColour(newMindsetQueue[0]?.colour || NEUTRAL_MINDSET_COLOUR));
     }
 
 
@@ -61,26 +62,38 @@ export default function Timeline() {
         <div className='w-full h-full flex flex-col items-center justify-center'>
             {/* Next event */}
             {eventQueue.length > 0 && 
-                <div className='w-full items-center justify-center flex flex-col gap-4'>
-                    {(!showMenu && eventQueue[0]) && (<>
+                <motion.div className='w-full items-center justify-center flex flex-col gap-4'
+                initial={{ y: 200 }} animate={{ y: 0 }}>
+                    <AnimatePresence>
+                    {(!showMenu && eventQueue[0]) && (<motion.div className='flex flex-col gap-4'
+                    initial={{ y: 200 }} animate={{ y: 0 }} exit={{ y: 200, opacity: 0 }}>
                         <Link href={`?task=${eventQueue[0].taskId}&event=${eventQueue[0].id}`} >
                             <EventCard event={eventQueue[0]} mindset={mindsetQueue[0]} />
                         </Link>
                         <TransportControls eventId={eventQueue[0].id} taskId={eventQueue[0].taskId} mindsetColour={mindsetColour} context='timeline'/>
-                    </>)}
-                </div>
+                    </motion.div>)}
+                    </AnimatePresence>
+                </motion.div>
             }
             {/* Later event */}
             {!!eventQueue.length && (
-                <div className='w-screen h-1/6 bottom-0 left-0 absolute overflow-clip flex items-end justify-center'>
+                <motion.div className='w-screen h-1/6 bottom-0 left-0 absolute overflow-clip flex items-end justify-center'
+                initial={{ y: 20 }} animate={{ y: 0 }}>
                 {(eventQueue.length > 1 && !showMenu) ?
                     <EventCard event={eventQueue[1]} nextEvent={true} mindset={mindsetQueue[1]} 
                     /> : showMenu ? <EventCard event={eventQueue[0]} nextEvent={true} mindset={mindsetQueue[0]} 
                     /> : <></>
                 }
-                </div>)
+                </motion.div>)
             }
-            { showMenu && <Menu /> }
+            {/* Menu cards */}
+            <AnimatePresence>
+            { showMenu && <motion.div className='w-full h-full flex items-center justify-center'
+            initial={{ scale: 0.9, opacity: 0, y: -600, position: 'absolute' }} animate={{ scale: 1, opacity: 1, y: 0 }} 
+            exit={{ scale: 0.9, opacity: 0, y: -600, height: '100%', padding: 0, position: 'absolute' }} transition={{ duration: 0.2 }}>
+                <Menu />
+            </motion.div> }
+            </AnimatePresence>
         </div>
     </>)
 }

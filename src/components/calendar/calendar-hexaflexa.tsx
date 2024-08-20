@@ -9,9 +9,9 @@ import './calendar-hexaflexa.css';
 import { eventsToHf } from '@/utils/date-utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
-import { getTimegridConfig } from '@/utils/calendar-utils';
 import { useEvents, useMindsetColour, useTasks } from '@/store/store';
 defineCustomElements();
+import { motion } from 'framer-motion';
 
 const CalendarComponent: React.FC<{
     startWeekToday?: boolean,
@@ -26,7 +26,46 @@ const CalendarComponent: React.FC<{
     const timezone = 'Europe/Bucharest' // Intl.DateTimeFormat().resolvedOptions().timeZone;
     const startDate: string = utcDateToString(new Date());
 
-    const [ timegridConfig, setTimegridConfig ] = useState<HfTimegridConfig>({});
+    const [ timegridConfig, setTimegridConfig ] = useState<HfTimegridConfig>({
+        daysConfig: {
+            daysCount: 7,
+            fullWeek: !startWeekToday,
+        },
+        timeFormat: 'h:mm a',
+        firstDayOfWeek: 1,
+        resources: [
+            { id: '1', title: 'Hidden Resource' }
+        ],
+        events: [],
+        bodyConfig: {
+            // enableNewEvents: true,
+            switchDragResizeAction: 'none',
+            selectAction: 'tap',
+            dragResizeStates: ["none","none","none","none"],
+            eventConfig: {
+            showDescription: true,
+            //   useRenderEvent(event: HfEvent, columnResourceId: string): boolean {
+            //     return true;
+            //   },
+            //   renderEvent(event: HfEvent, columnResourceId: string): string {
+            //     return `<Link href='?editTaskId=${event.id}' className='cursor-pointer w-full h-full'>${event.title}</Link>`;
+            //   }
+            },
+            timeCellWidth: 30,
+        },
+        headerDayConfig: {
+            showDateFirst: false,
+        },
+        toolbarConfig: {
+            startControls: [],
+            centerControls: ['today', 'prev', 'date', 'next'],
+            endControls: [],
+        },
+        headerResourceConfig: {
+            showTitle: false,
+            showImage: false
+        },
+    });
 
     const reloadEvents = (events: EventWithRelations[]) => {
         const eventColours = events.map(event => {
@@ -35,7 +74,11 @@ const CalendarComponent: React.FC<{
             return eventColour || NEUTRAL_MINDSET_COLOUR;
         });
         const newEventsForHf = eventsToHf(events, eventColours, timezone);
-        setTimegridConfig(getTimegridConfig(newEventsForHf, startWeekToday));
+        setTimegridConfig(prevConfig => ({ 
+            ...prevConfig, 
+            events: newEventsForHf, 
+            daysConfig: { ...prevConfig.daysConfig, fullWeek: !startWeekToday }
+        }));
     }
 
 
