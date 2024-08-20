@@ -176,11 +176,11 @@ export default function TaskCard() {
     useEffect(() => {
         const currentTask = tasks.find(task => task.id === taskId);
         if (currentTask) setTaskCache(currentTask);
-    }, [tasks]);
+    }, [tasks, taskId]);
     // Update mindset colour for whole card when mindset is selected
     useEffect(() => {
         setMindsetColour(mindsets.filter(el => el.name === taskCache.mindset?.name)[0]?.colour || NEUTRAL_MINDSET_COLOUR);
-    }, [taskCache.mindset]);
+    }, [taskCache.mindset, mindsets]);
     // Signal task as ready to submit once the compulsory fields are filled
     useEffect(() => {
         // Check if task was edited
@@ -194,7 +194,7 @@ export default function TaskCard() {
             && (taskCache.duration > 0 || (taskCache.startTime && taskCache.endTime))
         ) ? setTaskIsReady(true) : setTaskIsReady(false);
         // console.log('taskCache', taskCache);
-    }, [taskCache]);
+    }, [taskCache, task]);
 
     // Send onTaskUpdate every second, until state is successful
     // useEffect(() => {
@@ -222,7 +222,7 @@ export default function TaskCard() {
                 onChange={(event: any) => handleInputOnChange('name', event.target.value)}
             />
             <Link href={pathname} onClick={() => router.back()} >
-                <img src='../icons/close-black.svg' className='w-8 h-8'/>
+                <img src='../icons/close-black.svg' className='w-8 h-8' alt='icon-close'/>
             </Link>
         </div>
         <div className='w-full flex overflow-hidden'>
@@ -584,7 +584,6 @@ export default function TaskCard() {
                 <div className='min-h-1/6 flex flex-col gap-1 p-4'>
                     <span className='text-gray-300 text-md font-medium'>Task Relations</span>
                     <span className='text-gray-300 text-xs'>Coming soon</span>
-                    {/* <ChecklistEditor checklist={taskCache.checklist || ''} taskId={taskCache.id} className={'task-card'} /> */}
                 </div>
             </div>
         </div>

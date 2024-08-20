@@ -53,7 +53,7 @@ export default function Timeline() {
 
     useEffect(() => {
         handleEventsUpdate();
-        const timePassingInterval = setInterval(handleEventsUpdate, 300000); // every 5 minutes
+        const timePassingInterval = setInterval(() => handleEventsUpdate(), 300000); // every 5 minutes
         return () => clearInterval(timePassingInterval);
     }, []);
 

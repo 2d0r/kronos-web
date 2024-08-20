@@ -15,10 +15,10 @@ export default function TransportControls ({ eventId, taskId, context, className
     return (<div className={clsx('w-[350px] flex justify-between items-center', className)}>
         { context === 'taskPage' && <>
             <Link href='/'>
-                <img src='../icons/close.svg' className='h-8 w-8' />
+                <img src='../icons/close.svg' className='h-8 w-8' alt='icon-close' />
             </Link>
-            <img src='../icons/pause.svg' className='h-12 w-12' />
-            <img src='../icons/adjust.svg' className='h-8 w-8' />
+            <img src='../icons/pause.svg' className='h-12 w-12' alt='icon-pause' />
+            <img src='../icons/adjust.svg' className='h-8 w-8' alt='icon-adjust' />
         </>} { context === 'timeline' && <>
             <ShuffleSVG fill={mindsetColour} />
             <Link href={'/task'}>

@@ -22,7 +22,7 @@ export default function AddTaskButton() {
             style={{ background: mindsetColour }}
         >
             <img src={showTaskCard ? '../icons/close.svg' : '../icons/add.svg'} 
-                className='w-8 h-8'/>
+                className='w-8 h-8' alt='icon-close'/>
         </Link>
     )
 }

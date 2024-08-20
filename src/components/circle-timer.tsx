@@ -27,7 +27,7 @@ const CircleTimer:FC<{
 
     const renderTime = ({remainingTime} : {remainingTime: number}) => {
         if (remainingTime === 0) {
-          return <div className="timer">Time's up!</div>;
+          return <div className="timer">{'Time\'s up!'}</div>;
         }
       
         return (
@@ -61,14 +61,14 @@ const CircleTimer:FC<{
         <div className='w-full max-w-[400px] px-6 flex justify-between items-center'>
             <Link href='/'>
                 <div className='cursor-pointer ' onClick={handleExit}>
-                    <img src='../icons/close.svg' className='h-8 w-8' />
+                    <img src='../icons/close.svg' className='h-8 w-8' alt='close-icon' />
                 </div>
             </Link>
             <div className='cursor-pointer' onClick={handlePlayPause}>
                 { playing ? <PauseSVG /> : <PlaySVG /> }
             </div>
             <div className='cursor-pointer' onClick={handleEditTask}>
-                <img src='../icons/adjust.svg' className='h-8 w-8' />
+                <img src='../icons/adjust.svg' className='h-8 w-8' alt='icon-adjust' />
             </div>
             
         </div>

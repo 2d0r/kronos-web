@@ -122,11 +122,11 @@ const TaskBrowser: FC<{
                         className='!outline-0 border-0'
                     />
                     <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleSortDirection()}>
-                        <img src={sort[1] === 'Ascending' ? './icons/sort-desc.svg' : './icons/sort-asc.svg'} />
+                        <img src={sort[1] === 'Ascending' ? './icons/sort-desc.svg' : './icons/sort-asc.svg'} alt='icon-sort' />
                     </div>
                 </div>
                 <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
-                    <img src={ tableView === false ? './icons/table-rows.svg' : './icons/list-bulleted.svg'} />
+                    <img src={ tableView === false ? './icons/table-rows.svg' : './icons/list-bulleted.svg'} alt='icon-list' />
                 </div>
                 <Link 
                     href={logbookView ? '/browser' : '/browser?logbook=true'} 

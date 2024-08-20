@@ -31,7 +31,7 @@ const TopBar: FC<TopBarProps> = ({children, back}) => {
     return (<div className='top-0 fixed z-40 w-full flex justify-between items-center px-4 py-2'>
         {back === true ?
         <button onClick={() => router.back()}>
-            <img src='../icons/back.svg' className='w-8 h-8'/>
+            <img src='../icons/back.svg' className='w-8 h-8' alt='icon-back'/>
         </button> : <div className='w-8 h-8'></div>}
         {children}
         {pathname.endsWith('/') ? 
