@@ -1,4 +1,4 @@
-import { CheckboxStatus } from '@/lib/definitions';
+import { CheckboxStatus } from '@/lib/types';
 import { TaskType } from '@prisma/client';
 
 export default function CheckboxSVG ({

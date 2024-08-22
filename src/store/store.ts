@@ -1,4 +1,5 @@
-import { EventWithRelations, MindsetWithRelations, NEUTRAL_MINDSET_COLOUR, TaskWithRelations } from '@/lib/definitions';
+import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
+import { EventWithRelations, MindsetWithRelations, TaskWithRelations } from '@/lib/types';
 import { convertDatePropsToLocaleString } from '@/utils/date-utils';
 import { Timespan } from '@prisma/client';
 import { configureStore, createSlice, PayloadAction, } from '@reduxjs/toolkit';

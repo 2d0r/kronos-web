@@ -4,7 +4,8 @@ import prisma from '@/lib/db';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates, getStartAndEndOfDay } from '@/utils/date-utils';
 import { getEvents, getTasksByIds, getTasksToSchedule } from '@/lib/data';
 import { deleteEventsById, deleteFlexEventsInTimespan } from '@/lib/actions';
-import { DEFAULT_TIMES_OF_DAY, eventsToSchedule,TaskWithRelations } from '@/lib/definitions';
+import { DEFAULT_TIMES_OF_DAY } from '@/lib/definitions';
+import { eventsToSchedule,TaskWithRelations } from '@/lib/types';
 import { 
     BasicEvent, 
     checkGapIsFree, 

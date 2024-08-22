@@ -3,7 +3,7 @@
 import { Status } from '@prisma/client';
 import { useState } from 'react';
 import Checkbox from './checkbox';
-import { TaskWithRelations } from '@/lib/definitions';
+import { TaskWithRelations } from '@/lib/types';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 

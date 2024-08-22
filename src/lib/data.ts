@@ -1,11 +1,7 @@
-import {
-  MindsetWithRelations,
-  EventWithRelations,
-  TaskWithRelations,
-  NEUTRAL_MINDSET_COLOUR,
-} from '@/lib/definitions';
+import { MindsetWithRelations, EventWithRelations, TaskWithRelations } from '@/lib/types';
 import prisma from '@/lib/db';
-import { Event, Mindset, Task } from '@prisma/client';
+import { Event, Task } from '@prisma/client';
+import { NEUTRAL_MINDSET_COLOUR } from './definitions';
 
 
 // Tasks

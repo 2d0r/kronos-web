@@ -1,12 +1,13 @@
 // If repeating: Go to its next occurrence -> go to a time that divides perfectly by timespan
 
 import { DayOfWeek, Event, Task, Timespan } from '@prisma/client';
-import { DAYS_OF_WEEK_DICT, DEFAULT_TIME_ZONE, EventWithRelations, MAX_REP_OFFSET, PRIORITY_ORDER, TaskWithRelations } from '@/lib/definitions';
+import { DAYS_OF_WEEK_DICT, DEFAULT_TIME_ZONE, MAX_REP_OFFSET, PRIORITY_ORDER } from '@/lib/definitions';
+import { EventWithRelations, TaskWithRelations } from '@/lib/types';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates } from './date-utils';
 import { addDays } from 'date-fns';
 import { createTimespan, getIntersectingTimespans, scheduleEventForTask, updateTimespan } from '@/lib/actions';
 import { getTimezoneOffset } from 'date-fns-tz';
-import { fetchEventsOfTask, findEventsInTimespan } from '@/lib/data';
+import { findEventsInTimespan } from '@/lib/data';
 import { getTaskRepeatPhase } from './task-utils';
 
 // Can only calculate for tasks that had their first session already scheduled

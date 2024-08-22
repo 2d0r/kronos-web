@@ -8,7 +8,8 @@ import { HfTimegridConfig, utcDateToString } from '@hexaflexa/timegrid';
 import './calendar-hexaflexa.css';
 import { eventsToHf } from '@/utils/date-utils';
 import { useRouter } from 'next/navigation';
-import { EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
+import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
+import { EventWithRelations } from '@/lib/types';
 import { useEvents, useMindsetColour, useTasks } from '@/store/store';
 defineCustomElements();
 

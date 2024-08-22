@@ -4,7 +4,7 @@ import { Timespan } from '@prisma/client';
 import { Provider } from 'react-redux';
 import { createStore, setTasks, setEvents, setMindsets, setTimespans, setMindsetColour } from './store';
 import { useRef } from 'react';
-import { EventWithRelations, MindsetWithRelations, TaskWithRelations } from '@/lib/definitions';
+import { EventWithRelations, MindsetWithRelations, TaskWithRelations } from '@/lib/types';
 
 export default function StoreProvider({
     tasks, events, mindsets, mindsetColour, timespans,

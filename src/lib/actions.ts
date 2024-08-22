@@ -3,10 +3,10 @@
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import prisma from '@/lib/db';
-import { Event, Mindset, RepeatUnit, Task, TaskType, TimespanType } from '@prisma/client';
-import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION, TaskWithRelations, repeatUnitList } from '@/lib/definitions';
+import { Event, Task, TaskType, TimespanType } from '@prisma/client';
+import { DEFAULT_MINDSET_LIST, MIN_TASK_DURATION } from '@/lib/definitions';
+import { TaskWithRelations } from './types';
 import { getMindsets, getTasks, findEventIdsInTimespan, getMindsetByName } from '@/lib/data';
 import { calculatePriorityScores } from '@/lib/priority-score';
 import { calculateTimeScore } from '@/lib/time-score';

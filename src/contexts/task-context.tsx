@@ -1,4 +1,4 @@
-import { TaskWithRelations } from '@/lib/definitions';
+import { TaskWithRelations } from '@/lib/types';
 import React, { ReactNode, createContext, useContext, useState } from 'react';
 
 // Define the shape of the context state

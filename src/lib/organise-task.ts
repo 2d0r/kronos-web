@@ -4,7 +4,8 @@ import { addDays } from 'date-fns';
 import { countEventsOfTaskToBeScheduled, countFreeTimeInTimespan } from '@/utils/organiser-utils';
 import { deleteEventsOfTask, getIntersectingTimespans, scheduleEventForTask } from '@/lib/actions';
 import { findEventsInTimespan, getTasksToSchedule } from '@/lib/data';
-import { eventsToSchedule, PRIORITY_ORDER, TaskWithRelations } from '@/lib/definitions';
+import { eventsToSchedule, TaskWithRelations } from '@/lib/types';
+import { PRIORITY_ORDER } from './definitions';
 import { organiseTimespan } from '@/lib/organise-timespan';
 import { getStartAndEndOfDay } from '@/utils/date-utils';
 

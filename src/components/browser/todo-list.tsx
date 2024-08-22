@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react';
 import { TaskType, Task, Mindset, Status } from '@prisma/client';
 import ToDoItem from './todo-item';
 import Checkbox from './checkbox';
-import { PRIORITY_ORDER, SortItem, TaskWithRelations } from '@/lib/definitions';
-import { convertEmptyPropsToNull, convertPropsToDate, dateToDDMMYYYY, deserializeDateProp, minutesToDisplayDuration } from '@/utils/date-utils';
+import { PRIORITY_ORDER } from '@/lib/definitions';
+import { SortItem, TaskWithRelations } from '@/lib/types';
+import { convertEmptyPropsToNull, convertPropsToDate, dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/date-utils';
 import { useTasks, setTasks } from '@/store/store';
 import { useDispatch } from 'react-redux';
-import { convertEmptyObjectsToNull } from '@/store/date-middleware';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 

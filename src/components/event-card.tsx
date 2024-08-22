@@ -4,7 +4,8 @@ import React from 'react';
 import { Mindset, Task } from '@prisma/client';
 import { dateToHHMM, getLocalStartAndEnd, minutesBetweenDates, minutesToDisplayDuration } from '@/utils/date-utils';
 import clsx from 'clsx';
-import { EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
+import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
+import { EventWithRelations } from '@/lib/types';
 
 interface EventCardProps {
     event: EventWithRelations;

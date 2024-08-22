@@ -3,7 +3,8 @@
 import { TaskType } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { Dropdown } from '@/components/form-fields';
-import { DEFAULT_MINDSET_LIST, Filters, SortItem } from '@/lib/definitions';
+import { DEFAULT_MINDSET_LIST } from '@/lib/definitions';
+import { Filters, SortItem } from '@/lib/types';
 import '@/app/globals.css';
 import { adjustLightness } from '@/utils/colour-utils';
 import { History } from 'lucide-react';

@@ -1,7 +1,7 @@
 import { fetchEventsOfTask } from '@/lib/data';
 import { Event, Mindset, Task } from '@prisma/client';
 import { calcRepeatIntervalInMinutes, minutesBetweenDates } from './date-utils';
-import { TaskWithRelations } from '@/lib/definitions';
+import { TaskWithRelations } from '@/lib/types';
 
 interface Sortable {
     [key: string]: any;

@@ -1,5 +1,5 @@
 import { getEventsWithRelations, getEventMindset } from '@/lib/data';
-import { EventWithRelations, TaskWithRelations, URLSearchParamsKronos } from '@/lib/definitions';
+import { EventWithRelations, TaskWithRelations, URLSearchParamsKronos } from '@/lib/types';
 import BottomBar from '@/components/ui/bottom-bar';
 import Menu from '@/components/menu';
 import EventCard from '@/components/event-card';

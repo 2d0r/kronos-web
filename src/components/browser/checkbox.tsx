@@ -4,7 +4,7 @@ import { updateTaskField } from '@/lib/actions';
 import { Status, TaskType } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import CheckboxSVG from '@/components/svg/checkbox-svg';
-import { CheckboxStatus } from '@/lib/definitions';
+import { CheckboxStatus } from '@/lib/types';
 
 interface CheckboxProps {
     type: TaskType,
