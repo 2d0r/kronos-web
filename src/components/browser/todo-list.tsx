@@ -9,6 +9,8 @@ import { convertEmptyPropsToNull, convertPropsToDate, dateToDDMMYYYY, deserializ
 import { useTasks, setTasks } from '@/store/store';
 import { useDispatch } from 'react-redux';
 import { convertEmptyObjectsToNull } from '@/store/date-middleware';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 type Filters = {
     mindset: string, 
@@ -28,6 +30,7 @@ export default function TodoList ({
     const tasks = useTasks();
     const dispatch = useDispatch();
     const [ todoList, setTodoList ] = useState<TaskWithRelations[]>(tasks);
+    const pathname = usePathname();
 
     const updateTodoList = (newTodoList: TaskWithRelations[], filters: Filters) => {
         // console.log('todo-list/updateTodoList - newTodoList:', newTodoList);
@@ -85,7 +88,9 @@ export default function TodoList ({
         updateTodoList(tasks.map(obj => convertPropsToDate(obj)), filters);
         // console.log('todo-list/useEffect[tasks, filters]', tasks);
     }, [tasks, filters]);
-    
+
+
+    // RENDER
     
     if ( filters.tableView === false ) {
         if ( filters.type === 'task' ) {
@@ -113,7 +118,7 @@ export default function TodoList ({
                                 <Checkbox type={task.type} status={task.status} taskId={task.id} fill='white' width='36' height='36'
                                     onTaskStatusUpdated={handleTaskStatusUpdate}
                                 />
-                                <span className='text-lg'>{task.name}</span>
+                                <Link href={pathname + `?task=${task.id}`} className='text-lg'>{task.name}</Link>
                                 <span className='text-sm'>{task.notes}</span>
                                 <div className='w-full flex flex-col gap-2 items-start'>
                                     { todoList.filter(subtask => Array.isArray(subtask.tasksParent) && subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {

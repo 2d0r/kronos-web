@@ -5,6 +5,7 @@ import { FC, useState } from 'react';
 import Checkbox from './checkbox';
 import { ActionType, TaskWithRelations } from '@/lib/definitions';
 import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 const ToDoItem: FC<{
     task: TaskWithRelations, 
@@ -15,6 +16,8 @@ const ToDoItem: FC<{
 }> = ({task, className, size = 'regular', onTaskStatusUpdated, onTaskDelete}) => {
     
     const [ showEdit, setShowEdit ] = useState<boolean>(false);
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
 
     const handleHoverIn = () => {
         setShowEdit(true);
@@ -30,13 +33,13 @@ const ToDoItem: FC<{
     }
 
 
-    return (<div className='w-full flex items-center gap-3 justify-between' onMouseOver={handleHoverIn} onMouseOut={handleHoverOut}>
+    return (<div className='w-full flex items-center gap-3 justify-between cursor-pointer' onMouseOver={handleHoverIn} onMouseOut={handleHoverOut}>
         <div className={'flex gap-2 items-center ' + className}>
             <Checkbox type={task.type} repeat={task.repeat} taskId={task.id} status={task.status} 
                 onTaskStatusUpdated={onTaskStatusUpdated}
                 fill={task.mindset?.colour}
             />
-            <span>{task.name}</span>
+            <Link href={pathname + `?task=${task.id}`}>{task.name}</Link>
         </div>
         <div className='flex gap-2'>
             <Link 

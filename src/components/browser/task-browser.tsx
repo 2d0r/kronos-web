@@ -104,16 +104,17 @@ const TaskBrowser: FC<{
             </div>
 
             {/* Filter and sort */}
-            { filters.type !== 'goal' && 
             <div className='flex gap-4 items-center'>
-                <Dropdown 
-                    fieldName='chooseMindset'
-                    list={DEFAULT_MINDSET_LIST.concat('All')}
-                    defaultValue='All'
-                    onChange={handleMindsetFilter}
-                    prompt=''
-                    colour={mindsetColour}
-                />
+                { filters.type !== 'goal' &&
+                    <Dropdown 
+                        fieldName='chooseMindset'
+                        list={DEFAULT_MINDSET_LIST.concat('All')}
+                        defaultValue='All'
+                        onChange={handleMindsetFilter}
+                        prompt=''
+                        colour={mindsetColour}
+                    />
+                }
                 <div className='rounded-md flex items-center' style={{ backgroundColor: adjustLightness(mindsetColour, 0.95) }}>
                     <Dropdown 
                         fieldName='chooseMindset'
@@ -128,9 +129,12 @@ const TaskBrowser: FC<{
                         <img src={filters.sort[1] === 'Ascending' ? './icons/sort-desc.svg' : './icons/sort-asc.svg'} alt='icon-sort' />
                     </div>
                 </div>
-                <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
-                    <img src={ filters.tableView === false ? './icons/table-rows.svg' : './icons/list-bulleted.svg'} alt='icon-list' />
-                </div>
+                {/* Table view toggle */}
+                { filters.type !== 'goal' &&
+                    <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
+                        <img src={ filters.tableView === false ? './icons/table-rows.svg' : './icons/list-bulleted.svg'} alt='icon-list' />
+                    </div>
+                }
                 <Link 
                     href={filters.logbookView ? '/browser' : '/browser?logbook=true'} 
                     className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' 
@@ -138,7 +142,7 @@ const TaskBrowser: FC<{
                 >
                     <History color={filters.logbookView ? 'black' : 'lightgrey'}/>
                 </Link>
-            </div>}
+            </div>
 
             {/* Task list */}
             <div className='flex h-2/3 w-full items-start justify-center gap-6'>
