@@ -102,9 +102,10 @@ export default function Timeline() {
                 }
                 </motion.div>)
             }
-            { eventQueue.length === 0 && !showMenu && (<div className='flex flex-col gap-8 items-center' style={{ color: mindsetColour }}>
+            {/* Empty timeline */}
+            { eventQueue.length === 0 && !showMenu && (<div className='flex flex-col gap-8 items-center w-[24rem]' style={{ color: mindsetColour }}>
                 <span className='text-xl'>Nothing coming next</span>
-                <div className='flex gap-4 justify-center text-md'>
+                <div className='flex gap-4 justify-center text-md w-full'>
                     <Button 
                         className='rounded-md p-6 border text-md w-full' 
                         style={{ color: mindsetColour, borderColor: mindsetColour }}
@@ -112,7 +113,7 @@ export default function Timeline() {
                         >Organise today
                     </Button>
                     <Link href={`${pathname}?task=new`}
-                        className='rounded-md p-6 border text-md w-full' 
+                        className='rounded-md p-6 border text-md w-full text-center' 
                         style={{ color: mindsetColour, borderColor: mindsetColour }}
                         >Create a task
                     </Link>

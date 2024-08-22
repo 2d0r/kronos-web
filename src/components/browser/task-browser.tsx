@@ -145,7 +145,7 @@ const TaskBrowser: FC<{
             </div>
 
             {/* Task list */}
-            <div className='flex h-2/3 w-full items-start justify-center gap-6'>
+            <div className='flex h-2/3 w-full items-start justify-center gap-6 overflow-clip'>
                 <TodoList
                     mindsets={mindsets}
                     filters={filters}

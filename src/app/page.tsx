@@ -1,16 +1,14 @@
 import React from 'react';
 import TopBar from '@/components/ui/top-bar';
 import BottomBar from '@/components/ui/bottom-bar';
-import { NEUTRAL_MINDSET_COLOUR, URLSearchParamsKronos } from '@/lib/definitions';
+import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { adjustLightness } from '@/utils/colour-utils';
 import Timeline from '@/components/timeline';
-import TaskCard from '@/components/tasks/task-card';
 import { getCurrentMindsetColour } from '@/lib/data';
 
-export default async function Page({ searchParams } : { searchParams: URLSearchParamsKronos}) {
+export default async function Page() {
 
     const mindsetColour = await getCurrentMindsetColour() || NEUTRAL_MINDSET_COLOUR;
-    const showTaskCard = !!searchParams.task;
 
     return (<div className='w-screen h-screen' style={{
         backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour, 0.5)}, ${adjustLightness(mindsetColour, 0.7)})`
@@ -20,7 +18,6 @@ export default async function Page({ searchParams } : { searchParams: URLSearchP
             </TopBar>
             <Timeline />
             <BottomBar />
-            { showTaskCard && <TaskCard />}
         </div>
     );
 }

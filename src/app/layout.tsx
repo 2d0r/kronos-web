@@ -4,6 +4,7 @@ import './globals.css';
 import StoreProvider from '@/store/StoreProvider';
 import { getCurrentMindsetColour, getEventsWithRelations, getMindsetsWithRelations, getTasksWithRelations } from '@/lib/data';
 import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
+import TaskCard from '@/components/tasks/task-card';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -32,6 +33,7 @@ export default async function RootLayout({
       <body className={inter.className} suppressHydrationWarning={true}>
         <StoreProvider tasks={tasks} events={events} mindsets={mindsets} mindsetColour={mindsetColour} timespans={[]} >
           {children}
+          <TaskCard />
         </StoreProvider>
       </body>
     </html>

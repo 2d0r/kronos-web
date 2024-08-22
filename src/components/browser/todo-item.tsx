@@ -33,13 +33,13 @@ const ToDoItem: FC<{
     }
 
 
-    return (<div className='w-full flex items-center gap-3 justify-between cursor-pointer' onMouseOver={handleHoverIn} onMouseOut={handleHoverOut}>
+    return (<div className='w-full flex items-center gap-3 justify-between' onMouseOver={handleHoverIn} onMouseOut={handleHoverOut}>
         <div className={'flex gap-2 items-center ' + className}>
             <Checkbox type={task.type} repeat={task.repeat} taskId={task.id} status={task.status} 
                 onTaskStatusUpdated={onTaskStatusUpdated}
                 fill={task.mindset?.colour}
             />
-            <Link href={pathname + `?task=${task.id}`}>{task.name}</Link>
+            <Link href={pathname + `?task=${task.id}`} className='cursor-pointer'>{task.name}</Link>
         </div>
         <div className='flex gap-2'>
             <Link 

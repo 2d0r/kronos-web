@@ -2,11 +2,17 @@
 
 import { useMindsetColour } from '@/store/store';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 
-export default function SearchBar({ placeholder }: { placeholder: string }) {
+export default function SearchBar() {
     const searchParams = useSearchParams();
     const mindsetColour = useMindsetColour();
+    const pathname = usePathname();
+
+    const placeholder = pathname === '/' ? 'Search tasks, notes...' :
+        pathname.endsWith('/browser') ? 'Search tasks, projects, goals...' : 
+        pathname.endsWith('/calendar') ? 'Search events, dates...'
+        : '';
 
     return (
         <div className="relative flex">

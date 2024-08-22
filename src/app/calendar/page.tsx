@@ -1,11 +1,7 @@
 import CalendarComponent from '@/components/calendar/calendar-hexaflexa';
 import TimelineBoard from '@/components/ui/timeline-board';
-import { URLSearchParamsKronos } from '@/lib/definitions';
-import TaskCard from '@/components/tasks/task-card';
 
-export default async function Page({ searchParams } : {searchParams: URLSearchParamsKronos}) {
-
-  const showTaskCard = !!searchParams.task;
+export default async function Page() {
 
   return (<>
     <TimelineBoard back={true}>
@@ -13,6 +9,5 @@ export default async function Page({ searchParams } : {searchParams: URLSearchPa
         <CalendarComponent />
       </div>
     </TimelineBoard>
-    {showTaskCard && <TaskCard />}
   </>);
 }

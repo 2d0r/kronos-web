@@ -83,9 +83,9 @@ export default function TodoList ({
     }, []);
     // Update todoList when tasks are updated in store, or filters updated in TaskBrowser
     useEffect(() => {
-        console.log('todoList', todoList);
-        console.log('useTasks', tasks);
-        updateTodoList(tasks.map(obj => convertPropsToDate(obj)), filters);
+        if (tasks.length) {
+            updateTodoList(tasks.map(obj => convertPropsToDate(obj)), filters);
+        }
         // console.log('todo-list/useEffect[tasks, filters]', tasks);
     }, [tasks, filters]);
 

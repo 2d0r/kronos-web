@@ -9,10 +9,8 @@ import { dateToHHMM, minutesBetweenDates, minutesToDisplayDuration } from '@/uti
 import { adjustLightness } from '@/utils/colour-utils';
 import NotesEditor from '@/components/notes-editor/notes-editor';
 import CircleTimer from '@/components/circle-timer';
-import TaskCard from '@/components/tasks/task-card';
 
 export default async function Page({ searchParams }: { searchParams: URLSearchParamsKronos }) {
-    const showTaskCard = searchParams.task;
     const showMenu = searchParams.menu;
 
     const events = await getEventsWithRelations();
@@ -26,7 +24,6 @@ export default async function Page({ searchParams }: { searchParams: URLSearchPa
     return (<div className='w-screen h-screen text-white flex justify-center'
         style={{ backgroundImage: `linear-gradient(to bottom left, ${adjustLightness(eventMindset.colour, 0.2)}, ${adjustLightness(eventMindset.colour, -0.2)})`}}>
         <TopBar/>
-        {showTaskCard && <TaskCard/>}
         {showMenu && <Menu />}
         <div className='w-full h-full content-center justify-center flex flex-row text-center'>
             {/* Left area */}
