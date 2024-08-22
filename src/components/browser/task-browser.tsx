@@ -3,12 +3,12 @@
 import { TaskType } from '@prisma/client';
 import { FC, useEffect, useState } from 'react';
 import { Dropdown } from '@/components/form-fields';
-import { DEFAULT_MINDSET_LIST, SortItem } from '@/lib/definitions';
+import { DEFAULT_MINDSET_LIST, Filters, SortItem } from '@/lib/definitions';
 import '@/app/globals.css';
 import { adjustLightness } from '@/utils/colour-utils';
 import { History } from 'lucide-react';
 import Link from 'next/link';
-import TaskList from '@/components/browser/task-list';
+import TodoList from '@/components/browser/todo-list';
 import { useSearchParams } from 'next/navigation';
 import { useMindsetColour, useMindsets } from '@/store/store';
 
@@ -20,54 +20,57 @@ const TaskBrowser: FC<{
     const mindsets = useMindsets();
     const mindsetColour = useMindsetColour();
 
-    
-    const [ taskTypeFilter, setTaskTypeFilter ] = useState<TaskType>('task');
-    const [ mindsetFilter, setMindsetFilter ] = useState<string>('All');
-    const [ tableView, setTableView ] = useState<boolean>(false);
-    const [ logbookView, setLogbookView ] = useState<boolean>(!!searchParams.get('logbook'));
-    const [ sort, setSort ] = useState<SortItem>(searchParams.get('logbook') ? ['Date', 'Descending'] : ['Priority', 'Ascending']);
+    const [ filters, setFilters ] = useState<Filters>({
+        type: 'task', mindset: 'All', tableView: false, 
+        logbookView: !!searchParams.get('logbook'), 
+        sort: searchParams.get('logbook') ? ['Date', 'Descending'] : ['Priority', 'Ascending'],
+    });
 
 
     // HANDLERS
 
     const handleTaskTypeFilter = (type: TaskType) => {
-        setMindsetFilter('All'); // reset bucket when changing tab
-        type === 'goal' && setTableView(false);
-        setTaskTypeFilter(type);
+        setFilters(prevFilters => ({ ...prevFilters, 
+            type: type, 
+            mindset: 'All', // reset mindset filter when changing tab
+            tableView: type === 'goal' ? false : filters.tableView,
+        }));
     }
     const handleMindsetFilter = (event : React.ChangeEvent<HTMLSelectElement>) => {
-        const newMindsetFilter = event.target.value ? event.target.value : 'All';
-        setMindsetFilter(newMindsetFilter);
+        setFilters(prevFilters => ({ ...prevFilters, 
+            mindset: event.target.value ? event.target.value : 'All' }));
     }
     const handleTableToggle = () => {
-        setTableView(!tableView);
+        setFilters(prevFilters => ({ ...prevFilters, tableView: !prevFilters.tableView }));
     }
     const handleSort = (event : React.ChangeEvent<HTMLSelectElement>) => {
-        const newSort = [event.target.value, sort[1]] as SortItem;
-        setSort(newSort);
+        setFilters(prevFilters => ({ ...prevFilters, sort: [event.target.value, filters.sort[1]] as SortItem }));
     }
     const handleSortDirection = () => {
-        const newSort = [sort[0], sort[1] === 'Ascending' ? 'Descending' : 'Ascending'] as SortItem;
-        setSort(newSort);
+        setFilters(prevFilters => ({ ...prevFilters, 
+            sort: [filters.sort[0], filters.sort[1] === 'Ascending' ? 'Descending' : 'Ascending'] as SortItem }));
     }
     const handleLogbookToggle = () => {
-        const newLogbookView = !logbookView;
-        const newSort : SortItem = newLogbookView ? ['Date', 'Descending'] : ['Priority', 'Descending'];
-        setLogbookView(newLogbookView);
-        setSort(newSort);
+        const newLogbookView = !filters.logbookView;
+        setFilters(prevFilters => ({ ...prevFilters, 
+            logbookView: newLogbookView,
+            sort: newLogbookView ? ['Date', 'Descending'] : ['Priority', 'Descending'],
+        }));
     }
 
 
     // HOOKS
     // Update states for logbook
     useEffect(() => {
-        (logbookView) && setSort(['Date', 'Descending']);
-    }, [logbookView]);
+        if (filters.logbookView) setFilters(prevFilters => ({ ...prevFilters, sort: ['Date', 'Descending']}));
+    }, [filters.logbookView]);
     // Update logbookView based on searchaparams
     useEffect(() => {
         const newLogbookView = !!searchParams.get('logbook');
-        const newSort : SortItem = newLogbookView ? ['Date', 'Descending'] : ['Priority', 'Descending'];
-        setLogbookView(newLogbookView);
+        setFilters(prevFilters => ({ ...prevFilters, 
+            sort: newLogbookView ? ['Date', 'Descending'] : ['Priority', 'Descending'],
+            logbookView: newLogbookView,
+        }))
     }, [searchParams]);
 
     return(
@@ -77,7 +80,7 @@ const TaskBrowser: FC<{
                 <button 
                     className='p-2 focus:text-white uppercase text-bold text-sm font-medium'
                     style={{
-                        color: taskTypeFilter === 'task' ? mindsetColour : adjustLightness(mindsetColour, 0.5) ,
+                        color: filters.type === 'task' ? mindsetColour : adjustLightness(mindsetColour, 0.5) ,
                         borderColor: mindsetColour,
                     }}
                     onClick={() => handleTaskTypeFilter('task')}
@@ -85,7 +88,7 @@ const TaskBrowser: FC<{
                 <button 
                     className='p-2 focus:text-white uppercase text-bold text-sm font-medium'
                     style={{
-                        color: taskTypeFilter === 'project' ? mindsetColour : adjustLightness(mindsetColour, 0.5) ,
+                        color: filters.type === 'project' ? mindsetColour : adjustLightness(mindsetColour, 0.5) ,
                         borderColor: mindsetColour,
                     }}
                     onClick={() => handleTaskTypeFilter('project')}
@@ -93,7 +96,7 @@ const TaskBrowser: FC<{
                 <button 
                     className='p-2 focus:text-white uppercase text-sm font-medium'
                     style={{
-                        color: taskTypeFilter === 'goal' ? mindsetColour : adjustLightness(mindsetColour, 0.5),
+                        color: filters.type === 'goal' ? mindsetColour : adjustLightness(mindsetColour, 0.5),
                         borderColor: mindsetColour,
                     }}
                     onClick={() => handleTaskTypeFilter('goal')}
@@ -101,7 +104,7 @@ const TaskBrowser: FC<{
             </div>
 
             {/* Filter and sort */}
-            { taskTypeFilter !== 'goal' && 
+            { filters.type !== 'goal' && 
             <div className='flex gap-4 items-center'>
                 <Dropdown 
                     fieldName='chooseMindset'
@@ -115,39 +118,33 @@ const TaskBrowser: FC<{
                     <Dropdown 
                         fieldName='chooseMindset'
                         list={['Priority', 'Date', 'Duration']}
-                        defaultValue={sort[0]}
+                        defaultValue={filters.sort[0]}
                         onChange={handleSort}
                         prompt=''
                         colour={mindsetColour}
                         className='!outline-0 border-0'
                     />
                     <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleSortDirection()}>
-                        <img src={sort[1] === 'Ascending' ? './icons/sort-desc.svg' : './icons/sort-asc.svg'} alt='icon-sort' />
+                        <img src={filters.sort[1] === 'Ascending' ? './icons/sort-desc.svg' : './icons/sort-asc.svg'} alt='icon-sort' />
                     </div>
                 </div>
                 <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
-                    <img src={ tableView === false ? './icons/table-rows.svg' : './icons/list-bulleted.svg'} alt='icon-list' />
+                    <img src={ filters.tableView === false ? './icons/table-rows.svg' : './icons/list-bulleted.svg'} alt='icon-list' />
                 </div>
                 <Link 
-                    href={logbookView ? '/browser' : '/browser?logbook=true'} 
+                    href={filters.logbookView ? '/browser' : '/browser?logbook=true'} 
                     className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' 
                     onClick={() => handleLogbookToggle()}
                 >
-                    <History color={logbookView ? 'black' : 'lightgrey'}/>
+                    <History color={filters.logbookView ? 'black' : 'lightgrey'}/>
                 </Link>
             </div>}
 
             {/* Task list */}
             <div className='flex h-2/3 w-full items-start justify-center gap-6'>
-                <TaskList
+                <TodoList
                     mindsets={mindsets}
-                    filters={{
-                        mindsetFilter: mindsetFilter,
-                        typeFilter: taskTypeFilter,
-                        tableView: tableView,
-                        sort: sort,
-                        logbookFilter: logbookView,
-                    }}
+                    filters={filters}
                 />
             </div>
         </div>

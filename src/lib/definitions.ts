@@ -1,4 +1,4 @@
-import { Status, TimeUnit, Priority, TimeOfDay, DayOfWeek, RepeatUnit, Prisma, Mindset, TimespanType } from '@prisma/client';
+import { Status, TimeUnit, Priority, TimeOfDay, DayOfWeek, RepeatUnit, Prisma, Mindset, TimespanType, TaskType } from '@prisma/client';
 import { Url } from 'next/dist/shared/lib/router/router';
 import { ReactElement } from 'react';
 
@@ -156,6 +156,9 @@ export interface DatePickerEventFormData {
 export interface EventFormData {
     description: string
     todoId?: string
+};
+export interface Filters {
+    type: TaskType; mindset: string; tableView: boolean; logbookView: boolean; sort: SortItem;
 };
 export interface ITodo {
     _id: string

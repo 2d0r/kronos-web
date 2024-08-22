@@ -177,6 +177,7 @@ export function areSameDay(date1: Date, date2: Date) {
 // Convert events from database to HexaFlexa events
 import { localDateTimeToString, utcDateTimeToString } from '@hexaflexa/timegrid';
 import { toZonedTime } from 'date-fns-tz';
+import { deserialize } from 'v8';
 export const eventsToHf = (events: Event[], eventColours: string[], timezone: string) => {
     let eventsForHf = [];
     for (let i = 0; i < events.length; i++) {
@@ -304,4 +305,26 @@ export function convertDatePropsToLocaleString(obj: any): any {
         }
     }
     return result;
+}
+
+export const convertEmptyPropsToNull = (obj: any) => {
+    for (let key in obj) {
+        if (JSON.stringify(obj[key]) === '{}') {
+            obj[key] = null;
+        } 
+        // else if (typeof obj[key] === 'object') {
+        //     for (let subKey in obj[key]) convertEmptyPropsToNull(obj);
+        // }
+    }
+    return obj;
+}
+
+export const deserializeDateProp = (prop: string | null | {}) => {
+    if (typeof prop === 'string') {
+        return new Date(prop);
+    } else if (prop === null) {
+        return null;
+    } else if (JSON.stringify(prop) === '{}') {
+        return null;
+    }
 }

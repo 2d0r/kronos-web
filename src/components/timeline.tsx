@@ -1,18 +1,20 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import EventCard from './event-card';
 import Link from 'next/link';
 import Menu from './menu';
 import TransportControls from './buttons/transport-controls';
 import { Mindset } from '@prisma/client';
-import { fetchUpcomingEvents } from '@/lib/data';
+import { fetchEvents, fetchTasks, fetchUpcomingEvents } from '@/lib/data';
 import { EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
-import { convertPropsToDate } from '@/utils/date-utils';
-import { setMindsetColour, useMindsetColour, useMindsets } from '@/store/store';
+import { addDaysToDate, convertPropsToDate } from '@/utils/date-utils';
+import { setEvents, setMindsetColour, setTasks, useMindsetColour, useMindsets } from '@/store/store';
 import { useDispatch } from 'react-redux';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, color, motion } from 'framer-motion';
+import Button from './buttons/button';
+import { organiseTimespan } from '@/lib/organise-timespan';
 
 export default function Timeline() {
 
@@ -21,6 +23,7 @@ export default function Timeline() {
     const dispatch = useDispatch();
     const searchParams = useSearchParams();
     const showMenu = !!searchParams.get('menu');
+    const pathname = usePathname();
 
     const [ eventQueue, setEventQueue ] = useState<EventWithRelations[]>([]);
     const [ mindsetQueue, setMindsetQueue ] = useState<Mindset[]>([]);
@@ -47,6 +50,19 @@ export default function Timeline() {
 
         // Update mindset colour
         dispatch(setMindsetColour(newMindsetQueue[0]?.colour || NEUTRAL_MINDSET_COLOUR));
+    }
+    const handleOrganiseToday = async (daysAhead: number = 1) => {
+        const currentTime = new Date();
+        const xDaysFromNow = addDaysToDate(currentTime, daysAhead);
+        await organiseTimespan({
+            timespan: [currentTime, xDaysFromNow],
+        });
+        setTimeout(async () => {
+            const newEvents = await fetchEvents();
+            dispatch(setEvents(newEvents));
+            const newTasks = await fetchTasks();
+            dispatch(setTasks(newTasks));
+        }, 1000);
     }
 
 
@@ -86,6 +102,22 @@ export default function Timeline() {
                 }
                 </motion.div>)
             }
+            { eventQueue.length === 0 && !showMenu && (<div className='flex flex-col gap-8 items-center' style={{ color: mindsetColour }}>
+                <span className='text-xl'>Nothing coming next</span>
+                <div className='flex gap-4 justify-center text-md'>
+                    <Button 
+                        className='rounded-md p-6 border text-md w-full' 
+                        style={{ color: mindsetColour, borderColor: mindsetColour }}
+                        onClick={() => handleOrganiseToday(1)}
+                        >Organise today
+                    </Button>
+                    <Link href={`${pathname}?task=new`}
+                        className='rounded-md p-6 border text-md w-full' 
+                        style={{ color: mindsetColour, borderColor: mindsetColour }}
+                        >Create a task
+                    </Link>
+                </div>
+            </div>)}
             {/* Menu cards */}
             <AnimatePresence>
             { showMenu && <motion.div className='w-full h-full flex items-center justify-center'

@@ -2,22 +2,23 @@
 
 import { useEffect, useState } from 'react';
 import { TaskType, Task, Mindset, Status } from '@prisma/client';
-import ToDoItem from './to-do-item';
+import ToDoItem from './todo-item';
 import Checkbox from './checkbox';
 import { PRIORITY_ORDER, SortItem, TaskWithRelations } from '@/lib/definitions';
-import { convertPropsToDate, dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/date-utils';
+import { convertEmptyPropsToNull, convertPropsToDate, dateToDDMMYYYY, deserializeDateProp, minutesToDisplayDuration } from '@/utils/date-utils';
 import { useTasks, setTasks } from '@/store/store';
 import { useDispatch } from 'react-redux';
+import { convertEmptyObjectsToNull } from '@/store/date-middleware';
 
 type Filters = {
-    mindsetFilter: string, 
-    typeFilter: TaskType, 
+    mindset: string, 
+    type: TaskType, 
     tableView: boolean,
     sort?: SortItem, 
-    logbookFilter?: boolean,
+    logbookView?: boolean,
 }
 
-export default function TaskList ({
+export default function TodoList ({
     filters, mindsets,
 } : {
     filters: Filters,
@@ -26,33 +27,29 @@ export default function TaskList ({
 
     const tasks = useTasks();
     const dispatch = useDispatch();
-    const [ taskList, setTaskList ] = useState<TaskWithRelations[]>([]);
+    const [ todoList, setTodoList ] = useState<TaskWithRelations[]>(tasks);
 
-    const updateTaskList = (newTaskList: TaskWithRelations[], filters: Filters) => {
+    const updateTodoList = (newTodoList: TaskWithRelations[], filters: Filters) => {
+        // console.log('todo-list/updateTodoList - newTodoList:', newTodoList);
 
-        const { typeFilter, mindsetFilter, logbookFilter } = filters;
-
-        // console.log('task-list/updateTaskList - newTaskList:', newTaskList);
-
-        // Filter tasks
-        let filteredTasks = newTaskList.filter(task => !!task).filter(task => task.type === typeFilter);
+        // Filter by type
+        let filteredTasks = newTodoList.filter(task => !!task).filter(task => task.type === filters.type);
         // Filter by status (for logbook)
-        filteredTasks = filteredTasks.filter(task => logbookFilter ? task.status === 'done' : task.status !== 'done');
+        filteredTasks = filteredTasks.filter(task => filters.logbookView ? task.status === 'done' : task.status !== 'done');
         // Filter by mindset
-        if (mindsetFilter !== 'All') {
-            const mindsetId = mindsets.filter(el => el.name === mindsetFilter)[0].id;
+        if (filters.mindset !== 'All') {
+            const mindsetId = mindsets.filter(el => el.name === filters.mindset)[0].id;
             filteredTasks = filteredTasks.filter(task => task.mindsetId === mindsetId);
         }
         // Sort tasks
         
-        const { sort } = filters;
-        let sortedTasks = sort ? sort[0] === 'Priority' ? filteredTasks.sort((a, b) => a.timeScore - b.timeScore).sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority])
-            : sort[0] === 'Duration' ? filteredTasks.sort((a, b) => a.duration - b.duration)
-            : sort[0] === 'Date' ? filteredTasks.filter(el => el.startTime !== null).sort((a, b) => (a.startTime?.getTime() || 0) - (b.startTime?.getTime() || 0)).concat(filteredTasks.filter(task => task.startTime === null))
+        let sortedTasks = filters.sort ? filters.sort[0] === 'Priority' ? filteredTasks.sort((a, b) => a.timeScore - b.timeScore).sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority])
+            : filters.sort[0] === 'Duration' ? filteredTasks.sort((a, b) => a.duration - b.duration)
+            : filters.sort[0] === 'Date' ? filteredTasks.filter(el => el.startTime !== null).sort((a, b) => (a.startTime?.getTime() || 0) - (b.startTime?.getTime() || 0)).concat(filteredTasks.filter(task => task.startTime === null))
             : filteredTasks : filteredTasks;
-        (sort && sort[1] === 'Descending') && sortedTasks.reverse();
+        (filters.sort && filters.sort[1] === 'Descending') && sortedTasks.reverse();
 
-        setTaskList(sortedTasks);
+        setTodoList(sortedTasks);
     }
 
 
@@ -68,7 +65,7 @@ export default function TaskList ({
         });
         const data = await response.json();
         const updatedTask = data.task;
-        dispatch(setTasks([...taskList.filter(task => task.id !== taskId), updatedTask])); // .map(obj => convertDatePropsToLocaleStrings(obj))
+        dispatch(setTasks([...todoList.filter(task => task.id !== taskId), updatedTask])); // .map(obj => convertDatePropsToLocaleStrings(obj))
     }
     const handleTaskDelete = (taskId: string) => {
         dispatch(setTasks(tasks.filter(task => task.id !== taskId))); // .map(obj => convertDatePropsToLocaleStrings(obj))
@@ -78,34 +75,36 @@ export default function TaskList ({
     // HOOKS
 
     useEffect(() => {
-        // console.log('task-list/useEffect[]', tasks);
-        updateTaskList(tasks.map(obj => convertPropsToDate(obj)), filters);
+        // console.log('todo-list/useEffect[]', tasks);
+        updateTodoList(tasks.map(obj => convertPropsToDate(obj)), filters);
     }, []);
-    // Update taskList when tasks are updated in store, or filters updated in TaskBrowser
+    // Update todoList when tasks are updated in store, or filters updated in TaskBrowser
     useEffect(() => {
-        updateTaskList(tasks.map(obj => convertPropsToDate(obj)), filters);
-        // console.log('task-list/useEffect[tasks, filters]', tasks);
+        console.log('todoList', todoList);
+        console.log('useTasks', tasks);
+        updateTodoList(tasks.map(obj => convertPropsToDate(obj)), filters);
+        // console.log('todo-list/useEffect[tasks, filters]', tasks);
     }, [tasks, filters]);
-
-
-    const { tableView, typeFilter } = filters;
     
-    if ( tableView === false ) {
-        if ( typeFilter === 'task' ) {
+    
+    if ( filters.tableView === false ) {
+        if ( filters.type === 'task' ) {
             return (<div className='flex flex-col gap-2 w-full max-w-1/2 items-start justify-start py-2'>
-                {taskList.map((task: TaskWithRelations) => {
+                {todoList.map((task: TaskWithRelations) => {
                     return(
                         <ToDoItem key={task.id} task={task} onTaskStatusUpdated={handleTaskStatusUpdate} onTaskDelete={handleTaskDelete}/>
                     );
                 })}
-                { taskList.length === 0 &&
+                { todoList.length === 0 &&
                     <div className='w-full flex justify-center text-gray-400 p-2'>Nothing left to do</div>
                 }
             </div>);
-        } else if ( typeFilter === 'project' || typeFilter === 'goal') {
+        } else if ( filters.type === 'project' || filters.type === 'goal') {
             return (
                 <div className='flex gap-2 w-full items-start justify-center'>
-                    {taskList.map((task, idx) => {
+                    {todoList.map((task, idx) => {
+                        task = convertEmptyPropsToNull(task);
+
                         return(
                             <div key={task.id} 
                                 className='flex flex-col items-center justify-start gap-2 w-[200px] p-4 rounded-lg text-white'
@@ -117,7 +116,7 @@ export default function TaskList ({
                                 <span className='text-lg'>{task.name}</span>
                                 <span className='text-sm'>{task.notes}</span>
                                 <div className='w-full flex flex-col gap-2 items-start'>
-                                    { taskList.filter(subtask => subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
+                                    { todoList.filter(subtask => Array.isArray(subtask.tasksParent) && subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
                                         return(<div className={'flex gap-2 items-center text-sm'} key={innerTask.id}>
                                             <Checkbox taskId={innerTask.id} status={innerTask.status} type={innerTask.type}
                                                 height='20' width='20' fill='white'
@@ -130,24 +129,27 @@ export default function TaskList ({
                             </div>
                         );
                     })}
-                    { taskList.length === 0 &&
-                        <div className='w-full flex justify-center text-gray-400 p-2'>{`No ${typeFilter}s to display`}</div>
+                    { todoList.length === 0 &&
+                        <div className='w-full flex justify-center text-gray-400 p-2'>{`No ${filters.type}s to display`}</div>
                     }
                 </div>
             )
         }
-    } else if ( tableView === true ) {
-        const newTaskDisplayRows = taskList.map(task => {
+    } else if ( filters.tableView === true ) {
+        const newTaskDisplayRows = todoList.map(task => {
+            // console.log('taskSerialised', taskSerialised);
+            // const task = deserializeDates(taskSerialised);
+            task = convertEmptyPropsToNull(task);
+
             return (
                 <tr className='mb-4 rounded-lg' style={{background: task.mindset?.colour}} key={task.id}>
                     <td>{task.name}</td>
                     <td>{task.priority}</td>
                     <td>{minutesToDisplayDuration(task.duration)}</td>
                     <td>{task.repeat === true ? `${task.repeatFrequency} / ${task.repeatTimespan}`: 'one time'}</td>
-                    <td>{task.deadline ? `on ${dateToDDMMYYYY(task.deadline)}` 
+                    <td>{task.deadline ? `on ${dateToDDMMYYYY(new Date(task.deadline))}` 
                         : task.totalDuration ? `after ${minutesToDisplayDuration(task.totalDuration)} hrs` 
                         : task.totalRepetitions ? `after ${task.totalRepetitions} reps`
-                        : task.deadline ? `on ${dateToDDMMYYYY(task.deadline)}`
                         : '' }</td>
                 </tr>
             );

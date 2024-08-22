@@ -3,7 +3,7 @@ import { convertDatePropsToLocaleString } from '@/utils/date-utils';
 import { Timespan } from '@prisma/client';
 import { configureStore, createSlice, PayloadAction, } from '@reduxjs/toolkit';
 import { useSelector } from 'react-redux';
-import dateMiddleware from './date-middleware';
+import dateMiddleware, { convertEmptyObjectsToNull, deserializeDates } from './date-middleware';
 
 const initialTasks: { tasks: TaskWithRelations[] } = { tasks: [] };
 export const tasksSlice = createSlice({
@@ -86,3 +86,5 @@ export const useMindsets = () => useSelector((state: RootState) => state.mindset
 export const useMindsetColour = () => useSelector((state: RootState) => state.mindsets.mindsetColour);
 export const useTimespans = () => useSelector((state: RootState) => state.timespans.timespans);
 //.map(obj => convertPropsToDate(obj))
+// .map(obj => deserializeDates(obj))
+// .map(obj => convertEmptyObjectsToNull(obj))
