@@ -1,14 +1,14 @@
 'use server';
 
 import { addDays } from 'date-fns';
-import { countEventsOfTaskToBeScheduled, countFreeTimeInTimespan, filterSortTasksToSchedule } from '@/utils/organiser-utils';
-import { deleteEventsById, deleteEventsOfTask, getIntersectingTimespans, scheduleEventForTask, updateEventField } from '@/lib/actions';
+import { countEventsOfTaskToBeScheduled, countFreeTimeInTimespan } from '@/utils/organiser-utils';
+import { deleteEventsOfTask, getIntersectingTimespans, scheduleEventForTask } from '@/lib/actions';
 import { findEventsInTimespan, getTasksToSchedule } from '@/lib/data';
 import { eventsToSchedule, PRIORITY_ORDER, TaskWithRelations } from '@/lib/definitions';
 import { organiseTimespan } from '@/lib/organise-timespan';
 import { getStartAndEndOfDay } from '@/utils/date-utils';
 
-export async function organiseTask(newTask: TaskWithRelations, timespan?: [Date, Date]) {
+export const organiseTask = async (newTask: TaskWithRelations, timespan?: [Date, Date]) => {
 
     // GET TIMESPAN TO ORGANISE
     let timespanToOrganise: [Date, Date];

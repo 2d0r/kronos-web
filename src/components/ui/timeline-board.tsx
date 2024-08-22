@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import BottomBar from '@/components/ui/bottom-bar';
 import TopBar from '@/components/ui/top-bar';
 import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
@@ -10,7 +10,7 @@ import { adjustLightness } from '@/utils/colour-utils';
 import clsx from 'clsx';
 import { useSearchParams } from 'next/navigation';
 import { useMindsetColour } from '@/store/store';
-import { motion, useForceUpdate } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 interface TimelineBoardProps {
     children?: JSX.Element | JSX.Element[];
@@ -19,9 +19,9 @@ interface TimelineBoardProps {
     timelineClassName?: string;
 }
 
-const TimelineBoard: FC<TimelineBoardProps> = ({
+export default function TimelineBoard ({
     children, back, cardClassName, timelineClassName,
-}) => {
+} : TimelineBoardProps ) {
 
     // Modals
     const searchParams = useSearchParams();
@@ -61,5 +61,3 @@ const TimelineBoard: FC<TimelineBoardProps> = ({
         <BottomBar />
     </div>);
 }
-
-export default TimelineBoard;

@@ -58,7 +58,7 @@ export const deserializeDates = (obj: any): any => {
 };
 
 // Utility function (as defined above)
-export function convertEmptyObjectsToNull(obj: any): any {
+export const convertEmptyObjectsToNull = (obj: any) => {
 
   let newObj = obj;
   if (newObj && typeof newObj === 'object' && !Array.isArray(newObj)) {

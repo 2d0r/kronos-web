@@ -1,6 +1,5 @@
 'use client';
 
-import { FC } from 'react';
 import BottomBar from '@/components/ui/bottom-bar';
 import TopBar from '@/components/ui/top-bar';
 import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
@@ -22,7 +21,7 @@ interface TestViewProps {
     back?: boolean;
 }
 
-const TestView: FC<TestViewProps> = ({back}) => {
+export default function TestView ({back} : TestViewProps) {
 
     const dispatch = useDispatch();
     const mindsetColour = useMindsetColour();
@@ -66,7 +65,7 @@ const TestView: FC<TestViewProps> = ({back}) => {
             <div className='h-[60vh] w-[80vw]'>
                 <CalendarComponent  startWeekToday={true} />
             </div>
-            <TaskBrowser parentName='TestView' />
+            <TaskBrowser />
             <div className='container w-full flex flex-row gap-8 p-4 justify-center'>
                 <Button 
                     className='rounded-md from-neutral-950 p-6 w-1/4' 
@@ -84,6 +83,4 @@ const TestView: FC<TestViewProps> = ({back}) => {
         </motion.div>
         <BottomBar />
     </div>)
-}
-
-export default TestView;
+};

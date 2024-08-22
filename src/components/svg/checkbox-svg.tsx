@@ -1,15 +1,14 @@
 import { CheckboxStatus } from '@/lib/definitions';
-import { Status, TaskType } from '@prisma/client';
-import { FC } from 'react';
+import { TaskType } from '@prisma/client';
 
-const CheckboxSVG: FC<{
+export default function CheckboxSVG ({
+    fill = 'black', width = '36', height = '36', statusDisplay, type, repeat = false
+} : {
     fill?: string, 
     width?: string, height?: string, 
     statusDisplay: CheckboxStatus, 
     type: TaskType, repeat: boolean | undefined,
-}> = ({
-    fill = 'black', width = '36', height = '36', statusDisplay, type, repeat = false
-}) => {
+}) {
 
     if (type === 'task' && !repeat) {
         if ( statusDisplay === 'checked' ) {
@@ -100,5 +99,3 @@ const CheckboxSVG: FC<{
     }
     
 };
-
-export default CheckboxSVG;

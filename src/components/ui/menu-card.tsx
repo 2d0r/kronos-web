@@ -4,13 +4,12 @@ import { useMindsetColour } from '@/store/store';
 import { Url } from 'next/dist/shared/lib/router/router';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React, { FC, ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 interface MenuCardProps {
     className?: string,
     title: string,
     subtitle?: string,
-    iconSVG?: FC,
     href?: Url,
     children?: ReactNode
 }

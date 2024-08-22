@@ -1,22 +1,24 @@
 'use client';
 
 import { Status } from '@prisma/client';
-import { FC, useState } from 'react';
+import { useState } from 'react';
 import Checkbox from './checkbox';
-import { ActionType, TaskWithRelations } from '@/lib/definitions';
+import { TaskWithRelations } from '@/lib/definitions';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
-const ToDoItem: FC<{
+interface ToDoItemProps {
     task: TaskWithRelations, 
     className?: string, 
-    size?: ('small' | 'regular'), 
     onTaskStatusUpdated: (taskId: string, status: Status) => void,
     onTaskDelete: (taskId: string) => void,
-}> = ({task, className, size = 'regular', onTaskStatusUpdated, onTaskDelete}) => {
+};
+
+export default function ToDoItem ({
+    task, className, onTaskStatusUpdated, onTaskDelete
+} : ToDoItemProps) {
     
     const [ showEdit, setShowEdit ] = useState<boolean>(false);
-    const searchParams = useSearchParams();
     const pathname = usePathname();
 
     const handleHoverIn = () => {
@@ -53,6 +55,4 @@ const ToDoItem: FC<{
         </div>
     </div>);
     
-}
-
-export default ToDoItem;
+};

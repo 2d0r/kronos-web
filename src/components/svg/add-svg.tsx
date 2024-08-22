@@ -1,8 +1,6 @@
-import React, { FC } from 'react';
-
-const AddSVG: FC<{
+export default function AddSVG ({fill = 'white', width, height} : {
     fill?: string, width?: string, height?: string
-}> = ({fill = 'white', width, height}) => {
+}) {
     return (<svg width="36" height="37" viewBox="0 0 36 37" fill="none" xmlns="http://www.w3.org/2000/svg">
         <mask id="mask0_152_1316" style={{maskType:'alpha'}} maskUnits="userSpaceOnUse" x="0" y="0" width="36" height="37">
         <rect y="0.5" width="36" height="36" fill={fill}/>
@@ -12,5 +10,3 @@ const AddSVG: FC<{
         </g>
     </svg>);
 }
-
-export default AddSVG;

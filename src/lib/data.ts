@@ -10,7 +10,7 @@ import { Event, Mindset, Task } from '@prisma/client';
 
 // Tasks
 
-export async function getTasks() {
+export const getTasks = async () => {
   try {
       const allTasks = await prisma.task.findMany();
       return allTasks;
@@ -21,7 +21,7 @@ export async function getTasks() {
   }
 }
 
-export async function getTasksWithRelations() {
+export const getTasksWithRelations = async () => {
   try {
     const tasks: TaskWithRelations[] = await prisma.task.findMany({
       include: { 
@@ -42,7 +42,7 @@ export async function getTasksWithRelations() {
   }
 }
 
-export async function getTaskWithRelations(taskId: string) {
+export const getTaskWithRelations = async (taskId: string) => {
   try {
     const task: TaskWithRelations = await prisma.task.findUnique({
       where: {
@@ -66,7 +66,7 @@ export async function getTaskWithRelations(taskId: string) {
   }
 }
 
-export async function getCurrentTask() {
+export const getCurrentTask = async () => {
   const now = new Date();
   try {
     const currentEvents = await prisma.event.findMany({
@@ -98,7 +98,7 @@ export async function getCurrentTask() {
   }
 }
 
-export async function allTasksHaveActiveEvents() {
+export const allTasksHaveActiveEvents = async () => {
   const tasksWithoutActiveEvents = await prisma.task.findMany({
     where: {
       events: {
@@ -178,7 +178,7 @@ export const getTasksByIds = async (taskIds: string[]) => {
 
 // EVENTS
 
-export async function getEvents() {
+export const getEvents = async () => {
   try {
     const allEvents = await prisma.event.findMany();
     return allEvents;
@@ -188,7 +188,7 @@ export async function getEvents() {
   }
 }
 
-export async function getEventsWithRelations() {
+export const getEventsWithRelations = async () => {
   try {
     const events: EventWithRelations[] = await prisma.event.findMany({
         include: {
@@ -229,7 +229,7 @@ export const getUpcomingEvents = async (count: number) => {
   }
 }
 
-export async function findEventIdsInTimespan(start: Date, end?: Date) {
+export const findEventIdsInTimespan = async (start: Date, end?: Date) => {
   try {
     const events = await prisma.event.findMany({
       where: {
@@ -252,7 +252,7 @@ export async function findEventIdsInTimespan(start: Date, end?: Date) {
   }
 }
 
-export async function findEventsInTimespan(start: Date, end?: Date) {
+export const findEventsInTimespan = async (start: Date, end?: Date) => {
   try {
     const events = await prisma.event.findMany({
       where: {
@@ -279,7 +279,7 @@ export async function findEventsInTimespan(start: Date, end?: Date) {
 
 // MINDSETS
 
-export async function getMindsets() {
+export const getMindsets = async () => {
   try {
     const mindsets = await prisma.mindset.findMany();
     return mindsets;
@@ -289,7 +289,7 @@ export async function getMindsets() {
   }
 }
 
-export async function getMindsetsWithRelations() {
+export const getMindsetsWithRelations = async () => {
   try {
     const mindsets = await prisma.mindset.findMany({
       include: {
@@ -303,7 +303,7 @@ export async function getMindsetsWithRelations() {
   }
 }
 
-export async function getMindsetNames() {
+export const getMindsetNames = async () => {
   try {
     // Use Prisma to query all 'name' values from the 'mindset' table
     const mindsetNames = await prisma.mindset.findMany({
@@ -320,7 +320,7 @@ export async function getMindsetNames() {
   }
 }
   
-export async function getMindsetById (id : string) {
+export const getMindsetById  = async (id : string) => {
   try {
     const mindset = await prisma.mindset.findUnique({
       where: {
@@ -334,7 +334,7 @@ export async function getMindsetById (id : string) {
   }
 }
 
-export async function getMindsetByName (name: string) {
+export const getMindsetByName  = async (name: string) => {
   try {
     const mindset = await prisma.mindset.findUnique({
       where: {
@@ -348,7 +348,7 @@ export async function getMindsetByName (name: string) {
   }
 }
 
-export async function getTaskMindset(task: Task) {
+export const getTaskMindset = async (task: Task) => {
   try {
     const taskMindset = await prisma.mindset.findMany({
       where: {
@@ -366,7 +366,7 @@ export async function getTaskMindset(task: Task) {
   }
 }
 
-export async function getMindsetList() {
+export const getMindsetList = async () => {
   try {
     const mindsetNames = await prisma.mindset.findMany({
       select: {
@@ -383,7 +383,7 @@ export async function getMindsetList() {
   }
 }
 
-export async function getEventMindset(event: Event) {
+export const getEventMindset = async (event: Event) => {
   try {
       const mindsets: MindsetWithRelations[] = await getMindsetsWithRelations();
       const eventMindset = mindsets.filter(mindset => mindset.tasks.some(task => {
@@ -396,7 +396,7 @@ export async function getEventMindset(event: Event) {
   }
 }
 
-export async function getCurrentMindsetColour() {
+export const getCurrentMindsetColour = async () => {
   // Get nearest event with task
   // Get its task id
   const now = new Date();

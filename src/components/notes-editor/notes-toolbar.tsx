@@ -1,10 +1,11 @@
-import { Editor, useCurrentEditor } from '@tiptap/react';
-import { FC } from 'react';
+import { Editor } from '@tiptap/react';
 import ToolbarButton from '@/components/buttons/toolbar-button';
 import { Bold, CircleCheck, HeadingIcon, Italic, List } from 'lucide-react';
 import clsx from 'clsx';
 
-const Toolbar:FC<{ editor: Editor | null, hidden?: boolean, className?: string }> = ({editor, hidden, className}) => {
+export default function Toolbar ({editor, hidden, className} : { 
+  editor: Editor | null, hidden?: boolean, className?: string 
+}) {
 
     if (!editor) {
       return null
@@ -41,6 +42,4 @@ const Toolbar:FC<{ editor: Editor | null, hidden?: boolean, className?: string }
           className={clsx(className, editor.isActive('taskList') ? 'is-active' : '')}
         ><CircleCheck size='16' /></ToolbarButton>
     </div>);
-  }
-
-export default Toolbar;
+};

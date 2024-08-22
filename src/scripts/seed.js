@@ -5,7 +5,7 @@ const {
 } = require('./placeholder-data.js');
 const bcrypt = require('bcrypt');
 
-async function seedUsers(client) {
+const seedUsers = async (client) => {
   try {
     await client.sql`CREATE EXTENSION IF NOT EXISTS 'uuid-ossp'`;
     // Create the 'users' table if it doesn't exist
@@ -44,7 +44,7 @@ async function seedUsers(client) {
   }
 }
 
-async function seedTasks(client) {
+const seedTasks = async (client) => {
   try {
     await client.sql`CREATE EXTENSION IF NOT EXISTS 'uuid-ossp'`;
 
@@ -104,7 +104,7 @@ async function seedTasks(client) {
   }
 }
 
-async function main() {
+const main = async () => {
   const client = await db.connect();
 
   await seedUsers(client);

@@ -163,7 +163,7 @@ export const findMatchingDaysOfWeekInTimespan = (dayNames: DayOfWeek[], timespan
     return matchingDates;
 }
 
-export function checkGapIsFree(events: Event[], start: Date, end: Date) {
+export const checkGapIsFree = (events: Event[], start: Date, end: Date) => {
     const eventsInGap = events.filter(el => {
         if (el.startTime <= start && start < el.endTime) return true;
         if (el.startTime <= end && end < el.endTime) return true;
@@ -174,7 +174,7 @@ export function checkGapIsFree(events: Event[], start: Date, end: Date) {
     return true;
 }
 
-export function filterEventsInTimespan(timespan: [Date, Date], events: (Event[] | BasicEvent[])) {
+export const filterEventsInTimespan = (timespan: [Date, Date], events: (Event[] | BasicEvent[])) => {
     const eventsInTimespan = events.filter(el => {
         if (el.startTime <= timespan[0] && timespan[0] < el.endTime) return true;
         if (el.startTime <= timespan[1] && timespan[1] < el.endTime) return true;
@@ -202,7 +202,7 @@ export type BasicEvent = {
     endTime: Date,
 }
 
-export function findGapsInTimespan(timespan: [Date, Date], events: (BasicEvent[] | Event[]), minDuration?: number) {
+export const findGapsInTimespan = (timespan: [Date, Date], events: (BasicEvent[] | Event[]), minDuration?: number) => {
     // Find existing events in the timespan
     const eventsInTimespan = filterEventsInTimespan(timespan, events);
     const eventTimes = eventsInTimespan.map(event => [event.startTime, event.endTime]).sort((a, b) => a[0].getTime() - b[0].getTime());
@@ -242,7 +242,7 @@ export function findGapsInTimespan(timespan: [Date, Date], events: (BasicEvent[]
     return timeGaps;
 }
 
-export function findGapsThatStartInTimespan(timespan: [Date, Date], events: (BasicEvent[] | Event[]), taskDuration?: number) {
+export const findGapsThatStartInTimespan = (timespan: [Date, Date], events: (BasicEvent[] | Event[]), taskDuration?: number) => {
     // Find existing events in the timespan
     const eventsInTimespan = filterEventsInTimespan(timespan, events);
     const eventAfterTimespan = events.filter(el => timespan[1] <= el.startTime)[0];
@@ -325,7 +325,7 @@ export const timespanToDatesArray = (timespan: [Date, Date]): Date[] => {
  * @param span2 - The second time span as a [Date, Date] array.
  * @returns The intersection of the time spans as a [Date, Date] array, or null if there is no intersection.
  */
-export function intersectTimespans(span1: [Date, Date], span2: [Date, Date]): [Date, Date] | null {
+export const intersectTimespans = (span1: [Date, Date], span2: [Date, Date]): [Date, Date] | null => {
     const [start1, end1] = span1;
     const [start2, end2] = span2;
   

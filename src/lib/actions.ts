@@ -83,7 +83,7 @@ export type State = {
 const CreateTask = FormSchema.omit({ date: true });
 const EditTask = FormSchema.omit({ date: true });
 
-export async function createTaskPrisma(prevState: State, formData: FormData) {
+export const createTaskPrisma = async (prevState: State, formData: FormData) => {
 
   const validatedFields = CreateTask.safeParse({
     id: formData.get('id'),
@@ -212,13 +212,9 @@ export async function createTaskPrisma(prevState: State, formData: FormData) {
       success: false, message: 'Database Error: Failed to create task.',
     };
   }
-
-  
-
-  revalidatePath('/');
 }
 
-export async function editTaskPrisma(prevState: State, formData: FormData) {
+export const editTaskPrisma = async (prevState: State, formData: FormData) => {
 
   const validatedFields = EditTask.safeParse({
     id: formData.get('id'),
@@ -359,7 +355,7 @@ export async function editTaskPrisma(prevState: State, formData: FormData) {
   
 }
 
-export async function deleteTask(id: string) {
+export const deleteTask = async (id: string) => {
   try {
     await sql`DELETE FROM tasks WHERE id = ${id}`;
   } catch (error) {
@@ -372,7 +368,7 @@ export async function deleteTask(id: string) {
   // redirect('/');
 }
 
-export async function deleteTaskPrisma(id: string) {
+export const deleteTaskPrisma = async (id: string) => {
 
   const taskEvents = await prisma.event.findMany({
     where: {
@@ -410,7 +406,7 @@ export async function deleteTaskPrisma(id: string) {
   revalidatePath('/');
 }
 
-export async function updateTaskField(entryId: string, field: keyof Task, value: any) {
+export const updateTaskField = async (entryId: string, field: keyof Task, value: any) => {
   // get type of field from database
   try {
     await prisma.task.update({
@@ -428,7 +424,7 @@ export async function updateTaskField(entryId: string, field: keyof Task, value:
   }
 }
 
-export async function updatePriorityScores() {
+export const updatePriorityScores = async () => {
   const tasks = await getTasks();
   const mindsets = await getMindsets();
   const updatedTasks = calculatePriorityScores(tasks, mindsets);
@@ -439,7 +435,7 @@ export async function updatePriorityScores() {
   revalidatePath('/');
 }
 
-export async function updateTimeScores() {
+export const updateTimeScores = async () => {
   const tasks = await getTasks();
   tasks.forEach((task) => {
     const timeScore = calculateTimeScore(task);
@@ -449,7 +445,7 @@ export async function updateTimeScores() {
   revalidatePath('/');
 }
 
-export async function updateTaskNotes(notes: string, taskId: string) {
+export const updateTaskNotes = async (notes: string, taskId: string) => {
   try {
     const updateTaskNotes = await prisma.task.update({
       where: {
@@ -467,7 +463,7 @@ export async function updateTaskNotes(notes: string, taskId: string) {
 
 // EVENTS
 
-export async function createEventPrisma(event: Event) {
+export const createEventPrisma = async (event: Event) => {
   try {
     await prisma.event.create({
       data: {
@@ -484,7 +480,9 @@ export async function createEventPrisma(event: Event) {
 
 }
 
-export async function scheduleEventForTask(task: Task, startTimeProp: Date, duration?: number, localTime?: string) {
+export const scheduleEventForTask = async (
+  task: Task, startTimeProp: Date, duration?: number, localTime?: string
+) => {
 
   const startTime = new Date(startTimeProp);
   const endTime = new Date(startTime.getTime() + (duration || task.duration) * 60 * 1000);
@@ -510,7 +508,9 @@ export async function scheduleEventForTask(task: Task, startTimeProp: Date, dura
   return eventToSchedule as Event;
 }
 
-export async function updateEventField(eventId: string, field: keyof Event, value: any) {
+export const updateEventField = async (
+  eventId: string, field: keyof Event, value: any
+) => {
   try {
     await prisma.event.update({
       where: {
@@ -528,7 +528,7 @@ export async function updateEventField(eventId: string, field: keyof Event, valu
   }
 }
 
-export async function deleteAllEvents() {
+export const deleteAllEvents = async () => {
   try {
     await prisma.event.deleteMany();
   } catch (error) {
@@ -539,7 +539,7 @@ export async function deleteAllEvents() {
   }
 }
 
-export async function deleteEventsById(eventIds: string[]) {
+export const deleteEventsById = async (eventIds: string[]) => {
   try {
     await prisma.event.deleteMany({
       where: {
@@ -554,7 +554,7 @@ export async function deleteEventsById(eventIds: string[]) {
   }
 }
 
-export async function deleteEventsInTimespan(timespan: [Date, Date]) {
+export const deleteEventsInTimespan = async (timespan: [Date, Date]) => {
   const eventIdsInTimespan = await findEventIdsInTimespan(timespan[0], timespan[1]);
   try {
     await prisma.event.deleteMany({
@@ -567,7 +567,7 @@ export async function deleteEventsInTimespan(timespan: [Date, Date]) {
   }
 }
 
-export async function deleteFlexEventsInTimespan(timespan: [Date, Date]) {
+export const deleteFlexEventsInTimespan = async (timespan: [Date, Date]) => {
   const eventIdsInTimespan = await findEventIdsInTimespan(timespan[0], timespan[1]);
   try {
     await prisma.event.deleteMany({
@@ -581,7 +581,7 @@ export async function deleteFlexEventsInTimespan(timespan: [Date, Date]) {
   }
 }
 
-export async function deleteEventsOfTask(taskId: string, timespan?: [Date, Date]) {
+export const deleteEventsOfTask = async (taskId: string, timespan?: [Date, Date]) => {
   try {
     await prisma.event.deleteMany({
       where: {
@@ -599,7 +599,7 @@ export async function deleteEventsOfTask(taskId: string, timespan?: [Date, Date]
 
 // MINDSETS
 
-export async function getMindsetProximity(mindset1: string, mindset2: string) {
+export const getMindsetProximity = async (mindset1: string, mindset2: string) => {
   try {
     const mindsets = await prisma.mindset.findMany();
     const mindsetMaslowLevels = [mindset1, mindset2].map((mindset) => {

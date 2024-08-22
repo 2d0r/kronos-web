@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { FC, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Menu from '@/components/menu';
 import { ArrowLeftIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -15,7 +15,7 @@ interface TopBarProps {
     back?: boolean;
 }
 
-const TopBar: FC<TopBarProps> = ({children, back}) => {
+export default function TopBar ({children, back} : TopBarProps ) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [showMenu, setShowMenu] = useState(false);
@@ -53,6 +53,4 @@ const TopBar: FC<TopBarProps> = ({children, back}) => {
         }
         
     </div>);
-}
-
-export default TopBar;
+};

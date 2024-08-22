@@ -11,17 +11,17 @@ function capitalise(text: string) {
     return text[0].toUpperCase() + text.slice(1);
 }
 
-export function InputField(
-    { fieldName, placeholder, inputType, label, onChange = () => {}, className, tail, colour = NEUTRAL_MINDSET_COLOUR, state, value, hidden = false } : { 
-        fieldName: string, label?: string,
-        placeholder?: string, value?: string, tail?: string, 
-        inputType: string,
-        onChange?: any,
-        className?: string, colour?: string,
-        state: any,  
-        hidden?: boolean,
-    }
-) {
+export function InputField({ 
+    fieldName, placeholder, inputType, label, onChange = () => {}, className, tail, colour = NEUTRAL_MINDSET_COLOUR, state, value, hidden = false 
+} : { 
+    fieldName: string, label?: string,
+    placeholder?: string, value?: string, tail?: string, 
+    inputType: string,
+    onChange?: any,
+    className?: string, colour?: string,
+    state: any,  
+    hidden?: boolean,
+}) {
 
     const [ input, setInput ] = useState<string>(placeholder || '');
     const handleInput = (event : React.ChangeEvent<HTMLInputElement>) => {
@@ -73,20 +73,20 @@ export function InputField(
     </>);
 }
 
-export function Dropdown ( 
-    { fieldName, list, value, prompt, onChange = () => {}, label, colour = NEUTRAL_MINDSET_COLOUR, className = '', state, defaultValue } : {
-        fieldName: string,
-        list: string[],
-        value?: string,
-        defaultValue?: string,
-        prompt: string,
-        onChange?: any,
-        label?: string,
-        colour?: string,
-        className?: string,
-        state?: any,
-    }
-) {
+export function Dropdown ({ 
+    fieldName, list, value, prompt, onChange = () => {}, label, colour = NEUTRAL_MINDSET_COLOUR, className = '', state, defaultValue 
+} : {
+    fieldName: string,
+    list: string[],
+    value?: string,
+    defaultValue?: string,
+    prompt: string,
+    onChange?: any,
+    label?: string,
+    colour?: string,
+    className?: string,
+    state?: any,
+}) {
     const [ selection, setSelection ] = useState<string>(value || defaultValue || '');
     const handleSelect = (event : React.ChangeEvent<HTMLSelectElement>) => {
         setSelection(event.target.value !== undefined ? event.target.value : value || '');
@@ -128,20 +128,20 @@ export function Dropdown (
     );
 }
 
-export function SelectionField( 
-    { fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], colour = NEUTRAL_MINDSET_COLOUR, collapse = false, state, className } : {
-        fieldName: string,
-        list: string[],
-        prompt: string,
-        type: string,
-        onChange?: any,
-        defaultSelected?: string[],
-        colour?: string,
-        collapse?: boolean,
-        state: any,
-        className?: string,
-    }
-) {
+export function SelectionField({ 
+    fieldName, list, prompt, type, onChange = () => {}, defaultSelected = [], colour = NEUTRAL_MINDSET_COLOUR, collapse = false, state, className 
+} : {
+    fieldName: string,
+    list: string[],
+    prompt: string,
+    type: string,
+    onChange?: any,
+    defaultSelected?: string[],
+    colour?: string,
+    collapse?: boolean,
+    state: any,
+    className?: string,
+}) {
     const [ selectedOptions, setSelectedOptions ] = useState<string[]>(defaultSelected);
     const handleSelect = (event : React.ChangeEvent<HTMLInputElement>) => {
         setSelectedOptions((selectedOptions) => [...selectedOptions, event.target.value]);
@@ -211,19 +211,19 @@ export function SelectionField(
     </div>);
 }
 
-export function MultiSelectionField( 
-    { fieldName, list, prompt, type, onChange = () => {}, selected = [], className, colour = NEUTRAL_MINDSET_COLOUR, state } : {
-        fieldName: string,
-        list: string[],
-        prompt: string,
-        type: string,
-        onChange?: any,
-        selected?: string[],
-        className?: string,
-        colour?: string,
-        state?: any,
-    }
-) {
+export function MultiSelectionField({ 
+    fieldName, list, prompt, type, onChange = () => {}, selected = [], className, colour = NEUTRAL_MINDSET_COLOUR, state 
+} : {
+    fieldName: string,
+    list: string[],
+    prompt: string,
+    type: string,
+    onChange?: any,
+    selected?: string[],
+    className?: string,
+    colour?: string,
+    state?: any,
+}) {
     const [ selectedOptions, setSelectedOptions ] = useState<string[]>(selected);
 
     useEffect(() => {

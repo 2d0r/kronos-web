@@ -1,7 +1,7 @@
-import { DayOfWeek, Event, Task } from '@prisma/client';
+import { Event, Task } from '@prisma/client';
 import { DAYS_OF_WEEK_DICT, DEFAULT_TIMES_OF_DAY } from '@/lib/definitions';
 
-export function minutesBetweenDates (earlierDate : Date, laterDate : Date) {
+export const minutesBetweenDates = (earlierDate : Date, laterDate : Date) => {
     return (
         Math.round(
             (laterDate.getTime() - earlierDate.getTime()) / 1000 / 60
@@ -9,7 +9,7 @@ export function minutesBetweenDates (earlierDate : Date, laterDate : Date) {
     );
 };
 
-export function hoursBetweenDates (earlierDate : Date, laterDate : Date) {
+export const hoursBetweenDates = (earlierDate : Date, laterDate : Date) => {
     return (
         Math.round(
             (laterDate.getTime() - earlierDate.getTime()) / 1000 / 60 / 60
@@ -17,7 +17,7 @@ export function hoursBetweenDates (earlierDate : Date, laterDate : Date) {
     );
 };
 
-export function getCurrentTimeOfDay() {
+export const getCurrentTimeOfDay = () => {
     const currentTime = new Date();
     const hours = currentTime.getHours();
     for (const [timeOfDay, range] of Object.entries(DEFAULT_TIMES_OF_DAY)) {
@@ -30,15 +30,15 @@ export function getCurrentTimeOfDay() {
     }
 }
 
-export function addMinutesToDate(date: Date, minutes: number) {
+export const addMinutesToDate = (date: Date, minutes: number) => {
     return new Date(date.getTime() + minutes * 60 * 1000);
 }
 
-export function addDaysToDate(date: Date, days: number) {
+export const addDaysToDate = (date: Date, days: number) => {
     return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
 }
 
-export function calcRepeatIntervalInMinutes(task: Task) {
+export const calcRepeatIntervalInMinutes = (task: Task) => {
     if (task.repeat && task.repeatUnit === 'sessions' && task.repeatFrequency && task.repeatTimespan && task.repeatTimespanMultiplier) {
         const repeatTimespanInMinutes =
         task.repeatTimespan === 'hour' ? 60 :
@@ -57,7 +57,7 @@ export function calcRepeatIntervalInMinutes(task: Task) {
     
 }
 
-export function findNearestDate(dayName: string) {
+export const findNearestDate = (dayName: string) => {
     const today = new Date();
     const dayOfWeek = today.getDay();  // 0 for Sunday, 1 for Monday, ...
     const dayNum : number = DAYS_OF_WEEK_DICT[dayName];
@@ -116,15 +116,15 @@ export const updateTimeGaps = (event: [Date, Date], timeGaps: [Date, Date][]): [
     return updatedTimeGaps;
 }
 
-export function startOfDay(date: Date): Date {
+export const startOfDay = (date: Date): Date => {
     return new Date(date.setUTCHours(0, 0, 0, 0));
 }
 
-export function dateToDDMMYYYY (date: Date) {
+export const dateToDDMMYYYY = (date: Date) => {
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 }
 
-export function minutesToDisplayDuration (durationMinutes: number, displaySeconds: boolean = false) {
+export const minutesToDisplayDuration = (durationMinutes: number, displaySeconds: boolean = false) => {
     const hours = Math.floor(durationMinutes / 60);
     const hoursPlural = hours === 1 ? '' : 's';
     const hoursDisplay = hours > 0 ? `${hours} hr${hoursPlural}` : '';
@@ -139,7 +139,7 @@ export function minutesToDisplayDuration (durationMinutes: number, displaySecond
     return `${hoursDisplay}${minutesDisplay}${secondsDisplay}`;
 }
 
-export function minutesToTimerDisplay (durationMinutes: number) {
+export const minutesToTimerDisplay = (durationMinutes: number) => {
     const hours = Math.floor(durationMinutes / 60);
     const hoursDisplay = hours > 0 ? `${String(hours)}:` : '';
 
@@ -152,19 +152,11 @@ export function minutesToTimerDisplay (durationMinutes: number) {
     return `${hoursDisplay}${minutesDisplay}${secondsDisplay}`;
 }
 
-export function dateToHHMM (date: Date) {
+export const dateToHHMM = (date: Date) => {
     return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
 }
 
-// export function areSameDay(date1: Date, date2: Date) {
-//     return (
-//         date1.getFullYear() === date2.getFullYear() &&
-//         date1.getMonth() === date2.getMonth() &&
-//         date1.getDate() === date2.getDate()
-//     );
-// }
-
-export function areSameDay(date1: Date, date2: Date) {
+export const areSameDay = (date1: Date, date2: Date) => {
     const date1Copy = new Date(date1.getTime()); // Create a copy
     const date2Copy = new Date(date2.getTime()); // Create a copy
 
@@ -263,7 +255,7 @@ export const getStartAndEndOfDay = (day: Date): [Date, Date] => {
  * @param obj Any object with potential date props saved as string
  * @returns The same object, after converting all valid date props into Date objects
  */
-export function convertPropsToDate(obj: any): any {
+export const convertPropsToDate = (obj: any): any => {
     const result: Record<string, any> = { ...obj };
 
     for (const key in result) {
@@ -288,7 +280,7 @@ export function convertPropsToDate(obj: any): any {
  * @param date date object to covert
  * @returns local date formatted as string 'yyyy-MM-dd' for HTML input
  */
-export function dateToHtmlInput(date: Date) {
+export const dateToHtmlInput = (date: Date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
     const day = String(date.getDate()).padStart(2, '0');
@@ -296,7 +288,7 @@ export function dateToHtmlInput(date: Date) {
     return `${year}-${month}-${day}`;
 }
 
-export function convertDatePropsToLocaleString(obj: any): any {
+export const convertDatePropsToLocaleString = (obj: any): any => {
     const result: Record<string, any> = { ...obj };
     for (const key in result) {
         const value = result[key];

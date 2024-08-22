@@ -1,8 +1,6 @@
-import React, { FC } from 'react';
-
-const PauseSVG: FC<{
+export default function PauseSVG ({fill = 'white', width = '48', height = '49'} : {
     fill?: string, width?: string, height?: string
-}> = ({fill = 'white', width = 48, height = 49}) => {
+}) {
 
     return(<svg width={width} height={height} viewBox="0 0 48 49" fill="none" xmlns="http://www.w3.org/2000/svg">
         <mask id="mask0_152_1754" style={{maskType: 'alpha'}} maskUnits="userSpaceOnUse" x="0" y="0" width="48" height="49">
@@ -12,6 +10,4 @@ const PauseSVG: FC<{
         <path d="M18 32.5H22V16.5H18V32.5ZM26 32.5H30V16.5H26V32.5ZM24 44.5C21.2333 44.5 18.6333 43.975 16.2 42.925C13.7667 41.875 11.65 40.45 9.85 38.65C8.05 36.85 6.625 34.7333 5.575 32.3C4.525 29.8667 4 27.2667 4 24.5C4 21.7333 4.525 19.1333 5.575 16.7C6.625 14.2667 8.05 12.15 9.85 10.35C11.65 8.55 13.7667 7.125 16.2 6.075C18.6333 5.025 21.2333 4.5 24 4.5C26.7667 4.5 29.3667 5.025 31.8 6.075C34.2333 7.125 36.35 8.55 38.15 10.35C39.95 12.15 41.375 14.2667 42.425 16.7C43.475 19.1333 44 21.7333 44 24.5C44 27.2667 43.475 29.8667 42.425 32.3C41.375 34.7333 39.95 36.85 38.15 38.65C36.35 40.45 34.2333 41.875 31.8 42.925C29.3667 43.975 26.7667 44.5 24 44.5Z" fill={fill}/>
         </g>
     </svg>)
-}
-
-export default PauseSVG;
+};

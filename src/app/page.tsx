@@ -5,6 +5,7 @@ import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { adjustLightness } from '@/utils/colour-utils';
 import Timeline from '@/components/timeline';
 import { getCurrentMindsetColour } from '@/lib/data';
+import SearchBar from '@/components/search';
 
 export default async function Page() {
 
@@ -13,9 +14,7 @@ export default async function Page() {
     return (<div className='w-screen h-screen' style={{
         backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour, 0.5)}, ${adjustLightness(mindsetColour, 0.7)})`
         }}>
-            <TopBar>
-                {/* <SearchBar placeholder="Search tasks, projects, dates..." /> */}
-            </TopBar>
+            <TopBar><SearchBar /></TopBar>
             <Timeline />
             <BottomBar />
         </div>

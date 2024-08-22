@@ -1,8 +1,6 @@
-import React, { FC } from 'react';
-
-const StatsSVG: FC<{
+export default function StatsSVG ({fill = 'white', width, height} : {
     fill?: string, width?: string, height?: string
-}> = ({fill = 'white', width, height}) => {
+}) {
     return (<svg width={width || '36'} height={height || '37'} viewBox="0 0 36 37" fill="none" xmlns="http://www.w3.org/2000/svg">
         <mask id="mask0_204_1668" style={{maskType: 'alpha'}} maskUnits="userSpaceOnUse" x="0" y="0" width="36" height="37">
         <rect y="0.5" width="36" height="36" fill={fill}/>
@@ -11,6 +9,4 @@ const StatsSVG: FC<{
         <path d="M24 30.5V20H30V30.5H24ZM15 30.5V6.5H21V30.5H15ZM6 30.5V14H12V30.5H6Z" fill={fill}/>
         </g>
     </svg>);
-}
-
-export default StatsSVG;
+};

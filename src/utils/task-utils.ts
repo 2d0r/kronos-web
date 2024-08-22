@@ -7,11 +7,11 @@ interface Sortable {
     [key: string]: any;
 }
   
-export function sortByCustomOrder<T extends Sortable> (
+export const sortByCustomOrder = <T extends Sortable> (
     list: T[], 
     property: keyof T, 
     enumValues: string[]
-): T[] {
+) => {
     const orderMap = enumValues.reduce((map, value, index) => {
         map[value] = index;
         return map;
@@ -24,11 +24,11 @@ export function sortByCustomOrder<T extends Sortable> (
     });
 }
 
-export function sortTasksByPriority (
+export const sortTasksByPriority = async (
     list: Task[], 
     property: keyof Task, 
     enumValues: string[]
-): Task[] {
+) => {
     const orderMap = enumValues.reduce((map, value, index) => {
         map[value] = index;
         return map;
@@ -41,7 +41,7 @@ export function sortTasksByPriority (
     });
 }
 
-export function getTaskColour(task: Task, mindsets: Mindset[]): string {
+export const getTaskColour = async (task: Task, mindsets: Mindset[]) => {
     return mindsets.filter(el => el.id === task.mindsetId)[0].colour;
 }
 

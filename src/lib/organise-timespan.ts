@@ -38,12 +38,12 @@ interface OrganiseTimespanProps {
     eventsToSchedule?: eventsToSchedule,
 };
 
-export async function organiseTimespan({
+export const organiseTimespan = async ({
     timespan, 
     displaceableEventIds = [], 
     displaceAllFlexEvents = true,
     eventsToSchedule = [],
-} : OrganiseTimespanProps ) {
+} : OrganiseTimespanProps ) => {
     console.log('timespan', timespan);
     const timespanInMinutes = minutesBetweenDates(timespan[0], timespan[1]);
     const events = await getEvents(); // To do: only fetch events in timespanToOrganise

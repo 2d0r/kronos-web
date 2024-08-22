@@ -1,8 +1,6 @@
-import { FC } from 'react';
-
-const CheckboxBlankSVG: FC<{fill?: string, width?: string, height?: string}> = ({
-    fill = 'black', width = '36', height = '36'
-}) => {
+export default function CheckboxBlankSVG ({ fill = 'black', width = '36', height = '36' } : {
+    fill?: string, width?: string, height?: string
+}) {
     return (<svg width={width} height={height} viewBox='0 0 36 36' fill={fill} xmlns='http://www.w3.org/2000/svg'>
         <mask id='mask0_167_3343' style={{ maskType: 'alpha' }} maskUnits='userSpaceOnUse' x='0' y='0' width='36' height='36'>
         <rect width='36' height='36' fill='#D9D9D9'/>
@@ -12,5 +10,3 @@ const CheckboxBlankSVG: FC<{fill?: string, width?: string, height?: string}> = (
         </g>
     </svg>)
 };
-
-export default CheckboxBlankSVG;

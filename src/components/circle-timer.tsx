@@ -4,12 +4,10 @@ import PauseSVG from '@/components/svg/pause-svg';
 import PlaySVG from '@/components/svg/play-svg';
 import { minutesToTimerDisplay } from '@/utils/date-utils';
 import Link from 'next/link';
-import { FC, useState } from 'react';
+import { useState } from 'react';
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
-const CircleTimer:FC<{
-    duration: number
-}> = ({duration}) => {
+export default function CircleTimer ({ duration } : {duration: number}) {
 
     const [ playing, setPlaying ] = useState<boolean>(false);
 
@@ -74,7 +72,5 @@ const CircleTimer:FC<{
         </div>
     </>);
 }
-
-export default CircleTimer;
 
 // Reference https://www.npmjs.com/package/react-countdown-circle-timer

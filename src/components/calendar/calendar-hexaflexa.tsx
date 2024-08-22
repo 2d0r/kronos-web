@@ -2,21 +2,17 @@
 
 'use client';
 
-import React, { RefObject, useEffect, useState } from 'react';
+import { createRef, RefObject, useEffect, useState } from 'react';
 import { HfTimegrid, defineCustomElements } from '@hexaflexa/timegrid-react';
 import { HfTimegridConfig, utcDateToString } from '@hexaflexa/timegrid';
 import './calendar-hexaflexa.css';
 import { eventsToHf } from '@/utils/date-utils';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { EventWithRelations, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { useEvents, useMindsetColour, useTasks } from '@/store/store';
 defineCustomElements();
-import { motion } from 'framer-motion';
 
-const CalendarComponent: React.FC<{
-    startWeekToday?: boolean,
-}> = ({
-    startWeekToday = false }) => {
+export default function CalendarComponent ( { startWeekToday = false } : { startWeekToday?: boolean }) {
 
     const events = useEvents();
     const tasks = useTasks();
@@ -84,12 +80,12 @@ const CalendarComponent: React.FC<{
 
     // HANDLERS 
 
-    function onEventSelected(event: any) {
+    const onEventSelected = (event: any) => {
         router.push(`?task=${event.detail.taskId}&event=${event.detail.id}`);
     }
-    function onStartDateChanged(event: any) {
+    const onStartDateChanged = (event: any) => {
     }
-    function onEventNew(event: any) {
+    const onEventNew = (event: any) => {
         const newEvent = event.detail;
         newEvent.id = timegridConfig.events!.length * 100 + '';
         newEvent.title = 'New Event ' + newEvent.id;
@@ -112,7 +108,7 @@ const CalendarComponent: React.FC<{
         // console.log('calendar/useEffect[events] - tasks:', tasks);
     }, [events]);
     
-    let timegridRef: RefObject<HTMLHfTimegridElement> = React.createRef();
+    let timegridRef: RefObject<HTMLHfTimegridElement> = createRef();
 
     return (<>
         <HfTimegrid 
@@ -133,5 +129,3 @@ const CalendarComponent: React.FC<{
         />
     </>);
 }
-
-export default CalendarComponent;

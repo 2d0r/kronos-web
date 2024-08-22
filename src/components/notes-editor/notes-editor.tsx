@@ -1,7 +1,6 @@
 'use client';
 
 import { useEditor, EditorContent } from '@tiptap/react';
-import { FC } from 'react';
 import { updateTaskNotes } from '@/lib/actions';
 import '@/app/globals.css';
 import Strike from '@tiptap/extension-strike';
@@ -22,12 +21,12 @@ import Toolbar from '@/components/notes-editor/notes-toolbar';
 import Placeholder from '@tiptap/extension-placeholder';
 import clsx from 'clsx';
 
-const NotesEditor: FC<{ 
+export default function NotesEditor ({ notes, onChange, taskId, className } : { 
   notes: string, 
   onChange?: (richText: string) => void,
   taskId: string,
   className?: string,
-}> = ({ notes, onChange, taskId, className }) => {
+}) {
 
   // const CustomTaskItem = TaskItem.extend({
   //   content: 'inline*',
@@ -101,6 +100,4 @@ const NotesEditor: FC<{
       // style={{ backgroundColor: className === 'task-card' ? adjustLightness(NEUTRAL_MINDSET_COLOUR, 0.95) : ''}}
     />
   </div>);
-}
-
-export default NotesEditor;
+};

@@ -1,8 +1,8 @@
-export function recolorSVG(
+export const recolorSVG = (
     svgElement: SVGElement, 
     targetColor: string, 
     oldColor?: string 
-): SVGElement {
+) => {
     const svgElements = svgElement.querySelectorAll('*') as NodeListOf<SVGElement>; 
 
     svgElements.forEach((element) => {
@@ -19,11 +19,11 @@ export function recolorSVG(
     return svgElement;
 }
 
-export function recolorSVGRef(
+export const recolorSVGRef = (
     svgRef: React.RefObject<SVGElement>,
     targetColor: string, 
     oldColor?: string 
-) {
+) => {
     const svgElement = svgRef.current;
 
     if ( svgElement ) {
@@ -41,7 +41,7 @@ export function recolorSVGRef(
 
 
 
-export function colourLuminance(hex: string, lum: number) {
+export const colourLuminance = (hex: string, lum: number) => {
 
 	// validate hex string
 	hex = String(hex).replace(/[^0-9a-f]/gi, '');
@@ -61,7 +61,7 @@ export function colourLuminance(hex: string, lum: number) {
 	return rgb;
 }
 
-export function adjustLightness(hexCode: string, tone: number): string {
+export const adjustLightness = (hexCode: string, tone: number) => {
     // Remove the "#" symbol from the hex code
     let color = hexCode.replace('#', '');
   

@@ -1,7 +1,7 @@
 'use client';
 
 import { TaskType } from '@prisma/client';
-import { FC, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dropdown } from '@/components/form-fields';
 import { DEFAULT_MINDSET_LIST, Filters, SortItem } from '@/lib/definitions';
 import '@/app/globals.css';
@@ -12,9 +12,7 @@ import TodoList from '@/components/browser/todo-list';
 import { useSearchParams } from 'next/navigation';
 import { useMindsetColour, useMindsets } from '@/store/store';
 
-const TaskBrowser: FC<{
-    parentName?: string,
-}> = ({parentName}) => {
+export default function TaskBrowser () {
 
     const searchParams = useSearchParams();
     const mindsets = useMindsets();
@@ -154,5 +152,3 @@ const TaskBrowser: FC<{
         </div>
     );
 }
-
-export default TaskBrowser;

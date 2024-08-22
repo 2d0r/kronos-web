@@ -1,8 +1,6 @@
-import React, { FC } from 'react';
-
-const CloseIconSVG: FC<{
+export default function CloseIconSVG ({fill = 'white', width, height} : {
     fill?: string, width?: string, height?: string
-}> = ({fill = 'white', width, height}) => {
+}) {
     return (<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
         <mask id="mask0_155_2857" style={{maskType:'alpha'}} maskUnits="userSpaceOnUse" x="0" y="0" width="36" height="36">
         <rect width="36" height="36" fill={fill}/>
@@ -12,5 +10,3 @@ const CloseIconSVG: FC<{
         </g>
     </svg>);
 }
-
-export default CloseIconSVG;

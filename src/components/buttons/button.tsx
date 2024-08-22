@@ -1,13 +1,13 @@
 'use client';
 
-import React, { ComponentPropsWithoutRef } from 'react';
+import { ComponentPropsWithoutRef } from 'react';
 import clsx from 'clsx';
 
 type Props = ComponentPropsWithoutRef<'button'> & {
     onClick?: () => Promise<void> | void;
 }
 
-const Button: React.FC<Props> = ({onClick, className, style, ...props}) => {
+export default function Button ({onClick, className, style, ...props} : Props) {
     return (
         <button 
             {...props} 
@@ -20,6 +20,4 @@ const Button: React.FC<Props> = ({onClick, className, style, ...props}) => {
             style={style}
         />
     );
-}
-
-export default Button;
+};
