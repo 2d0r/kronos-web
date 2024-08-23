@@ -24,7 +24,7 @@ export const sortByCustomOrder = <T extends Sortable> (
     });
 }
 
-export const sortTasksByPriority = async (
+export const sortTasksByPriority = (
     list: Task[], 
     property: keyof Task, 
     enumValues: string[]
@@ -41,7 +41,7 @@ export const sortTasksByPriority = async (
     });
 }
 
-export const getTaskColour = async (task: Task, mindsets: Mindset[]) => {
+export const getTaskColour = (task: Task, mindsets: Mindset[]) => {
     return mindsets.filter(el => el.id === task.mindsetId)[0].colour;
 }
 
