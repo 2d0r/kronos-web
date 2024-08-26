@@ -3,13 +3,10 @@
 import { useRef } from 'react';
 import BottomBar from '@/components/ui/bottom-bar';
 import TopBar from '@/components/ui/top-bar';
-import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import SearchBar from '@/components/search';
 import Menu from '@/components/menu';
-import { adjustLightness } from '@/utils/colour-utils';
 import clsx from 'clsx';
 import { useSearchParams } from 'next/navigation';
-import { useMindsetColour } from '@/store/store';
 import { motion } from 'framer-motion';
 
 interface TimelineBoardProps {
@@ -26,7 +23,6 @@ export default function TimelineBoard ({
     // Modals
     const searchParams = useSearchParams();
     const showMenu = searchParams.get('menu');
-    const mindsetColour = useMindsetColour();
 
     // Detect resize and reload, in order to animate
     // const [, updateState] = useState<any>();
@@ -47,9 +43,7 @@ export default function TimelineBoard ({
     // }, []);
 
 
-    return (<div className={clsx(timelineClassName, 'w-screen h-screen flex flex-col gap-8 items-center justify-start pt-[20vh]')} style={{
-        backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.5)}, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.7)})`
-    }}>
+    return (<div className={clsx(timelineClassName, 'w-screen h-screen flex flex-col gap-8 items-center justify-start pt-[20vh]')}>
         <TopBar back={back}><SearchBar /></TopBar>
         {showMenu && <Menu />}
         <motion.div id='whiteBoard' ref={divRef} className={clsx(cardClassName, 'bg-white max-h-[80vh] rounded-3xl shadow-xl w-fit p-4 flex items-center justify-start')}
