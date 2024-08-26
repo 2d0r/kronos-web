@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { EventWithRelations } from '@/lib/types';
 import { useEvents, useMindsetColour, useTasks } from '@/store/store';
+import useWindowSize from '@/lib/useWindowSize';
 defineCustomElements();
 
 export default function CalendarComponent ( { startWeekToday = false } : { startWeekToday?: boolean }) {
@@ -19,10 +20,14 @@ export default function CalendarComponent ( { startWeekToday = false } : { start
     const tasks = useTasks();
     const mindsetColour = useMindsetColour();
     const router = useRouter();
+    const { windowWidth } = useWindowSize();
+
+    console.log('windowWidth', windowWidth);
 
     const timezone = 'Europe/Bucharest' // Intl.DateTimeFormat().resolvedOptions().timeZone;
     const startDate: string = utcDateToString(new Date());
 
+    const [ daysCount, setDaysCount ] = useState<number>(7);
     const [ timegridConfig, setTimegridConfig ] = useState<HfTimegridConfig>({
         daysConfig: {
             daysCount: 7,
@@ -108,6 +113,13 @@ export default function CalendarComponent ( { startWeekToday = false } : { start
         reloadEvents(events);
         // console.log('calendar/useEffect[events] - tasks:', tasks);
     }, [events]);
+    useEffect(() => {
+        const newDaysCount = windowWidth ? windowWidth <= 400 ? 2 : windowWidth <= 900 ? 4 : 7 : 7;
+        console.log('newDaysCount', newDaysCount);
+        setTimegridConfig(prevConfig => ({ ...prevConfig,
+            daysConfig: { ...prevConfig.daysConfig, daysCount: newDaysCount, fullWeek: newDaysCount === 7 }
+        }));
+    }, [windowWidth])
     
     let timegridRef: RefObject<HTMLHfTimegridElement> = createRef();
 
@@ -127,6 +139,7 @@ export default function CalendarComponent ( { startWeekToday = false } : { start
                 borderRadius: '10px',
                 position: 'relative'
             }}
+            className='hide-scrollbar'
         />
     </>);
 }

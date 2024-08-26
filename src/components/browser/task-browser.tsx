@@ -12,12 +12,16 @@ import Link from 'next/link';
 import TodoList from '@/components/browser/todo-list';
 import { useSearchParams } from 'next/navigation';
 import { useMindsetColour, useMindsets } from '@/store/store';
+import { ArrowDownIcon, ArrowUpIcon, ListBulletIcon, TableCellsIcon } from '@heroicons/react/24/outline';
+import useWindowSize from '@/lib/useWindowSize';
+import clsx from 'clsx';
 
 export default function TaskBrowser () {
 
     const searchParams = useSearchParams();
     const mindsets = useMindsets();
     const mindsetColour = useMindsetColour();
+    const { windowWidth } = useWindowSize(); 
 
     const [ filters, setFilters ] = useState<Filters>({
         type: 'task', mindset: 'All', tableView: false, 
@@ -73,7 +77,7 @@ export default function TaskBrowser () {
     }, [searchParams]);
 
     return(
-        <div className='flex flex-col items-center gap-4'>
+        <div className='flex flex-col items-center gap-4 md:w-auto w-full'>
             {/* Tab bar */}
             <div className='flex gap-4 items-center justify-center'>
                 <button 
@@ -103,7 +107,7 @@ export default function TaskBrowser () {
             </div>
 
             {/* Filter and sort */}
-            <div className='flex gap-4 items-center'>
+            <div className='flex gap-4 items-center justify-center w-full'>
                 { filters.type !== 'goal' &&
                     <Dropdown 
                         fieldName='chooseMindset'
@@ -112,6 +116,7 @@ export default function TaskBrowser () {
                         onChange={handleMindsetFilter}
                         prompt=''
                         colour={mindsetColour}
+                        className='w-full no-form'
                     />
                 }
                 <div className='rounded-md flex items-center' style={{ backgroundColor: adjustLightness(mindsetColour, 0.95) }}>
@@ -122,21 +127,22 @@ export default function TaskBrowser () {
                         onChange={handleSort}
                         prompt=''
                         colour={mindsetColour}
-                        className='!outline-0 border-0'
+                        className='!outline-0 border-0 w-full no-form'
                     />
                     <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleSortDirection()}>
-                        <img src={filters.sort[1] === 'Ascending' ? './icons/sort-desc.svg' : './icons/sort-asc.svg'} alt='icon-sort' />
+                        {filters.sort[1] === 'Ascending' ? <ArrowUpIcon width={18}/> : <ArrowDownIcon width={18} />}
                     </div>
                 </div>
                 {/* Table view toggle */}
-                { filters.type !== 'goal' &&
+                { filters.type !== 'goal' && windowWidth && windowWidth > 500 &&
                     <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
-                        <img src={ filters.tableView === false ? './icons/table-rows.svg' : './icons/list-bulleted.svg'} alt='icon-list' />
+                        {filters.tableView ? <ListBulletIcon width={24} /> : <TableCellsIcon width={24} />}
                     </div>
                 }
                 <Link 
                     href={filters.logbookView ? '/browser' : '/browser?logbook=true'} 
-                    className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' 
+                    className={clsx('h-10 w-10 flex items-center justify-center cursor-pointer border-gray-200 rounded-md')} 
+                    style={{ backgroundColor: filters.logbookView ? adjustLightness(mindsetColour, 0.95) : 'transparent' }}
                     onClick={() => handleLogbookToggle()}
                 >
                     <History color={filters.logbookView ? 'black' : 'lightgrey'}/>

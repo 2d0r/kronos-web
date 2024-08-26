@@ -24,6 +24,7 @@ import { fetchEventsOfTask, fetchTask } from '@/lib/data';
 import { AnimatePresence, motion } from 'framer-motion';
 import { setSearchParams } from '@/utils/app-utils';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import useWindowSize from '@/lib/useWindowSize';
 
 
 export default function TaskCard() {
@@ -32,6 +33,7 @@ export default function TaskCard() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { replace } = useRouter();
+    const { windowWidth } = useWindowSize();
 
     const eventIdParam = searchParams.get('event');
     const tasks = useTasks();
@@ -222,12 +224,18 @@ export default function TaskCard() {
     // }, [state])
 
     
-    return (<AnimatePresence>
-        {searchParams.get('task') && searchParams.get('status') === 'edit' && (
-        <motion.div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1, ease: false }}>
-        <motion.div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl text-sm text-black overflow-hidden'
-        initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 0.1, ease: false }}>
+    return (<AnimatePresence>{searchParams.get('task') && searchParams.get('status') === 'edit' && (
+        // Overlay
+        <motion.div className='z-50 absolute w-full h-full left-0 top-0 flex md:items-center justify-center bg-black/20 backdrop-blur-sm md:py-4 pt-4'
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
+        transition={{ duration: 0.1, ease: false }}>
+        {/* Card */}
+        <motion.div className='w-full md:w-auto md:m-20 z-50 top-1/3 md:rounded-2xl rounded-t-2xl md:overflow-hidden overflow-y-scroll hide-scrollbar
+        bg-white shadow-2xl text-sm text-black'
+        initial={windowWidth && windowWidth > 500 ? { scale: 0.8 } : { y: 500 }} 
+        animate={windowWidth && windowWidth > 500 ? { scale: 1 } : { y: 0 }} 
+        exit={windowWidth && windowWidth > 500 ? { scale: 0.8, opacity: 0 } : { y: 500 }} 
+        transition={{ duration: 0.1, ease: false }}>
         <form action={formAction}>
             {/* Top bar */}
             <div className='w-full h-16 flex justify-between items-center p-4 border-b-[0.5px]'>
@@ -247,9 +255,10 @@ export default function TaskCard() {
                     {/* <img src='../icons/close-black.svg' className='w-8 h-8' alt='icon-close'/> */}
                 </div>
             </div>
-            <div className='w-full flex overflow-hidden'>
+            <div className='w-full flex md:flex-row flex-col overflow-hidden'>
+
                 {/* Settings panel */}
-                <div className='w-[350px] h-[70vh] py-2 border-r-[0.5px] flex flex-col overflow-y-scroll task-input-fields'>
+                <div className='md:w-[350px] w-full md:h-[70vh] py-2 border-r-[0.5px] flex flex-col overflow-y-scroll task-input-fields'>
                     <Dropdown 
                         fieldName='mindset'
                         prompt='Pick a mindset'
@@ -594,11 +603,11 @@ export default function TaskCard() {
                 </div>
 
                 {/* Notes and checklist panel */}
-                <div className='w-[400px] h-[70vh] flex flex-col task-card'>
+                <div className='md:w-[400px] w-full md:h-[70vh] flex flex-col task-card'>
                     <div className=''>
                         <EventSection event={taskCache.events?.filter(el => el.id === eventId)[0] || {} as Event} mindsetColour={mindsetColour} />
                     </div>
-                    <div className='h-full border-b-[0.5px] overflow-y-scroll'>
+                    <div className='md:h-full min-h-[12rem] border-b-[0.5px] overflow-y-scroll'>
                         <NotesEditor notes={taskCache.notes || ''} taskId={taskCache.id} page={'edit-task'} />
                     </div>
                     <div className='min-h-1/6 flex flex-col gap-1 p-4'>

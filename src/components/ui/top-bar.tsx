@@ -9,13 +9,15 @@ import { ArrowLeftIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline
 import { useMindsetColour } from '@/store/store';
 import { AnimatePresence } from 'framer-motion';
 import { motion } from 'framer-motion';
+import clsx from 'clsx';
 
 interface TopBarProps {
     children?: JSX.Element; // Or a more specialized type
     back?: boolean;
+    className?: string;
 }
 
-export default function TopBar ({children, back} : TopBarProps ) {
+export default function TopBar ({children, back, className} : TopBarProps ) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [showMenu, setShowMenu] = useState(false);
@@ -34,7 +36,7 @@ export default function TopBar ({children, back} : TopBarProps ) {
 
 
     return (
-    <div className='top-0 absolute z-40 w-full flex justify-between items-center px-4 py-2'>
+    <div className={clsx(className, 'top-0 absolute z-[39] md:z-40 w-full flex justify-between items-center px-4 py-2')}>
         {back === true ?
         <button onClick={() => router.back()}>
             <ArrowLeftIcon color={mindsetColour || 'white'} width={36}/>

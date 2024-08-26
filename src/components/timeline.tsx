@@ -83,7 +83,7 @@ export default function Timeline() {
             {eventQueue.length > 0 && 
                 <motion.div className={clsx('w-full justify-center items-center flex flex-col gap-4',
                     showMenu ? 'absolute bottom-0 left-0 right-0 h-1/6' : '',
-                )} initial={{ y: 200 }} animate={{ y: 0 }} layout='preserve-aspect' transition={{ ease: false }}>
+                )} initial={{ y: 200, overflow: 'hidden' }} animate={{ y: 0 }} layout='preserve-aspect' transition={{ ease: false }}>
                     <AnimatePresence>
                     {(eventQueue[0]) && (<motion.div className='flex flex-col gap-4 w-full items-center'
                     // initial={{ y: 200 }} animate={{ y: 0 }} exit={{ y: 200, opacity: 0 }}
@@ -104,16 +104,16 @@ export default function Timeline() {
                 <AnimatePresence>{!showMenu &&
                     <motion.div className={clsx('w-screen h-1/6 left-0 absolute overflow-clip flex items-end justify-center',
                         showMenu ? 'top-full h-0' : 'bottom-0'
-                    )} initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} layout='position' transition={{ ease: false }}>
+                    )} initial={{ y: 100, overflow: 'hidden' }} animate={{ y: 0 }} exit={{ y: 100 }} layout='position' transition={{ ease: false }}>
                         <EventCard event={eventQueue[1]} mindset={mindsetQueue[1]} isTucked={true} greyed={true} />
                     </motion.div>
                 }</AnimatePresence>
             )}
             
             {/* Empty timeline */}
-            { eventQueue.length === 0 && !showMenu && (<div className='flex flex-col gap-8 items-center w-[24rem]' style={{ color: mindsetColour }}>
+            { eventQueue.length === 0 && !showMenu && (<div className='flex flex-col gap-8 items-center md:w-[24rem] w-full' style={{ color: mindsetColour }}>
                 <span className='text-xl'>Nothing coming next</span>
-                <div className='flex gap-4 justify-center text-md w-full'>
+                <div className='flex gap-4 justify-center text-md w-full md:p-0 p-2'>
                     <Button 
                         className='rounded-md p-6 border text-md w-full' 
                         style={{ color: mindsetColour, borderColor: mindsetColour }}
@@ -127,9 +127,10 @@ export default function Timeline() {
                     </Link>
                 </div>
             </div>)}
+
             {/* Menu cards */}
             <AnimatePresence>
-            { showMenu && <motion.div className='w-full h-full flex items-center justify-center'
+            { showMenu && <motion.div className='w-full h-full flex md:items-center justify-center md:pt-0 pt-[5vh]'
             initial={{ scale: 0.9, opacity: 0, y: -600, position: 'absolute' }} animate={{ scale: 1, opacity: 1, y: 0 }} 
             exit={{ scale: 0.9, opacity: 0, y: -600, height: '100%', padding: 0, position: 'absolute' }} transition={{ duration: 0.2 }}>
                 <Menu />

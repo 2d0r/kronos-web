@@ -4,11 +4,6 @@ import React from 'react';
 import MenuCard from '@/components/ui/menu-card';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import CalendarSVG from '@/components/svg/calendar-svg';
-import BulletListSVG from '@/components/svg/bullet-list-svg';
-import StatsSVG from '@/components/svg/stats-svg';
-import HistorySVG from '@/components/svg/history-svg';
-import SettingsSVG from '@/components/svg/settings-svg';
 import '@/app/globals.css';
 import { useMindsetColour } from '@/store/store';
 import { motion } from 'framer-motion';
@@ -21,7 +16,7 @@ export default function Menu({onBlur}: {onBlur?: () => void}) {
     if (pathname.endsWith('/')) {
 
         return (
-            <div className='w-full max-w-[1200px] h-1/2 flex p-8 gap-4'>
+            <div className='w-full md:max-w-[1200px] md:h-1/2 flex flex-col md:flex-row md:p-8 p-2 pt-8 gap-2 md:gap-4'>
                 <MenuCard title='Calendar' href='/calendar'>
                     <CalendarIcon color={mindsetColour} height={24} />
                 </MenuCard>
@@ -31,7 +26,7 @@ export default function Menu({onBlur}: {onBlur?: () => void}) {
                 <MenuCard title='Stats' subtitle='Coming soon!' className='opacity-60 cursor-default'>
                     <ChartBarIcon color={mindsetColour} height={24} />
                 </MenuCard>
-                <div className='flex flex-col h-full w-full gap-4'>
+                <div className='flex md:flex-col h-full w-full gap-2 md:gap-4'>
                     <MenuCard title='Logbook' href='/browser?logbook=true'>
                         <DocumentCheckIcon color={mindsetColour} height={24} />
                     </MenuCard>
@@ -42,8 +37,8 @@ export default function Menu({onBlur}: {onBlur?: () => void}) {
             </div>
         );
     } else {
-        return (<motion.div className='absolute w-screen h-screen top-0 left-0'
-        initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }}>
+        return (<motion.div className='absolute z-50 w-screen h-screen top-0 left-0'
+        initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.1 }}>
             <div className='absolute z-50 right-10 top-10 w-auto h-auto p-3 gap-1 flex flex-col text-black border-[0.5px] border-white rounded-3xl 
                 bg-gradient-to-br from-white to-white/50 backdrop-blur-lg shadow-lg' onBlur={onBlur} tabIndex={0}>
                 { !pathname.includes('/task') && <Link href={'/'} className='menu-link'>Timeline</Link>}

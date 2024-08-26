@@ -26,7 +26,7 @@ export default function EventCard({ event, mindset, className, isTucked = false,
     
     return (!isTucked ? <>
         <div className={clsx(className, 
-            'text-white rounded-2xl flex flex-col justify-between items-center text-center cursor-pointer p-4 w-[350px]'
+            'text-white rounded-2xl flex flex-col justify-between items-center text-center cursor-pointer p-4 md:w-[350px] w-[96vw]'
         )}
         style = {{
             backgroundColor: mindset.colour || NEUTRAL_MINDSET_COLOUR,
@@ -42,7 +42,7 @@ export default function EventCard({ event, mindset, className, isTucked = false,
         </div>
     </> : <>
         <div className={clsx(className, 
-            'text-white rounded-2xl flex flex-col items-center text-center p-4 w-[350px]',
+            'text-white rounded-2xl flex flex-col items-center text-center p-4 md:w-[350px] w-[96vw]',
             'absolute top-full mt-[-10vh]',
             greyed && 'bg-gradient-to-br from-gray-400 to-gray-600 opacity-60'
         )}

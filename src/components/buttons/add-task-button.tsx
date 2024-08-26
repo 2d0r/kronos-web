@@ -21,7 +21,7 @@ export default function AddTaskButton() {
     return (
         <Link href={showTaskCard ? pathname : `${pathname}?task=new&status=edit`}>
         <motion.div
-            className={'bottom-[2vh] right-[2vw] w-10 h-10 text-white rounded-full flex items-center justify-center'}
+            className={'bottom-[2vh] right-[2vw] w-10 h-10 text-white rounded-full flex items-center justify-center shadow-lg shadow-black/20'}
             style={{ background: buttonBg }}
             whileHover={{ scale: 1.1 }}
         >

@@ -147,6 +147,15 @@ ul[data-type="taskList"] {
 .formValuesColumn {
   @apply w-2/3;
 }
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
 .menu-link {
   @apply hover:bg-white/50 rounded-lg px-2 py-1;
 }

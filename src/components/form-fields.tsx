@@ -94,8 +94,10 @@ export function Dropdown ({
     }
 
     return (
-        <div className={clsx(' flex items-baseline')}>
-            <label htmlFor={fieldName} className='my-2 block text-sm font-medium formKeysColumn'>
+        <div className='flex items-baseline'>
+            <label htmlFor={fieldName} className={clsx(
+                'block text-sm font-medium', label ? 'my-2' : '', !className.includes('no-form') && 'formKeysColumn'
+            )}>
                 {label}
             </label>
             <div className={label && 'relative formValuesColumn'}>

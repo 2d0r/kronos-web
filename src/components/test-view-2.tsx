@@ -1,9 +1,5 @@
 'use client';
 
-import BottomBar from '@/components/ui/bottom-bar';
-import TopBar from '@/components/ui/top-bar';
-import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
-import { adjustLightness } from '@/utils/colour-utils';
 import clsx from 'clsx';
 import CalendarComponent from '@/components/calendar/calendar-hexaflexa';
 import TaskBrowser from '@/components/browser/task-browser';
@@ -14,14 +10,13 @@ import { organiseTimespan } from '@/lib/organise-timespan';
 import { fetchEvents, fetchTasks } from '@/lib/data';
 import { setTasks, setEvents, useMindsetColour } from '@/store/store';
 import { useDispatch } from 'react-redux';
-import { motion } from 'framer-motion';
 
 interface TestViewProps {
     children?: JSX.Element | JSX.Element[];
     back?: boolean;
 }
 
-export default function TestView ({back} : TestViewProps) {
+export default function TestView2 ({back} : TestViewProps) {
 
     const dispatch = useDispatch();
     const mindsetColour = useMindsetColour();
@@ -54,19 +49,13 @@ export default function TestView ({back} : TestViewProps) {
     }
 
 
-    return (<div className={clsx('pt-[10vh] pb-[10vh] overflow-scroll w-screen h-screen flex flex-col gap-8 items-center justify-start')} style={{
-        backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.5)}, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.7)})`
-    }}>
-        <TopBar back={back} className='!z-50'>
-            {/* <SearchBar placeholder='Search events, dates...'/> */}
-        </TopBar>
-        <motion.div className={clsx('max-h-none z-[39] bg-white rounded-3xl shadow-xl md:w-fit w-full p-4 flex flex-col gap-4 items-center justify-start')}
-        initial={{ y: -200 }} animate={{ y: 0 }}>
-            <div className='h-[60vh] md:w-[80vw] w-[90vw]'>
+    return (
+        <div className={clsx('md:h-[100vh] h-[150vh] z-[39] md:w-fit w-full flex flex-col gap-4 items-center justify-start')}>
+            <div className='md:h-[60vh] h-full md:w-[80vw] w-[90vw]'>
                 <CalendarComponent  startWeekToday={true} />
             </div>
             <TaskBrowser />
-            <div className='container w-full flex flex-row gap-8 p-4 justify-center'>
+            <div className='container w-full flex flex-row md:gap-8 gap-4 md:p-4 justify-center'>
                 <Button 
                     className='rounded-md from-neutral-950 p-6 md:w-1/4' 
                     style={{ background: mindsetColour }}
@@ -80,7 +69,6 @@ export default function TestView ({back} : TestViewProps) {
                     >Delete all events
                 </Button>
             </div>
-        </motion.div>
-        <BottomBar />
-    </div>)
+        </div>
+    );
 };

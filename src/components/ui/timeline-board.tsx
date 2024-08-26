@@ -8,6 +8,7 @@ import Menu from '@/components/menu';
 import clsx from 'clsx';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
+import useWindowSize from '@/lib/useWindowSize';
 
 interface TimelineBoardProps {
     children?: JSX.Element | JSX.Element[];
@@ -23,6 +24,7 @@ export default function TimelineBoard ({
     // Modals
     const searchParams = useSearchParams();
     const showMenu = searchParams.get('menu');
+    const { windowWidth } = useWindowSize();
 
     // Detect resize and reload, in order to animate
     // const [, updateState] = useState<any>();
@@ -43,11 +45,14 @@ export default function TimelineBoard ({
     // }, []);
 
 
-    return (<div className={clsx(timelineClassName, 'w-screen h-screen flex flex-col gap-8 items-center justify-start pt-[20vh]')}>
+    return (<div className={clsx(timelineClassName, 'w-screen h-screen flex flex-col gap-8 items-center justify-start')}>
         <TopBar back={back}><SearchBar /></TopBar>
         {showMenu && <Menu />}
-        <motion.div id='whiteBoard' ref={divRef} className={clsx(cardClassName, 'bg-white max-h-[80vh] rounded-3xl shadow-xl w-fit p-4 flex items-center justify-start')}
-        initial={{ y: -300, opacity: 0, minHeight: '30vh' }} animate={{ y: 0, opacity: 1, minHeight: 'none' }} exit={{ y: -300 }} 
+        <motion.div id='whiteBoard' ref={divRef} 
+        className={clsx(cardClassName, 'bg-white mt-[12vh] md:mt-[20vh] md:max-h-[80vh] h-full md:h-auto w-full md:w-fit p-4 flex rounded-t-3xl md:rounded-3xl shadow-xl overflow-hidden')}
+        initial={{ y: windowWidth && windowWidth > 500 ? -300 : 300, opacity: 0, minHeight: '30vh' }} 
+        animate={{ y: 0, opacity: 1, minHeight: 'none' }} 
+        exit={{ y: windowWidth && windowWidth > 500 ? -300 : 300 }} 
         transition={{ duration: 0.2 }}
         >
             {children}
