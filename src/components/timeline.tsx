@@ -16,6 +16,7 @@ import { useDispatch } from 'react-redux';
 import { AnimatePresence, color, motion } from 'framer-motion';
 import Button from './buttons/button';
 import { organiseTimespan } from '@/lib/organise-timespan';
+import clsx from 'clsx';
 
 export default function Timeline() {
 
@@ -76,33 +77,39 @@ export default function Timeline() {
     }, []);
 
     return (<>
-        <div className='w-full h-full flex flex-col items-center justify-center'>
+        <div className='w-full h-full flex flex-col items-center justify-center overflow-hidden'>
+
             {/* Next event */}
             {eventQueue.length > 0 && 
-                <motion.div className='w-full items-center justify-center flex flex-col gap-4'
-                initial={{ y: 200 }} animate={{ y: 0 }}>
+                <motion.div className={clsx('w-full justify-center items-center flex flex-col gap-4',
+                    showMenu ? 'absolute bottom-0 left-0 right-0 h-1/6' : '',
+                )} initial={{ y: 200 }} animate={{ y: 0 }} layout='preserve-aspect' transition={{ ease: false }}>
                     <AnimatePresence>
-                    {(!showMenu && eventQueue[0]) && (<motion.div className='flex flex-col gap-4'
-                    initial={{ y: 200 }} animate={{ y: 0 }} exit={{ y: 200, opacity: 0 }}>
-                        <Link href={`?task=${eventQueue[0].taskId}&event=${eventQueue[0].id}&status=edit`} >
-                            <EventCard event={eventQueue[0]} mindset={mindsetQueue[0]} />
+                    {(eventQueue[0]) && (<motion.div className='flex flex-col gap-4 w-full items-center'
+                    // initial={{ y: 200 }} animate={{ y: 0 }} exit={{ y: 200, opacity: 0 }}
+                    >
+                        <Link href={`?task=${eventQueue[0].taskId}&event=${eventQueue[0].id}&status=edit`} className='w-full flex items-center justify-center' >
+                            <EventCard event={eventQueue[0]} mindset={mindsetQueue[0]} isTucked={showMenu} />
                         </Link>
-                        <TransportControls eventId={eventQueue[0].id} taskId={eventQueue[0].taskId} mindsetColour={mindsetColour} context='timeline'/>
+                        {!showMenu && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                            <TransportControls eventId={eventQueue[0].id} taskId={eventQueue[0].taskId} mindsetColour={mindsetColour} context='timeline'/>
+                        </motion.div>}
                     </motion.div>)}
                     </AnimatePresence>
                 </motion.div>
             }
+
             {/* Later event */}
-            {!!eventQueue.length && (
-                <motion.div className='w-screen h-1/6 bottom-0 left-0 absolute overflow-clip flex items-end justify-center'
-                initial={{ y: 20 }} animate={{ y: 0 }}>
-                {(eventQueue.length > 1 && !showMenu) ?
-                    <EventCard event={eventQueue[1]} nextEvent={true} mindset={mindsetQueue[1]} 
-                    /> : showMenu ? <EventCard event={eventQueue[0]} nextEvent={true} mindset={mindsetQueue[0]} 
-                    /> : <></>
-                }
-                </motion.div>)
-            }
+            {eventQueue.length > 1 && (
+                <AnimatePresence>{!showMenu &&
+                    <motion.div className={clsx('w-screen h-1/6 left-0 absolute overflow-clip flex items-end justify-center',
+                        showMenu ? 'top-full h-0' : 'bottom-0'
+                    )} initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} layout='position' transition={{ ease: false }}>
+                        <EventCard event={eventQueue[1]} mindset={mindsetQueue[1]} isTucked={true} greyed={true} />
+                    </motion.div>
+                }</AnimatePresence>
+            )}
+            
             {/* Empty timeline */}
             { eventQueue.length === 0 && !showMenu && (<div className='flex flex-col gap-8 items-center w-[24rem]' style={{ color: mindsetColour }}>
                 <span className='text-xl'>Nothing coming next</span>
