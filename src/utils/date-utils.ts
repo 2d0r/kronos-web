@@ -226,7 +226,7 @@ export const getLocalStartAndEnd = (event: Event) => {
     let [ startTime, endTime ] = ['', ''];
     if (event.localTime) {
         // Get startTime from localTime
-        const startTimeAsNum = (new Date(event.startTime)).setHours(Number(event.localTime.split(':')[0]), Number(event.localTime.split(':')[1]));
+        const startTimeAsNum = (new Date(event.startTime)).setHours(Number(event.localTime?.split(':')[0] || 0), Number(event.localTime.split(':')[1]));
         startTime = localDateTimeToString(new Date(startTimeAsNum));
         // Get endTime using timezone difference
         const minutesBetweenLocalTimes = minutesBetweenDates(new Date(startTimeAsNum), new Date(event.startTime));

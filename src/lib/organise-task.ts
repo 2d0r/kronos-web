@@ -11,6 +11,12 @@ import { getStartAndEndOfDay } from '@/utils/date-utils';
 
 export const organiseTask = async (newTask: TaskWithRelations, timespan?: [Date, Date]) => {
 
+    // Goals and projects can't have directly organised events
+    if (newTask.type !== 'task') {
+        return;
+    }
+    // TO DO: Create generic tasks that 
+
     // GET TIMESPAN TO ORGANISE
     let timespanToOrganise: [Date, Date];
     if (timespan) {

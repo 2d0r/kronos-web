@@ -118,7 +118,7 @@ export default function TodoList ({
                                 <Checkbox type={task.type} status={task.status} taskId={task.id} fill='white' width='36' height='36'
                                     onTaskStatusUpdated={handleTaskStatusUpdate}
                                 />
-                                <Link href={pathname + `?task=${task.id}`} className='text-lg'>{task.name}</Link>
+                                <Link href={pathname + `?task=${task.id}&status=edit`} className='text-lg'>{task.name}</Link>
                                 <span className='text-sm'>{task.notes}</span>
                                 <div className='w-full flex flex-col gap-2 items-start'>
                                     { todoList.filter(subtask => Array.isArray(subtask.tasksParent) && subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {

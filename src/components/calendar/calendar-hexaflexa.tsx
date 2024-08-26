@@ -82,7 +82,7 @@ export default function CalendarComponent ( { startWeekToday = false } : { start
     // HANDLERS 
 
     const onEventSelected = (event: any) => {
-        router.push(`?task=${event.detail.taskId}&event=${event.detail.id}`);
+        router.push(`?task=${event.detail.taskId}&event=${event.detail.id}status=edit`);
     }
     const onStartDateChanged = (event: any) => {
     }

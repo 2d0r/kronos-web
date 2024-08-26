@@ -1,6 +1,6 @@
 import { MindsetWithRelations, EventWithRelations, TaskWithRelations } from '@/lib/types';
 import prisma from '@/lib/db';
-import { Event, Task } from '@prisma/client';
+import { Event, Task, TaskType } from '@prisma/client';
 import { NEUTRAL_MINDSET_COLOUR } from './definitions';
 
 
@@ -94,6 +94,87 @@ export const getCurrentTask = async () => {
   }
 }
 
+export const getRelatedProjects = async (taskId: string) => {
+  try {
+    const currentTask = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: {
+        tasksParent: {
+          where: { type: 'project' }
+        }, // Include the parent task
+      },
+    });
+  
+    // Extract the related tasks of type 'project'
+    const relatedTasks = currentTask?.tasksParent;
+  
+    return relatedTasks;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to get task\'s related projects.');
+  }
+}
+
+export const getRelatedGoals = async (taskId: string) => {
+  try {
+    const currentTask = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: {
+        tasksParent: {
+          where: { type: 'goal' }
+        }, // Include the parent task
+      },
+    });
+  
+    // Extract the related tasks of type 'project'
+    const relatedTasks = currentTask?.tasksParent;
+  
+    return relatedTasks;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to get task\'s related goals.');
+  }
+}
+
+export const getRelatedTasks = async (taskId: string, type?: TaskType, chained?: 'after' | 'before' | 'rightAfter' | 'rightBefore' | 'all') => {
+  try {
+    const currentTask = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: {
+        tasksBefore: true,
+        tasksAfter: true,
+        tasksRightBefore: true,
+        tasksRightAfter: true,
+        tasksParent: true,
+        tasksChild: true,
+      },
+    });
+
+    const taskTypeHierarchy = {
+      'step': 1,
+      'task': 2,
+      'project': 3,
+      'goal': 4,
+    }
+  
+    // Extract the related tasks of type 'project'
+    const relatedTasks = currentTask ? 
+      type && taskTypeHierarchy[currentTask.type] < taskTypeHierarchy[type] ? currentTask.tasksParent.filter(task => task.type === type)
+      : type && taskTypeHierarchy[currentTask.type] > taskTypeHierarchy[type] ? currentTask.tasksChild.filter(task => task.type === type)
+      : chained === 'all' ? [...currentTask.tasksAfter, ...currentTask.tasksBefore, ...currentTask.tasksRightAfter, ...currentTask.tasksRightBefore ]
+      : chained === 'after' ? currentTask.tasksAfter
+      : chained === 'before' ? currentTask.tasksBefore
+      : chained === 'rightBefore' ? currentTask.tasksRightBefore
+      : chained === 'rightAfter' ? currentTask.tasksRightAfter
+      : [] : [];
+  
+    return relatedTasks;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to get task\'s related goals.');
+  }
+}
+
 export const allTasksHaveActiveEvents = async () => {
   const tasksWithoutActiveEvents = await prisma.task.findMany({
     where: {
@@ -139,6 +220,30 @@ export const getTasksToSchedule = async () => {
   }
 }
 
+export const getTaskById = async (taskId: string) => {
+  try {
+    const task = await prisma.task.findUnique({
+      where: {
+        id: taskId,
+      },
+      include: { 
+          tasksBefore: true,
+          tasksAfter: true,
+          tasksRightBefore: true,
+          tasksRightAfter: true,
+          tasksParent: true,
+          tasksChild: true,
+          mindset: true,
+          events: true,
+      }, // Include the subtasks relation
+    }); 
+    return task;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch task by ID.');
+  }
+}
+
 export const getTasksByIds = async (taskIds: string[]) => {
   try {
     const tasks: TaskWithRelations[] = await prisma.task.findMany({
@@ -181,6 +286,23 @@ export const getEvents = async () => {
   } catch (error) {
       console.error('Database Error:', error);
       throw new Error('Failed to fetch the latest events.');
+  }
+}
+
+export const getEventById = async (eventId: string) => {
+  try {
+    const event = await prisma.event.findUnique({
+      where: {
+        id: eventId,
+      },
+      include: { 
+          task: true,
+      }, // Include the subtasks relation
+    }); 
+    return event;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch event by ID.');
   }
 }
 
@@ -344,20 +466,20 @@ export const getMindsetByName  = async (name: string) => {
   }
 }
 
-export const getTaskMindset = async (task: Task) => {
+export const getMindsetByTaskId = async (taskId: string) => {
   try {
     const taskMindset = await prisma.mindset.findMany({
       where: {
         tasks: {
           some: {
-            id: task.id
+            id: taskId
           } 
         }
       }
     });
     return taskMindset[0];
   } catch (error) {
-    console.error('Error getting mindset of task:', task.name);
+    console.error('Error getting mindset of task:', taskId);
     process.exit(1);
   }
 }
@@ -444,7 +566,7 @@ export const fetchUpcomingEvents = async (count?: number) => {
   return upcomingEvents as EventWithRelations[];
 }
 export const fetchTasks = async () => {
-  const response = await fetch('/task');
+  const response = await fetch('/task/api');
   const data = await response.json();
   const newTasks = data.tasks;
   return newTasks;
@@ -455,9 +577,14 @@ export const fetchTask = async (taskId: string) => {
   return data.task;
 }
 export const fetchEventsOfTask = async (taskId: string) => {
-  const response = await fetch(`/event/${taskId}`);
+  const response = await fetch(`/event/task/${taskId}`);
   const data = await response.json();
   return data.events;
+}
+export const fetchEventById = async (eventId: string) => {
+  const response = await fetch(`/event/${eventId}`);
+  const data = await response.json();
+  return data.event;
 }
 export const fetchTaskOfEvent = async (eventId: string) => {
   const response = await fetch(`/task/event/${eventId}`);

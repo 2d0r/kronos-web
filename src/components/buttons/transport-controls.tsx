@@ -9,7 +9,11 @@ import { Edit2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function TransportControls ({ eventId, taskId, context, className, mindsetColour }: { 
-    eventId: string | undefined, taskId: string, context?: string, className?: string, mindsetColour: string
+    eventId: string | undefined, 
+    taskId: string | undefined,
+    context?: string, 
+    className?: string, 
+    mindsetColour: string
 }) {
 
 
@@ -23,11 +27,11 @@ export default function TransportControls ({ eventId, taskId, context, className
             <img src='../icons/adjust.svg' className='h-8 w-8' alt='icon-adjust' />
         </>} { context === 'timeline' && <>
             <ShuffleSVG fill={mindsetColour} />
-            <Link href={'/task'}>
+            <Link href={`/task?task=${taskId}&event=${eventId}&status=doing`}>
                 {/* <img src='../icons/play.svg' className='h-12 w-12' /> */}
                 <PlaySVG fill={mindsetColour} />
             </Link>
-            <Link href={`?task=${taskId}`}>
+            <Link href={`?task=${taskId}status=edit`}>
                 <Edit2 color={mindsetColour} fill={mindsetColour} />
             </Link>
         </>}

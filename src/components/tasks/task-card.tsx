@@ -22,6 +22,8 @@ import { useTasks, setTasks, setEvents, useEvents, useMindsets } from '@/store/s
 import { useDispatch } from 'react-redux';
 import { fetchEventsOfTask, fetchTask } from '@/lib/data';
 import { AnimatePresence, motion } from 'framer-motion';
+import { setSearchParams } from '@/utils/app-utils';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 
 export default function TaskCard() {
@@ -29,8 +31,9 @@ export default function TaskCard() {
     const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const event = searchParams.get('event');
+    const { replace } = useRouter();
 
+    const eventIdParam = searchParams.get('event');
     const tasks = useTasks();
     const events = useEvents();
     const mindsets = useMindsets();
@@ -50,7 +53,7 @@ export default function TaskCard() {
     const [ deadline, setDeadline ] = useState<boolean>(false);
     const [ taskIsEdited, setTaskIsEdited ] = useState<boolean>(false);
     const [ taskIsReady, setTaskIsReady ] = useState<boolean>(false);
-    const [ eventId, setEventId ] = useState<string>(event || '');
+    const [ eventId, setEventId ] = useState<string>(eventIdParam || '');
     
 
 
@@ -147,6 +150,16 @@ export default function TaskCard() {
         dispatch(setEvents(events.filter(event => event.taskId !== taskId)));
         router.back();
     }
+    const handleClickClose = () => {
+        // setSearchParams('status', 'doing')
+        const params = new URLSearchParams(searchParams);
+        if (searchParams.get('task') && searchParams.get('task') !== 'new') {
+            params.set('status', 'doing');
+            replace(`${pathname}?${params.toString()}`);
+        } else if (searchParams.get('task') && searchParams.get('task') === 'new') {
+            router.back();
+        }
+    }
 
 
     // HOOKS
@@ -210,7 +223,7 @@ export default function TaskCard() {
 
     
     return (<AnimatePresence>
-        {searchParams.get('task') && (
+        {searchParams.get('task') && searchParams.get('status') === 'edit' && (
         <motion.div className='z-50 absolute w-full h-full left-0 top-0 flex items-center justify-center bg-black/20 backdrop-blur-sm py-4'
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.1, ease: false }}>
         <motion.div className='m-20 z-50 top-1/3 rounded-2xl bg-white shadow-2xl text-sm text-black overflow-hidden'
@@ -229,9 +242,10 @@ export default function TaskCard() {
                     value={taskCache.name || ''}
                     onChange={(event: any) => handleInputOnChange('name', event.target.value)}
                 />
-                <Link href={pathname} onClick={() => router.back()} >
-                    <img src='../icons/close-black.svg' className='w-8 h-8' alt='icon-close'/>
-                </Link>
+                <div onClick={handleClickClose} className='cursor-pointer' >
+                    <XMarkIcon color='black' width={32} />
+                    {/* <img src='../icons/close-black.svg' className='w-8 h-8' alt='icon-close'/> */}
+                </div>
             </div>
             <div className='w-full flex overflow-hidden'>
                 {/* Settings panel */}
@@ -585,9 +599,7 @@ export default function TaskCard() {
                         <EventSection event={taskCache.events?.filter(el => el.id === eventId)[0] || {} as Event} mindsetColour={mindsetColour} />
                     </div>
                     <div className='h-full border-b-[0.5px] overflow-y-scroll'>
-                        <NotesEditor notes={taskCache.notes || ''} taskId={taskCache.id} className={'task-card'} />
-                        {/* <Tiptap /> */}
-                        {/* <NotesEditor3 notes={taskCache.checklist || ''} taskId={taskCache.id} className={'task-card'} /> */}
+                        <NotesEditor notes={taskCache.notes || ''} taskId={taskCache.id} page={'edit-task'} />
                     </div>
                     <div className='min-h-1/6 flex flex-col gap-1 p-4'>
                         <span className='text-gray-300 text-md font-medium'>Task Relations</span>

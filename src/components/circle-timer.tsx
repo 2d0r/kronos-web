@@ -4,19 +4,25 @@ import PauseSVG from '@/components/svg/pause-svg';
 import PlaySVG from '@/components/svg/play-svg';
 import { minutesToTimerDisplay } from '@/utils/date-utils';
 import Link from 'next/link';
+import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
 export default function CircleTimer ({ duration } : {duration: number}) {
 
     const [ playing, setPlaying ] = useState<boolean>(false);
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const { replace } = useRouter();
+
+    const handleEditTask = () => {
+        const params = new URLSearchParams(searchParams);
+        params.set('status', 'edit');
+        replace(`${pathname}?${params.toString()}`);
+    }
 
     const handlePlayPause = () => {
         setPlaying(!playing);
-    }
-
-    const handleEditTask = () => {
-
     }
 
     const handleExit = () => {

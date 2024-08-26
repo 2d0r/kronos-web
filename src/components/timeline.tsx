@@ -84,7 +84,7 @@ export default function Timeline() {
                     <AnimatePresence>
                     {(!showMenu && eventQueue[0]) && (<motion.div className='flex flex-col gap-4'
                     initial={{ y: 200 }} animate={{ y: 0 }} exit={{ y: 200, opacity: 0 }}>
-                        <Link href={`?task=${eventQueue[0].taskId}&event=${eventQueue[0].id}`} >
+                        <Link href={`?task=${eventQueue[0].taskId}&event=${eventQueue[0].id}&status=edit`} >
                             <EventCard event={eventQueue[0]} mindset={mindsetQueue[0]} />
                         </Link>
                         <TransportControls eventId={eventQueue[0].id} taskId={eventQueue[0].taskId} mindsetColour={mindsetColour} context='timeline'/>
@@ -113,7 +113,7 @@ export default function Timeline() {
                         onClick={() => handleOrganiseToday(1)}
                         >Organise today
                     </Button>
-                    <Link href={`${pathname}?task=new`}
+                    <Link href={`${pathname}?task=new&status=edit`}
                         className='rounded-md p-6 border text-md w-full text-center' 
                         style={{ color: mindsetColour, borderColor: mindsetColour }}
                         >Create a task

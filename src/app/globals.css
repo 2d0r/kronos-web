@@ -99,6 +99,78 @@ rect {
 
 /* Tiptap markdown text editor */
 
+
+ul[data-type="taskList"] {
+  list-style: none;
+  padding: 0;
+
+  p {
+    margin: 0;
+  }
+
+  li {
+    display: flex;
+
+    > label {
+      flex: 0 0 auto;
+      margin-right: 0.5rem;
+      user-select: none;
+    }
+
+    > div {
+      flex: 1 1 auto;
+    }
+
+    ul li,
+    ol li {
+      display: list-item;
+    }
+    
+    ul[data-type="taskList"] > li {
+      display: flex;
+    }
+  }
+}
+
+
+/* Custom Tailwind classes */
+
+.bg-glass-white {
+  @apply bg-gradient-to-br from-gray-400/10 to-gray-100/10 backdrop-blur-md;
+}
+.divider {
+  @apply h-[0.5px] w-full border-b-[0.5px];
+}
+.formKeysColumn {
+  @apply w-1/3 text-left max-w-[100px];
+}
+.formValuesColumn {
+  @apply w-2/3;
+}
+.menu-link {
+  @apply hover:bg-white/50 rounded-lg px-2 py-1;
+}
+.remove-default-focus {
+  @apply: focus-visible:!border-none focus-visible:!outline-none focus:!ring-transparent;
+}
+.task-input-fields > div {
+  @apply px-4 py-2 border-b-[0.5px] border-b-black/5 min-h-[3.125rem];
+}
+.task-card {
+  .tiptap input[type="checkbox"] {
+    cursor: pointer;
+    background-color: transparent;
+    border-color: black!important;
+    color: black!important;
+    border-radius: 24px;
+  }
+  .notesEditor-toolbar-button {
+    @apply !border-black;
+  } 
+  input[type='checkbox']:checked {
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='black' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+  }
+}
 .tiptap:focus-visible {
   @apply border-none outline-none;
 }
@@ -151,93 +223,14 @@ rect {
     
   }
 
-  .is-editor-empty:first-child::before {
-    color: #adb5bd;
-    content: attr(data-placeholder);
-    float: left;
-    height: 0;
-    pointer-events: none;
-  }
-
-  p.is-empty::before {
-    color: #adb5bd;
+  p.is-editor-empty:first-child::before {
+    color: rgba(255,255,255,0.2);
     content: attr(data-placeholder);
     float: left;
     height: 0;
     pointer-events: none;
   }
 }
-ul[data-type="taskList"] {
-  list-style: none;
-  padding: 0;
-
-  p {
-    margin: 0;
-  }
-
-  li {
-    display: flex;
-
-    > label {
-      flex: 0 0 auto;
-      margin-right: 0.5rem;
-      user-select: none;
-    }
-
-    > div {
-      flex: 1 1 auto;
-    }
-
-    ul li,
-    ol li {
-      display: list-item;
-    }
-    
-    ul[data-type="taskList"] > li {
-      display: flex;
-    }
-  }
-}
-
-
-/* Custom Tailwind classes */
-
-.divider {
-  @apply h-[0.5px] w-full border-b-[0.5px];
-}
-.formKeysColumn {
-  @apply w-1/3 text-left max-w-[100px];
-}
-.formValuesColumn {
-  @apply w-2/3;
-}
-.menu-link {
-  @apply hover:bg-white/50 rounded-lg px-2 py-1;
-}
-.remove-default-focus {
-  @apply: focus-visible:!border-none focus-visible:!outline-none focus:!ring-transparent;
-}
-.task-input-fields > div {
-  @apply px-4 py-2 border-b-[0.5px] border-b-black/5 min-h-[3.125rem];
-}
-.task-card {
-  .tiptap input[type="checkbox"] {
-    cursor: pointer;
-    background-color: transparent;
-    border-color: black!important;
-    color: black!important;
-    border-radius: 24px;
-  }
-  .notesEditor-toolbar-button {
-    @apply !border-black;
-  } 
-  input[type='checkbox']:checked {
-    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='black' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
-  }
-}
-.whiteGlassBg {
-  @apply bg-gradient-to-br from-gray-400/10 to-gray-100/10 backdrop-blur-md;
-}
-.wirecard {
+.wire-card {
   @apply border-[0.5px] border-white rounded-[30px] overflow-hidden;
 }

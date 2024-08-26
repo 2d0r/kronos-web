@@ -1,6 +1,6 @@
 // TYPES
 
-import { Prisma, TaskType } from '@prisma/client';
+import { Prisma, Status, TaskType } from '@prisma/client';
 import { ReactElement } from 'react';
 
 export type ActionType = ('edit' | 'create' | 'delete');
@@ -96,7 +96,8 @@ export type SearchParamProps = {
 };
 export interface URLSearchParamsKronos extends URLSearchParams {
     menu: boolean
-    eventId: string
+    event: string
     logbook: boolean
     task: string
+    status: Status | 'edit'
 };

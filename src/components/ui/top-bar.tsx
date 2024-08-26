@@ -22,6 +22,8 @@ export default function TopBar ({children, back} : TopBarProps ) {
     const router = useRouter();
     const mindsetColour = useMindsetColour();
 
+    const buttonColour = pathname.includes('task') ? 'white' : mindsetColour || 'white';
+
     const handleMenuClick = () => {
         setShowMenu(!showMenu);
     }
@@ -31,7 +33,8 @@ export default function TopBar ({children, back} : TopBarProps ) {
     }, [searchParams]);
 
 
-    return (<div className='top-0 fixed z-40 w-full flex justify-between items-center px-4 py-2'>
+    return (
+    <div className='top-0 fixed z-40 w-full flex justify-between items-center px-4 py-2'>
         {back === true ?
         <button onClick={() => router.back()}>
             <ArrowLeftIcon color={mindsetColour || 'white'} width={36}/>
@@ -40,17 +43,16 @@ export default function TopBar ({children, back} : TopBarProps ) {
         {pathname.endsWith('/') ? 
             <Link className='top-[2vh] right-[2vw]' href={showMenu ? pathname : `${pathname}?menu=true`} onClick={handleMenuClick}>
                 {/* <img src={showMenu ? '../icons/close.svg' : '../icons/menu.svg'} className='w-8 h-8'/> */}
-                { showMenu ? <XMarkIcon color={mindsetColour || 'white'} width={36} /> : <Bars3Icon color={mindsetColour || 'white'} width={36}/>}
+                { showMenu ? <XMarkIcon color={buttonColour} width={36} /> : <Bars3Icon color={buttonColour} width={36}/>}
             </Link> :
             <div onClick={handleMenuClick} className='cursor-default' >
-                { showMenu ? <XMarkIcon color={mindsetColour || 'white'} width={36} /> : <Bars3Icon color={mindsetColour || 'white'} width={36}/>}
+                { showMenu ? <XMarkIcon color={buttonColour} width={36} /> : <Bars3Icon color={buttonColour} width={36}/>}
                 <AnimatePresence>
                     {showMenu && <motion.div className='w-full h-full flex items-center justify-center'>
                         <Menu onBlur={handleMenuClick} />
                     </motion.div>}
                 </AnimatePresence>
             </div>
-        }
-        
+        }  
     </div>);
 };

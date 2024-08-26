@@ -41,11 +41,11 @@ export default function ToDoItem ({
                 onTaskStatusUpdated={onTaskStatusUpdated}
                 fill={task.mindset?.colour}
             />
-            <Link href={pathname + `?task=${task.id}`} className='cursor-pointer'>{task.name}</Link>
+            <Link href={pathname + `?task=${task.id}&status=edit`} className='cursor-pointer'>{task.name}</Link>
         </div>
         <div className='flex gap-2'>
             <Link 
-                href={`?task=${task.id}`}
+                href={`?task=${task.id}&status=edit`}
                 className='text-sm text-gray-400 cursor-pointer'
             >{showEdit && 'Edit'}</Link>
             <button 

@@ -447,7 +447,7 @@ export const updateTimeScores = async () => {
 
 export const updateTaskNotes = async (notes: string, taskId: string) => {
   try {
-    const updateTaskNotes = await prisma.task.update({
+    await prisma.task.update({
       where: {
         id: taskId,
       },
@@ -465,19 +465,19 @@ export const updateTaskNotes = async (notes: string, taskId: string) => {
 
 export const createEventPrisma = async (event: Event) => {
   try {
-    await prisma.event.create({
+    const newEvent = await prisma.event.create({
       data: {
         ...event,
         startTime: event.startTime
       },
     });
+    return Response.json({message: `Created new event ${event.name}`, newEvent});
   } catch (error) {
     console.log('Failed to create event ❌', error);
-    return {
+    return Response.json({
       message: 'Database Error: Failed to create event.',
-    };
+    });
   }
-
 }
 
 export const scheduleEventForTask = async (

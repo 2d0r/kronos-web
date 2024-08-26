@@ -38,7 +38,7 @@ export async function GET(req: Request, context: { params: Params }) {
 }
 
 export async function DELETE (req: Request, context: { params: Params }) {
-    const id= context.params.id;
+    const id = context.params.id;
     try {
         await prisma.event.deleteMany({
             where: { taskId: id },

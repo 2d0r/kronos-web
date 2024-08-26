@@ -1,6 +1,6 @@
 import React from 'react';
 import { DeleteTask } from '@/components/tasks/delete-task';
-import { getTaskMindset } from '@/lib/data';
+import { getMindsetByTaskId } from '@/lib/data';
 import { Task } from '@prisma/client';
 import { dateToDDMMYYYY } from '@/utils/date-utils';
 
@@ -9,7 +9,7 @@ interface TaskCardProps {
 }
 
 export default async function TaskRow({ task } : TaskCardProps) {
-    const mindset = await getTaskMindset(task);
+    const mindset = await getMindsetByTaskId(task.id);
     
     return (<>
         <div className='rounded-md flex flex-row justify-between align-middle p-6 w-full text-white' style={{background: mindset.colour}}>

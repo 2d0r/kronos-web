@@ -21,11 +21,11 @@ import Toolbar from '@/components/notes-editor/notes-toolbar';
 import Placeholder from '@tiptap/extension-placeholder';
 import clsx from 'clsx';
 
-export default function NotesEditor ({ notes, onChange, taskId, className } : { 
+export default function NotesEditor ({ notes, onChange, taskId, page } : { 
   notes: string, 
   onChange?: (richText: string) => void,
   taskId: string,
-  className?: string,
+  page?: ('doing-task' | 'edit-task'),
 }) {
 
   // const CustomTaskItem = TaskItem.extend({
@@ -70,7 +70,7 @@ export default function NotesEditor ({ notes, onChange, taskId, className } : {
     content: notes || '',
     editorProps: {
       attributes: {
-        class: '',
+        class: 'placeholder:white/20',
         spellcheck: 'false',
       }
     },
@@ -81,23 +81,16 @@ export default function NotesEditor ({ notes, onChange, taskId, className } : {
     immediatelyRender: false,
   });
 
-  // Show notes toolbar only when focusing on textarea
-  // const [ showToolbar, setShowToolbar ] = useState<boolean>(false);
-  // const handleNotesBlur = (event: React.ChangeEvent<HTMLDivElement>) => {
-  //   setShowToolbar(false);
-  // }
-  // const handleNotesSelect = (event: React.ChangeEvent<HTMLDivElement>) => {
-  //   setShowToolbar(true);
-  // }
-
   return (<div>
-    <Toolbar editor={editor} className={className} />
+    <Toolbar editor={editor} className={clsx(
+        page === 'doing-task' && 'wire-card',
+      )
+    } />
     <EditorContent editor={editor} 
-      className={clsx('h-1/4 remove-default-focus text-left',
-        className?.includes('task-card') && 'rounded-lg px-4 pb-4 overflow-y-scroll',
-        className?.includes('doing-task') && 'max-h-[50vh] overflow-auto p-4',
+      className={clsx('remove-default-focus text-left',
+        page === 'edit-task' && 'rounded-lg px-4 pb-4 overflow-y-scroll',
+        page === 'doing-task' && 'overflow-auto pt-4',
       )}
-      // style={{ backgroundColor: className === 'task-card' ? adjustLightness(NEUTRAL_MINDSET_COLOUR, 0.95) : ''}}
     />
   </div>);
 };
