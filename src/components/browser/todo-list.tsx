@@ -7,7 +7,7 @@ import Checkbox from './checkbox';
 import { PRIORITY_ORDER } from '@/lib/definitions';
 import { SortItem, TaskWithRelations } from '@/lib/types';
 import { convertEmptyPropsToNull, convertPropsToDate, dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/date-utils';
-import { useTasks, setTasks } from '@/store/store';
+import { useTasks, setTasks, useSearchQuery, setSearchQuery } from '@/store/store';
 import { useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -31,6 +31,7 @@ export default function TodoList ({
     const dispatch = useDispatch();
     const [ todoList, setTodoList ] = useState<TaskWithRelations[]>(tasks);
     const pathname = usePathname();
+    const searchQuery = useSearchQuery();
 
     const updateTodoList = (newTodoList: TaskWithRelations[], filters: Filters) => {
         // console.log('todo-list/updateTodoList - newTodoList:', newTodoList);
@@ -84,10 +85,11 @@ export default function TodoList ({
     // Update todoList when tasks are updated in store, or filters updated in TaskBrowser
     useEffect(() => {
         if (tasks.length) {
-            updateTodoList(tasks.map(obj => convertPropsToDate(obj)), filters);
+            const newTasks = searchQuery ? tasks.filter(task => task.name.toLowerCase().includes(searchQuery.toLowerCase())) : tasks;
+            updateTodoList(newTasks.map(obj => convertPropsToDate(obj)), filters);
         }
         // console.log('todo-list/useEffect[tasks, filters]', tasks);
-    }, [tasks, filters]);
+    }, [tasks, filters, searchQuery]);
 
 
     // RENDER

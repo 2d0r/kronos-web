@@ -55,6 +55,17 @@ export const timespansSlice = createSlice({
     }
 });
 
+const initialSearchState: { searchQuery: string } = { searchQuery: '' };
+export const searchSlice = createSlice({
+    name: 'search',
+    initialState: initialSearchState,
+    reducers: {
+        setSearchQuery: (state, action: PayloadAction<string>) => {
+            state.searchQuery = action.payload;
+        }
+    }
+});
+
 export const createStore = () => 
     configureStore({
         reducer: {
@@ -62,6 +73,7 @@ export const createStore = () =>
             events: eventsSlice.reducer,
             mindsets: mindsetsSlice.reducer,
             timespans: timespansSlice.reducer,
+            search: searchSlice.reducer,
         },
         middleware: (getDefaultMiddleware) => 
             getDefaultMiddleware({
@@ -76,6 +88,7 @@ export const { setEvents } = eventsSlice.actions;
 export const { setMindsets } = mindsetsSlice.actions;
 export const { setMindsetColour } = mindsetsSlice.actions;
 export const { setTimespans } = timespansSlice.actions;
+export const { setSearchQuery } = searchSlice.actions;
 
 export type StoreType = ReturnType<typeof createStore>;
 export type RootState = ReturnType<StoreType['getState']>;
@@ -86,6 +99,4 @@ export const useEvents = () => useSelector((state: RootState) => state.events.ev
 export const useMindsets = () => useSelector((state: RootState) => state.mindsets.mindsets);
 export const useMindsetColour = () => useSelector((state: RootState) => state.mindsets.mindsetColour);
 export const useTimespans = () => useSelector((state: RootState) => state.timespans.timespans);
-//.map(obj => convertPropsToDate(obj))
-// .map(obj => deserializeDates(obj))
-// .map(obj => convertEmptyObjectsToNull(obj))
+export const useSearchQuery = () => useSelector((state: RootState) => state.search.searchQuery);

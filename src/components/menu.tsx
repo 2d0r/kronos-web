@@ -16,7 +16,7 @@ export default function Menu({onBlur}: {onBlur?: () => void}) {
     if (pathname.endsWith('/')) {
 
         return (
-            <div className='w-full md:max-w-[1200px] md:h-1/2 flex flex-col md:flex-row md:p-8 p-2 pt-8 gap-2 md:gap-4'>
+            <div className='w-[90vw] md:max-w-[1200px] md:h-1/2 flex flex-col md:flex-row md:p-8 pt-8 gap-2 md:gap-4'>
                 <MenuCard title='Calendar' href='/calendar'>
                     <CalendarIcon color={mindsetColour} height={24} />
                 </MenuCard>

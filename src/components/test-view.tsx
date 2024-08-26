@@ -57,9 +57,7 @@ export default function TestView ({back} : TestViewProps) {
     return (<div className={clsx('pt-[10vh] pb-[10vh] overflow-scroll w-screen h-screen flex flex-col gap-8 items-center justify-start')} style={{
         backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.5)}, ${adjustLightness(mindsetColour || NEUTRAL_MINDSET_COLOUR, 0.7)})`
     }}>
-        <TopBar back={back} className='!z-50'>
-            {/* <SearchBar placeholder='Search events, dates...'/> */}
-        </TopBar>
+        <TopBar back={back} className='!z-50' />
         <motion.div className={clsx('max-h-none z-[39] bg-white rounded-3xl shadow-xl md:w-fit w-full p-4 flex flex-col gap-4 items-center justify-start')}
         initial={{ y: -200 }} animate={{ y: 0 }}>
             <div className='h-[60vh] md:w-[80vw] w-[90vw]'>

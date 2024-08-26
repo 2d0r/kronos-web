@@ -44,12 +44,11 @@ export default function TimelineBoard ({
     //     }
     // }, []);
 
-
     return (<div className={clsx(timelineClassName, 'w-screen h-screen flex flex-col gap-8 items-center justify-start')}>
-        <TopBar back={back}><SearchBar /></TopBar>
+        <TopBar back={back} searchBar={true} />
         {showMenu && <Menu />}
         <motion.div id='whiteBoard' ref={divRef} 
-        className={clsx(cardClassName, 'bg-white mt-[12vh] md:mt-[20vh] md:max-h-[80vh] h-full md:h-auto w-full md:w-fit p-4 flex rounded-t-3xl md:rounded-3xl shadow-xl overflow-hidden')}
+        className={clsx(cardClassName, 'bg-white mt-[10vh] md:mt-[20vh] md:max-h-[80vh] h-full md:h-auto w-full md:w-fit p-4 flex rounded-t-3xl md:rounded-3xl shadow-xl overflow-hidden')}
         initial={{ y: windowWidth && windowWidth > 500 ? -300 : 300, opacity: 0, minHeight: '30vh' }} 
         animate={{ y: 0, opacity: 1, minHeight: 'none' }} 
         exit={{ y: windowWidth && windowWidth > 500 ? -300 : 300 }} 
