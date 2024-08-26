@@ -2,7 +2,7 @@
 
 'use client';
 
-import { createRef, RefObject, useEffect, useState } from 'react';
+import { createRef, RefObject, Suspense, useEffect, useState } from 'react';
 import { HfTimegrid, defineCustomElements } from '@hexaflexa/timegrid-react';
 import { HfTimegridConfig, utcDateToString } from '@hexaflexa/timegrid';
 import './calendar-hexaflexa.css';
@@ -27,7 +27,6 @@ export default function CalendarComponent ( { startWeekToday = false } : { start
     const timezone = 'Europe/Bucharest' // Intl.DateTimeFormat().resolvedOptions().timeZone;
     const startDate: string = utcDateToString(new Date());
 
-    const [ daysCount, setDaysCount ] = useState<number>(7);
     const [ timegridConfig, setTimegridConfig ] = useState<HfTimegridConfig>({
         daysConfig: {
             daysCount: 7,
@@ -123,7 +122,7 @@ export default function CalendarComponent ( { startWeekToday = false } : { start
     
     let timegridRef: RefObject<HTMLHfTimegridElement> = createRef();
 
-    return (<>
+    return (<><Suspense>
         <HfTimegrid 
             startDate={startDate} 
             config={timegridConfig}
@@ -141,5 +140,5 @@ export default function CalendarComponent ( { startWeekToday = false } : { start
             }}
             className='hide-scrollbar'
         />
-    </>);
+    </Suspense></>);
 }

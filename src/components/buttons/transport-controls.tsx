@@ -7,6 +7,7 @@ import PlaySVG from '@/components/svg/play-svg';
 import ShuffleSVG from '@/components/svg/shuffle-svg';
 import { Edit2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { AdjustmentsVerticalIcon, PauseCircleIcon, PauseIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function TransportControls ({ eventId, taskId, context, className, mindsetColour }: { 
     eventId: string | undefined, 
@@ -21,14 +22,13 @@ export default function TransportControls ({ eventId, taskId, context, className
     initial={{ opacity: 1 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
         { context === 'taskPage' && <>
             <Link href='/'>
-                <img src='../icons/close.svg' className='h-8 w-8' alt='icon-close' />
+                <XMarkIcon width={32}/>
             </Link>
-            <img src='../icons/pause.svg' className='h-12 w-12' alt='icon-pause' />
-            <img src='../icons/adjust.svg' className='h-8 w-8' alt='icon-adjust' />
+            <PauseCircleIcon color='white' width={48} />
+            <AdjustmentsVerticalIcon width={32} />
         </>} { context === 'timeline' && <>
             <ShuffleSVG fill={mindsetColour} />
             <Link href={`/task?task=${taskId}&event=${eventId}&status=doing`}>
-                {/* <img src='../icons/play.svg' className='h-12 w-12' /> */}
                 <PlaySVG fill={mindsetColour} />
             </Link>
             <Link href={`?task=${taskId}status=edit`}>

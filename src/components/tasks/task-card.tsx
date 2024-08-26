@@ -22,7 +22,7 @@ import { useTasks, setTasks, setEvents, useEvents, useMindsets } from '@/store/s
 import { useDispatch } from 'react-redux';
 import { fetchEventsOfTask, fetchTask } from '@/lib/data';
 import { AnimatePresence, motion } from 'framer-motion';
-import { setSearchParams } from '@/utils/app-utils';
+import { useSetSearchParams } from '@/utils/app-utils';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import useWindowSize from '@/lib/useWindowSize';
 
@@ -33,13 +33,15 @@ export default function TaskCard() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { replace } = useRouter();
-    const { windowWidth } = useWindowSize();
 
     const eventIdParam = searchParams.get('event');
     const tasks = useTasks();
     const events = useEvents();
     const mindsets = useMindsets();
     const dispatch = useDispatch();
+
+    const { windowWidth } = useWindowSize();
+    const { setSearchParams } = useSetSearchParams();
 
 
     // STATES
@@ -153,11 +155,11 @@ export default function TaskCard() {
         router.back();
     }
     const handleClickClose = () => {
-        // setSearchParams('status', 'doing')
-        const params = new URLSearchParams(searchParams);
+        // const params = new URLSearchParams(searchParams);
         if (searchParams.get('task') && searchParams.get('task') !== 'new') {
-            params.set('status', 'doing');
-            replace(`${pathname}?${params.toString()}`);
+            // params.set('status', 'doing');
+            // replace(`${pathname}?${params.toString()}`);
+            setSearchParams('status', 'doing');
         } else if (searchParams.get('task') && searchParams.get('task') === 'new') {
             router.back();
         }
@@ -252,7 +254,6 @@ export default function TaskCard() {
                 />
                 <div onClick={handleClickClose} className='cursor-pointer' >
                     <XMarkIcon color='black' width={32} />
-                    {/* <img src='../icons/close-black.svg' className='w-8 h-8' alt='icon-close'/> */}
                 </div>
             </div>
             <div className='w-full flex md:flex-row flex-col overflow-hidden'>

@@ -3,6 +3,7 @@
 import PauseSVG from '@/components/svg/pause-svg';
 import PlaySVG from '@/components/svg/play-svg';
 import { minutesToTimerDisplay } from '@/utils/date-utils';
+import { AdjustmentsVerticalIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -65,14 +66,14 @@ export default function CircleTimer ({ duration } : {duration: number}) {
         <div className='w-full max-w-[400px] px-6 flex justify-between items-center'>
             <Link href='/'>
                 <div className='cursor-pointer ' onClick={handleExit}>
-                    <img src='../icons/close.svg' className='h-8 w-8' alt='close-icon' />
+                    <XMarkIcon width={32} />
                 </div>
             </Link>
             <div className='cursor-pointer' onClick={handlePlayPause}>
                 { playing ? <PauseSVG /> : <PlaySVG /> }
             </div>
             <div className='cursor-pointer' onClick={handleEditTask}>
-                <img src='../icons/adjust.svg' className='h-8 w-8' alt='icon-adjust' />
+                <AdjustmentsVerticalIcon width={32} />
             </div>
             
         </div>

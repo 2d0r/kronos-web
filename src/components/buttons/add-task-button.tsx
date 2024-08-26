@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function AddTaskButton() {
     const pathname = usePathname();
@@ -25,8 +26,7 @@ export default function AddTaskButton() {
             style={{ background: buttonBg }}
             whileHover={{ scale: 1.1 }}
         >
-            <img src={showTaskCard ? '../icons/close.svg' : '../icons/add.svg'} 
-            className='w-8 h-8' alt='icon-close'/>
+            {showTaskCard ? <XMarkIcon width={32}/> : <PlusIcon width={32}/>}
         </motion.div>
         </Link>
     )
