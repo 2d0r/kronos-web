@@ -51,11 +51,11 @@ export default function SearchBar() {
             <motion.input
                 id='search'
                 className='peer block bg-transparent border-0 py-[9px] pl-10 
-                    text-lg placeholder:text-white placeholder:text-opacity-50 text-white
+                    text-lg placeholder:text-white placeholder:text-opacity-50
                     focus-peer:border-none focus:!outline-none  focus:!ring-transparent 
                     hover:border-x-0 hover:border-t-0 hover:border-b-white
                     active:!ring-transparent active:!outline-none'
-                style={{ width: isFocused ? '100%' : '0' }}
+                style={{ width: isFocused ? '100%' : '0', color: mindsetColour || 'white' }}
                 placeholder={placeholder}
                 defaultValue={searchParams.get('query')?.toString()}
                 onChange={(event) => handleSearchQuery(event)}

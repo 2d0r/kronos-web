@@ -232,7 +232,7 @@ export default function TaskCard() {
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
         transition={{ duration: 0.1, ease: false }}>
         {/* Card */}
-        <motion.div className='w-full md:w-auto md:m-20 z-50 top-1/3 md:rounded-2xl rounded-t-2xl md:overflow-hidden overflow-y-scroll hide-scrollbar
+        <motion.div className='w-full md:h-auto h-full md:w-auto md:m-20 z-50 top-1/3 md:rounded-2xl rounded-t-2xl overflow-hidden hide-scrollbar
         bg-white shadow-2xl text-sm text-black'
         initial={windowWidth && windowWidth > 500 ? { scale: 0.8 } : { y: 500 }} 
         animate={windowWidth && windowWidth > 500 ? { scale: 1 } : { y: 0 }} 
@@ -240,13 +240,13 @@ export default function TaskCard() {
         transition={{ duration: 0.1, ease: false }}>
         <form action={formAction}>
             {/* Top bar */}
-            <div className='w-full h-16 flex justify-between items-center p-4 border-b-[0.5px]'>
+            <div className='w-full h-16 flex justify-between items-center p-4 border-b-[0.5px] sticky top-0 bg-white'>
                 <div className='w-8 h-8'></div>
                 <InputField 
                     fieldName='name'
                     placeholder='Enter task name'
                     inputType='string'
-                    className={`!border-0 !text-xl font-bold placeholder:text-lg placeholder:text-gray-300 pl-0 cursor-text !bg-transparent rounded-none text-center`}
+                    className={`!border-0 !text-xl font-bold placeholder:text-lg pl-0 cursor-text !bg-transparent rounded-none text-center`}
                     colour={mindsetColour}
                     state={state}
                     value={taskCache.name || ''}
@@ -256,10 +256,12 @@ export default function TaskCard() {
                     <XMarkIcon color='black' width={32} />
                 </div>
             </div>
-            <div className='w-full flex md:flex-row flex-col overflow-hidden'>
+
+            {/* Body */}
+            <div className='w-full md:h-auto h-[calc(100vh-8rem)] flex md:flex-row flex-col md:overflow-hidden overflow-y-auto'>
 
                 {/* Settings panel */}
-                <div className='md:w-[350px] w-full md:h-[70vh] py-2 border-r-[0.5px] flex flex-col overflow-y-scroll task-input-fields'>
+                <div className='md:w-[350px] w-full md:h-[70vh] py-2 border-r-[0.5px] flex flex-col md:overflow-y-scroll task-input-fields'>
                     <Dropdown 
                         fieldName='mindset'
                         prompt='Pick a mindset'
@@ -269,7 +271,7 @@ export default function TaskCard() {
                             handleInputOnChange('mindset', event.target.value);
                         }}
                         value={taskCache.mindset?.name || ''}
-                        colour={mindsetColour}
+                        bgColour={mindsetColour}
                         state={state}
                     />
                     <Dropdown 
@@ -279,7 +281,7 @@ export default function TaskCard() {
                         list={priorityList}
                         onChange={(event: any) => handleInputOnChange('priority', event.target.value)}
                         value={taskCache.priority || ''}
-                        colour={mindsetColour}
+                        bgColour={mindsetColour}
                         state={state}
                     />
 
@@ -429,7 +431,7 @@ export default function TaskCard() {
                                 list={timeSpanList.filter(el => el.toLowerCase() !== 'hour')} // Removed hourly repetition
                                 value={taskCache.repeatTimespan || 'Day'}
                                 onChange={(event: any) => handleInputOnChange('repeatTimespan', event.target.value)}
-                                colour={mindsetColour}
+                                bgColour={mindsetColour}
                                 state={state}
                             />
                         </div>
@@ -617,6 +619,7 @@ export default function TaskCard() {
                     </div>
                 </div>
             </div>
+
             {/* Bottom bar */}
             <div className='flex justify-between items-center gap-4 p-4 h-12 border-t-[0.5px]'>
                 <button type='button'

@@ -40,23 +40,21 @@ export function InputField({
             )}>
                 <div className={'relative'} suppressHydrationWarning>
                     <input
-                        id={fieldName}
-                        name={fieldName}
-                        value={value}
-                        type={inputType}
+                        id={fieldName} name={fieldName}
+                        value={value} placeholder={placeholder}
+                        type={inputType} 
+                        min='0'
                         className={clsx(
                             inputType === 'number' ? 'no-arrows w-[46px]' : 'w-fit',
                             'pr-4 cursor-text items-baseline text-sm rounded-lg border-0 outline-0 placeholder:text-gray-400 focus:!border-0',
-                            className
+                            className, 
+                            `placeholder:${adjustLightness(colour, 0.95) || 'grey'}`
                         )}
-                        style={{ backgroundColor: adjustLightness(colour, 0.95) }}
-                        placeholder={placeholder}
+                        style={{ backgroundColor: adjustLightness(colour, 0.95), color: colour }}
                         onChange={handleInput}
-                        aria-describedby='task-error'
-                        min='0'
                         step={inputType === 'time' ? '60' : ['duration', 'totalDuration'].includes(fieldName) ? '5' : '1'}
-                        hidden={hidden}
-                        suppressHydrationWarning
+                        hidden={hidden} 
+                        suppressHydrationWarning aria-describedby='task-error'
                     />
                 </div>
                 <div className={tail ? 'mr-2' : ''}>{tail}</div>
@@ -74,7 +72,10 @@ export function InputField({
 }
 
 export function Dropdown ({ 
-    fieldName, list, value, prompt, onChange = () => {}, label, colour = NEUTRAL_MINDSET_COLOUR, className = '', state, defaultValue 
+    fieldName, prompt, label,  
+    value, defaultValue, list, 
+    colour = NEUTRAL_MINDSET_COLOUR, bgColour = NEUTRAL_MINDSET_COLOUR, className = '',
+    onChange = () => {}, state, 
 } : {
     fieldName: string,
     list: string[],
@@ -83,7 +84,7 @@ export function Dropdown ({
     prompt: string,
     onChange?: any,
     label?: string,
-    colour?: string,
+    colour?: string, bgColour?: string,
     className?: string,
     state?: any,
 }) {
@@ -105,7 +106,7 @@ export function Dropdown ({
                 id={fieldName}
                 name={fieldName}
                 className={`${className} peer block cursor-pointer rounded-lg border-none py-2 pl-4 text-sm outline-0 placeholder:text-gray-500 focus:![${colour}]`}
-                style={{ backgroundColor: adjustLightness(colour, 0.95) }}
+                style={{ backgroundColor: adjustLightness(bgColour, 0.95), color: colour }}
                 value={value} defaultValue={defaultValue}
                 onChange={handleSelect}
                 aria-describedby='task-error'
@@ -260,8 +261,11 @@ export function MultiSelectionField({
                 />
                 <label
                     htmlFor={item}
-                    className='flex cursor-pointer items-center gap-1.5 pr-4 text-sm font-regular'
-                    style={{ color: checked ? colour : adjustLightness(colour, 0.6)}}
+                    className='flex cursor-pointer items-center gap-2 mr-2 px-2 py-1 rounded-lg text-sm font-regular'
+                    style={{ 
+                        color: checked ? 'white' : adjustLightness(colour, 0.6),
+                        backgroundColor: checked ? adjustLightness(colour, 0.2) : adjustLightness(colour, 0.95),
+                    }}
                 >
                     {fieldName === 'preferredDayOfWeek' ? capitalise(item.slice(0, 2)) : capitalise(item)}
                 </label>

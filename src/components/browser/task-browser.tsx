@@ -12,7 +12,7 @@ import Link from 'next/link';
 import TodoList from '@/components/browser/todo-list';
 import { useSearchParams } from 'next/navigation';
 import { useMindsetColour, useMindsets } from '@/store/store';
-import { ArrowDownIcon, ArrowUpIcon, ListBulletIcon, TableCellsIcon } from '@heroicons/react/24/outline';
+import { ArchiveBoxIcon, ArrowDownIcon, ArrowUpIcon, ListBulletIcon, TableCellsIcon } from '@heroicons/react/24/outline';
 import useWindowSize from '@/lib/useWindowSize';
 import clsx from 'clsx';
 
@@ -77,7 +77,7 @@ export default function TaskBrowser () {
     }, [searchParams]);
 
     return(
-        <div className='flex flex-col items-center gap-4 md:w-auto w-full'>
+        <div className='flex flex-col items-center gap-2 md:gap-4 md:w-auto w-full'>
             {/* Tab bar */}
             <div className='flex gap-4 items-center justify-center'>
                 <button 
@@ -115,8 +115,8 @@ export default function TaskBrowser () {
                         defaultValue='All'
                         onChange={handleMindsetFilter}
                         prompt=''
-                        colour={mindsetColour}
-                        className='w-full no-form'
+                        bgColour={mindsetColour} colour={mindsetColour}
+                        className={`w-full no-form text-[${mindsetColour}]`}
                     />
                 }
                 <div className='rounded-md flex items-center' style={{ backgroundColor: adjustLightness(mindsetColour, 0.95) }}>
@@ -126,17 +126,17 @@ export default function TaskBrowser () {
                         defaultValue={filters.sort[0]}
                         onChange={handleSort}
                         prompt=''
-                        colour={mindsetColour}
+                        colour={mindsetColour} bgColour={mindsetColour}
                         className='!outline-0 border-0 w-full no-form'
                     />
                     <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleSortDirection()}>
-                        {filters.sort[1] === 'Ascending' ? <ArrowUpIcon width={18}/> : <ArrowDownIcon width={18} />}
+                        {filters.sort[1] === 'Ascending' ? <ArrowUpIcon width={18} color={mindsetColour} /> : <ArrowDownIcon width={18} color={mindsetColour} />}
                     </div>
                 </div>
                 {/* Table view toggle */}
                 { filters.type !== 'goal' && windowWidth && windowWidth > 500 &&
                     <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
-                        {filters.tableView ? <ListBulletIcon width={24} /> : <TableCellsIcon width={24} />}
+                        {filters.tableView ? <ListBulletIcon width={24} color={mindsetColour} /> : <TableCellsIcon width={24} color={mindsetColour} />}
                     </div>
                 }
                 <Link 
@@ -145,7 +145,7 @@ export default function TaskBrowser () {
                     style={{ backgroundColor: filters.logbookView ? adjustLightness(mindsetColour, 0.95) : 'transparent' }}
                     onClick={() => handleLogbookToggle()}
                 >
-                    <History color={filters.logbookView ? 'black' : 'lightgrey'}/>
+                    <ArchiveBoxIcon width={24} color={mindsetColour} opacity={filters.logbookView ? 1 : 0.5}/>
                 </Link>
             </div>
 

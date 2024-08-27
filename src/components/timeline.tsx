@@ -17,6 +17,7 @@ import { AnimatePresence, color, motion } from 'framer-motion';
 import Button from './buttons/button';
 import { organiseTimespan } from '@/lib/organise-timespan';
 import clsx from 'clsx';
+import { PlusIcon, SparklesIcon } from '@heroicons/react/24/outline';
 
 export default function Timeline() {
 
@@ -113,17 +114,19 @@ export default function Timeline() {
             {/* Empty timeline */}
             { eventQueue.length === 0 && !showMenu && (<div className='flex flex-col gap-8 items-center md:w-[24rem] w-full' style={{ color: mindsetColour }}>
                 <span className='text-xl'>Nothing coming next</span>
-                <div className='flex gap-4 justify-center text-md w-full md:p-0 p-2'>
+                <div className='flex md:flex-row flex-col gap-4 justify-center items-center text-md w-full md:p-0 p-2'>
                     <Button 
-                        className='rounded-md p-6 border text-md w-full' 
-                        style={{ color: mindsetColour, borderColor: mindsetColour }}
-                        onClick={() => handleOrganiseToday(1)}
-                        >Organise today
+                    className='rounded-md p-6 border text-md text-center md:w-full w-[70vw] flex flex-col gap-2 items-center' 
+                    style={{ color: mindsetColour, borderColor: mindsetColour }}
+                    onClick={() => handleOrganiseToday(1)}>
+                        <SparklesIcon width={24} color={mindsetColour}/>
+                        Organise today
                     </Button>
                     <Link href={`${pathname}?task=new&status=edit`}
-                        className='rounded-md p-6 border text-md w-full text-center' 
-                        style={{ color: mindsetColour, borderColor: mindsetColour }}
-                        >Create a task
+                    className='rounded-md p-6 border text-md md:w-full w-[70vw] text-center flex flex-col gap-2 items-center' 
+                    style={{ color: mindsetColour, borderColor: mindsetColour }}>
+                        <PlusIcon width={24} color={mindsetColour}/>
+                        Create a task
                     </Link>
                 </div>
             </div>)}
