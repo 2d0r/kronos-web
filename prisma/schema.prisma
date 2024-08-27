@@ -175,6 +175,9 @@ model Timespan {
   startTime DateTime
   endTime   DateTime
   type      TimespanType @default(organised)
+
+  @@index([id])
+  @@map("timespans")
 }
 
 enum TimespanType {

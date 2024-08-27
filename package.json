@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "node -r dotenv/config ./src/scripts/seed.js",
-    "migrate": "dotenv -e .env.development -- npx prisma migrate",
+    "migrate": "dotenv -e .env.development.local -- npx prisma migrate",
+    "prisma:migrate": "dotenv -e .env.development.local -- npx prisma migrate",
+    "prisma:generate": "dotenv -e .env.development.local -- npx prisma generate",
     "postinstall": "prisma generate",
     "vercel-build": "prisma generate && prisma migrate deploy && npm run build"
   },
