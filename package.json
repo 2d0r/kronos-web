@@ -4,13 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && npm run build",
     "start": "next start",
     "lint": "next lint",
     "seed": "node -r dotenv/config ./src/scripts/seed.js",
     "migrate": "dotenv -e .env.development -- npx prisma migrate",
     "postinstall": "prisma generate",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "vercel-build": "prisma generate && prisma migrate deploy && npm run build"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -56,6 +56,7 @@
     "swr": "^2.2.5",
     "ts-node": "^10.9.2",
     "uuid": "^9.0.1",
+    "vercel": "^37.1.2",
     "zod": "^3.22.4",
     "zod-validation-error": "^3.0.2"
   },
