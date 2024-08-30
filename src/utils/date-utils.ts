@@ -224,7 +224,7 @@ export const getMinutesBetweenLocalAndUTC = (event: Event) => {
 export const getLocalStartAndEnd = (event: Event) => {
     
     let [ startTime, endTime ] = ['', ''];
-    if (event.localTime) {
+    if (typeof event.localTime === 'string') {
         // Get startTime from localTime
         const startTimeAsNum = (new Date(event.startTime)).setHours(Number(event.localTime?.split(':')[0] || 0), Number(event.localTime.split(':')[1]));
         startTime = localDateTimeToString(new Date(startTimeAsNum));

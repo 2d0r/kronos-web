@@ -466,6 +466,20 @@ export const getMindsetByName  = async (name: string) => {
   }
 }
 
+export const getMindsetByDisplayName  = async (display: string) => {
+  try {
+    const mindsets = await prisma.mindset.findMany({
+      where: {
+        display: display
+      }
+    });
+    return mindsets[0];
+  } catch (error) {
+      console.error('Error getting mindset by name:', name);
+      process.exit(1);
+  }
+}
+
 export const getMindsetByTaskId = async (taskId: string) => {
   try {
     const taskMindset = await prisma.mindset.findMany({

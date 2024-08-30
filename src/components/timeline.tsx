@@ -11,7 +11,7 @@ import { fetchEvents, fetchTasks, fetchUpcomingEvents } from '@/lib/data';
 import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { EventWithRelations } from '@/lib/types';
 import { addDaysToDate, convertPropsToDate } from '@/utils/date-utils';
-import { setEvents, setMindsetColour, setTasks, useMindsetColour, useMindsets } from '@/store/store';
+import { setEvents, setMindsetColour, setTasks, useEvents, useMindsetColour, useMindsets } from '@/store/store';
 import { useDispatch } from 'react-redux';
 import { AnimatePresence, color, motion } from 'framer-motion';
 import Button from './buttons/button';
@@ -27,6 +27,7 @@ export default function Timeline() {
     const searchParams = useSearchParams();
     const showMenu = !!searchParams.get('menu');
     const pathname = usePathname();
+    const events = useEvents();
 
     const [ eventQueue, setEventQueue ] = useState<EventWithRelations[]>([]);
     const [ mindsetQueue, setMindsetQueue ] = useState<Mindset[]>([]);
@@ -76,6 +77,9 @@ export default function Timeline() {
         const timePassingInterval = setInterval(() => handleEventsUpdate(), 300000); // every 5 minutes
         return () => clearInterval(timePassingInterval);
     }, []);
+    useEffect(() => {
+        handleEventsUpdate();
+    }, [events]);
 
     return (<>
         <div className='w-full h-full flex flex-col items-center justify-center overflow-hidden'>

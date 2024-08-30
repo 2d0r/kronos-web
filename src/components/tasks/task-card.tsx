@@ -6,7 +6,6 @@ import Button from '@/components/buttons/button';
 import { Dropdown, InputField, MultiSelectionField } from '@/components/form-fields';
 import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { TaskWithRelations } from '@/lib/types';
-import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { DayOfWeek, Event, TimeOfDay } from '@prisma/client';
 import { useRouter } from 'next/navigation';
@@ -130,8 +129,10 @@ export default function TaskCard() {
     }
 
 
-    const handleTaskSubmit = (taskId: string) => {
+    const handleTaskSubmit = () => {
         // Tasks database is being created/edited in parallel, via form action
+
+        const taskId = taskCache.id;
 
         // We wait 1 sec for formAction and then signal the parent component to update its tasks and events
         // setTimeout(() => onTaskUpdate(taskCache.id, isNewTask ? 'create' : 'edit'), 1000);
@@ -643,7 +644,7 @@ export default function TaskCard() {
                         className={`task-card h-8 text-black ${taskIsReady ? '' : 'bg-gray-300 cursor-not-allowed'}`}
                         disabled={!taskIsReady}
                         style={{ backgroundColor: taskIsReady ? mindsetColour : '' }}
-                        onClick={() => handleTaskSubmit(taskCache.id)}
+                        onClick={handleTaskSubmit}
                         >{isNewTask ? 'Add task' : 'Save'}
                     </Button>
                 </div>
