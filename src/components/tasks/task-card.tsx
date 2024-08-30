@@ -29,10 +29,8 @@ import useWindowSize from '@/lib/useWindowSize';
 
 export default function TaskCard() {
 
-    const pathname = usePathname();
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { replace } = useRouter();
 
     const eventIdParam = searchParams.get('event');
     const tasks = useTasks();
@@ -74,7 +72,7 @@ export default function TaskCard() {
 
     const handleInputOnChange = (field: keyof TaskWithRelations, value: any) => {
         if (field === 'mindset') {
-            const mindset = mindsets.filter(el => el.name === value)[0];
+            const mindset = mindsets.filter(el => el.display === value)[0];
             setTaskCache(task => ({...task, mindset: mindset}));
         } else {
             setTaskCache(prevTask => ({ ...prevTask, [field]: value }));
@@ -238,13 +236,13 @@ export default function TaskCard() {
         animate={windowWidth && windowWidth > 500 ? { scale: 1 } : { y: 0 }} 
         exit={windowWidth && windowWidth > 500 ? { scale: 0.8, opacity: 0 } : { y: 500 }} 
         transition={{ duration: 0.1, ease: false }}>
-        <form action={formAction}>
+        <form action={formAction}> 
             {/* Top bar */}
             <div className='w-full h-16 flex justify-between items-center p-4 border-b-[0.5px] sticky top-0 bg-white'>
                 <div className='w-8 h-8'></div>
                 <InputField 
                     fieldName='name'
-                    placeholder='Enter task name'
+                    placeholder='New task'
                     inputType='string'
                     className={`!border-0 !text-xl font-bold placeholder:text-lg pl-0 cursor-text !bg-transparent rounded-none text-center`}
                     colour={mindsetColour}
@@ -266,12 +264,12 @@ export default function TaskCard() {
                         fieldName='mindset'
                         prompt='Pick a mindset'
                         label='Mindset'
-                        list={mindsets.map(el => el.name)}
+                        list={mindsets.map(el => el.display || el.name)}
                         onChange={(event: any) => {
                             handleInputOnChange('mindset', event.target.value);
                         }}
-                        value={taskCache.mindset?.name || ''}
-                        bgColour={mindsetColour}
+                        value={taskCache.mindset?.display || ''}
+                        bgColour={mindsetColour} colour={mindsetColour}
                         state={state}
                     />
                     <Dropdown 
@@ -281,7 +279,7 @@ export default function TaskCard() {
                         list={priorityList}
                         onChange={(event: any) => handleInputOnChange('priority', event.target.value)}
                         value={taskCache.priority || ''}
-                        bgColour={mindsetColour}
+                        bgColour={mindsetColour} colour={mindsetColour}
                         state={state}
                     />
 

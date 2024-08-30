@@ -1,43 +1,13 @@
-import { Status, TimeUnit, Priority, TimeOfDay, DayOfWeek, RepeatUnit, Prisma, TimespanType, TaskType } from '@prisma/client';
-import { ReactElement } from 'react';
+import { Status, TimeUnit, Priority, TimeOfDay, DayOfWeek, RepeatUnit, TimespanType } from '@prisma/client';
 
 
 // CONSTANTS 
-
-export const DEFAULT_AVERAGE_SLEEP = 8 * 60; // 8 hours, expressed in minutes
-export const DEFAULT_AVERAGE_MEALS = 3 * 60; // 3 hours, expressed in minutes
-export const MINIMUM_TRANSITION = 0;
-export const MIN_TASK_DURATION = 10;
-export const HOURS_IN_A_WEEK = 168;
-export const MAX_REP_OFFSET = 1/4;
-export const MAX_OFFSET = 120;
-export const QUEUE_LENGTH = 10;
-
-// Mindsets
-export const DEFAULT_MINDSET = 'maintain';
-export const CLOSEST_MINDSET = 1;
-export const FURTHEST_MINDSET = 6;
-export const DEFAULT_MINDSET_LIST = [
-    'restReward', 'survive', 'maintain', 'play', 'socialise', 'learn', 'create', 'selfChallenge', 'selfCare', 'achieve'
-] as [string, ...string[]];
-export const NEUTRAL_MINDSET_COLOUR = '#b19870';
 
 export const CARD_SCALES = {
     small: 1,
     medium: 1.5,
     large: 2
 }
-export const SMALL_CARD_HEIGHT = 200;
-export const DEFAULT_TIME_ZONE = 'Europe/Bucharest';
-export const DEFAULT_TIMES_OF_DAY : { [key: string]: [number, number]} = {
-    'morning': [6, 12],
-    'afternoon': [12, 18],
-    'evening': [18, 22],
-    'noon': [12, 13],
-    'night': [22, 6]
-    // TO DO: add late night and noon ?
-};
-export const TIME_DAY_LIST = Object.keys(DEFAULT_TIMES_OF_DAY) as [string, ...string[]];
 export const DAYS_OF_WEEK_DICT : { [key: string]: number } = {
     'Sunday': 0,
     'Monday': 1,
@@ -47,17 +17,44 @@ export const DAYS_OF_WEEK_DICT : { [key: string]: number } = {
     'Friday': 5,
     'Saturday': 6,
 }
+export const DEFAULT_AVERAGE_SLEEP = 8 * 60; // 8 hours, expressed in minutes
+export const DEFAULT_AVERAGE_MEALS = 3 * 60; // 3 hours, expressed in minutes
+export const DEFAULT_TIME_ZONE = 'Europe/Bucharest';
+export const DEFAULT_TIMES_OF_DAY : { [key: string]: [number, number]} = {
+    'morning': [6, 12],
+    'afternoon': [12, 18],
+    'evening': [18, 22],
+    'noon': [12, 13],
+    'night': [22, 6]
+    // TO DO: add late night and noon ?
+};
+export const HOURS_IN_A_WEEK = 168;
+export const MAX_REP_OFFSET = 1/4;
+export const MAX_OFFSET = 120;
+export const MINIMUM_TRANSITION = 0;
+export const MIN_TASK_DURATION = 10;
 export const PRIORITY_ORDER = {
     [Priority['veryHigh']]: 0,
     [Priority['high']]: 1,
     [Priority['medium']]: 2,
     [Priority['low']]: 3
 };
+export const QUEUE_LENGTH = 10;
+export const SMALL_CARD_HEIGHT = 200;
+export const TIME_DAY_LIST = Object.keys(DEFAULT_TIMES_OF_DAY) as [string, ...string[]];
 
 
+// Mindsets 
+
+export const CLOSEST_MINDSET = 1;
+export const DEFAULT_MINDSET = 'maintain';
+export const DEFAULT_MINDSET_LIST = [ 'Survive', 'Work', 'Chore', 'Free Time', 'Learn', 'Healthy', 'Family & Friends', 'Create', 'Achieve' ] as [string, ...string[]];
+// export const DEFAULT_MINDSET_LIST = [ 'restReward', 'survive', 'maintain', 'play', 'socialise', 'learn', 'create', 'selfChallenge', 'selfCare', 'achieve' ] as [string, ...string[]];
+export const FURTHEST_MINDSET = 6;
+export const NEUTRAL_MINDSET_COLOUR = '#b19870';
 
 
-// Enums
+// Prisma enums
 
 const getEnumValues = (enumType: Record<string, string>) => {
     return enumType ? Object.values(enumType) : [];
@@ -77,17 +74,3 @@ export let prismaEnums = {
     preferredTimeOfDay: getEnumValues(TimeOfDay),
     preferredDayOfWeek: getEnumValues(DayOfWeek),
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-

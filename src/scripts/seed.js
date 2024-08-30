@@ -1,122 +1,98 @@
-const { db } = require('@vercel/postgres');
-const {
-  tasks,
-  users,
-} = require('./placeholder-data.js');
-const bcrypt = require('bcrypt');
+import { PrismaClient } from '@prisma/client';
 
-const seedUsers = async (client) => {
-  try {
-    await client.sql`CREATE EXTENSION IF NOT EXISTS 'uuid-ossp'`;
-    // Create the 'users' table if it doesn't exist
-    const createTable = await client.sql`
-      CREATE TABLE IF NOT EXISTS users (
-        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        email TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL
-      );
-    `;
+const prisma = new PrismaClient();
 
-    console.log(`Created 'users' table`);
+async function main() {
+  // ... you will write your Prisma Client queries here\
+  await prisma.user.create({
+    data: {
+      name: '2d0r',
+      email: '2d0r@kronos.com'
+    },
+  });
+  await prisma.mindset.create({
+    data: {
+      name: 'survive',
+      display: 'Survive',
+      maslowLevel: 1,
+      colour: '#d44c47',
+    },
+  });
+  await prisma.mindset.create({
+    data: {
+      name: 'work',
+      display: 'Work',
+      maslowLevel: 2,
+      colour: '#337ea9',
+    },
+  });
+  await prisma.mindset.create({
+    data: {
+      name: 'chore',
+      display: 'Chore',
+      maslowLevel: 2,
+      colour: '#d9730d',
+    },
+  });
+  await prisma.mindset.create({
+    data: {
+      name: 'freeTime',
+      display: 'Free Time',
+      maslowLevel: 3,
+      colour: '#cb912f',
+    },
+  });
+  await prisma.mindset.create({
+    data: {
+      name: 'love',
+      display: 'Family & Friends',
+      maslowLevel: 3,
+      colour: '#c14c8a',
+    },
+  });
+  await prisma.mindset.create({
+    data: {
+      name: 'learn',
+      display: 'Learn',
+      maslowLevel: 4,
+      colour: '#18938D',
+    },
+  });
+  await prisma.mindset.create({
+    data: {
+      name: 'health',
+      display: 'Health',
+      maslowLevel: 4,
+      colour: '#448361',
+    },
+  });
+  await prisma.mindset.create({
+    data: {
+      name: 'create',
+      display: 'Create',
+      maslowLevel: 4,
+      colour: '#7c3aed',
+    },
+  });
+  await prisma.mindset.create({
+    data: {
+      name: 'achieve',
+      display: 'Achieve',
+      maslowLevel: 5,
+      colour: '#7c3aed',
+    },
+  });
 
-    // Insert data into the 'users' table
-    const insertedUsers = await Promise.all(
-      users.map(async (user) => {
-        const hashedPassword = await bcrypt.hash(user.password, 10);
-        return client.sql`
-        INSERT INTO users (id, name, email, password)
-        VALUES (${user.id}, ${user.name}, ${user.email}, ${hashedPassword})
-        ON CONFLICT (id) DO NOTHING;
-      `;
-      }),
-    );
-
-    console.log(`Seeded ${insertedUsers.length} users`);
-
-    return {
-      createTable,
-      users: insertedUsers,
-    };
-  } catch (error) {
-    console.error('Error seeding users:', error);
-    throw error;
-  }
+  const allMindsets = await prisma.mindset.findMany();
+  console.dir(allMindsets, { depth: null });
 }
 
-const seedTasks = async (client) => {
-  try {
-    await client.sql`CREATE EXTENSION IF NOT EXISTS 'uuid-ossp'`;
-
-    const deleteTable = await client.sql`
-      DROP TABLE IF EXISTS tasks;
-    `;
-
-    // Create the 'invoices' table if it doesn't exist
-    const createTable = await client.sql`
-      CREATE TABLE IF NOT EXISTS tasks (
-        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        mindset VARCHAR(255) NOT NULL,
-        status VARCHAR(255) NOT NULL,
-        date DATE NOT NULL
-      );
-    `;
-
-    console.log(`Created 'tasks' table`);
-
-    // Insert data into the 'invoices' table
-    const seededTasks = await Promise.all(
-      tasks.map(
-        (task) => client.sql`
-        INSERT INTO tasks (id, name, mindset, status, date)
-        VALUES (${task.id}, ${task.name}, ${task.mindset}, ${task.status}, ${task.date})
-        ON CONFLICT (id) DO NOTHING;
-      `,
-      ),
-    );
-
-    console.log(`Seeded ${seededTasks.length} tasks`);
-
-    // const updateTableFullTask = await client.sql`
-    //   ALTER TABLE tasks
-    //   ADD duration TIME,
-    //   ADD start_time DATE,
-    //   ADD end_time DATE,
-    //   ADD repeat BOOL DEFAULT 0,
-    //   ADD frequency INT,
-    //   ADD repeatRange ENUM('', 'day', 'week', 'month', 'year') DEFAULT '',
-    //   ADD totalDuration TIME,
-    //   ADD preferredTimeOfDay SET('morning', 'noon', 'afternoon', 'evening', 'night'),
-    //   ADD preferredDayOfWeek SET('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'),
-    //   ADD type ENUM('task', 'project', 'step', 'goal'),
-    //   ADD priority ENUM('urgent', 'high', 'medium', 'low') DEFAULT 'medium';
-    // `;
-
-    return {
-      // deleteTable,
-      createTable,
-      // tasks: seededTasks,
-    };
-  } catch (error) {
-    console.error('Error seeding tasks:', error);
-    throw error;
-  }
-}
-
-const main = async () => {
-  const client = await db.connect();
-
-  await seedUsers(client);
-  await seedTasks(client);
-  await deleteKnexTables(client);
-
-  await client.end();
-}
-
-main().catch((err) => {
-  console.error(
-    'An error occurred while attempting to seed the database:',
-    err,
-  );
-});
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  })

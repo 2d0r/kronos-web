@@ -111,7 +111,7 @@ export default function TaskBrowser () {
                 { filters.type !== 'goal' &&
                     <Dropdown 
                         fieldName='chooseMindset'
-                        list={DEFAULT_MINDSET_LIST.concat('All')}
+                        list={mindsets.length ? mindsets.map(el => el.display || '') : ['All']}
                         defaultValue='All'
                         onChange={handleMindsetFilter}
                         prompt=''

@@ -42,7 +42,7 @@ export default function TodoList ({
         filteredTasks = filteredTasks.filter(task => filters.logbookView ? task.status === 'done' : task.status !== 'done');
         // Filter by mindset
         if (filters.mindset !== 'All') {
-            const mindsetId = mindsets.filter(el => el.name === filters.mindset)[0].id;
+            const mindsetId = mindsets.filter(el => el.display === filters.mindset)[0].id;
             filteredTasks = filteredTasks.filter(task => task.mindsetId === mindsetId);
         }
         // Sort tasks

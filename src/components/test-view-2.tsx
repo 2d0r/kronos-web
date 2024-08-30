@@ -50,7 +50,7 @@ export default function TestView2 ({back} : TestViewProps) {
 
 
     return (
-        <div className={clsx('md:h-[100vh] h-[150vh] z-[39] md:w-fit w-full flex flex-col gap-4 items-center justify-start')}>
+        <div className={clsx('md:h-[100vh] h-[150vh] z-30 md:w-fit w-full flex flex-col gap-4 items-center justify-start')}>
             <div className='md:h-[60vh] h-full md:w-[80vw] w-[90vw]'>
                 <CalendarComponent  startWeekToday={true} />
             </div>

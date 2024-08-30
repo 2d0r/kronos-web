@@ -544,8 +544,16 @@ export const getCurrentMindsetColour = async () => {
   } catch (error) {
     console.log('Failed to get current mindset colour ❌', error);
   } 
-  
-  
+}
+
+export const getMindsetDisplayValues = async () => {
+  const mindsets = await prisma.mindset.findMany({
+    select: {
+      display: true,
+    },
+  });
+
+  return mindsets.map((mindset) => mindset.display);
 }
 
 

@@ -30,15 +30,12 @@ export function InputField({
     }
 
     return (<>
-        <div className={clsx('flex items-baseline',  label && 'gap-2')}>
+        <div className={clsx('flex items-baseline',  label && 'gap-2', fieldName === 'name' && 'justify-center w-full')}>
             <label htmlFor={fieldName} className={clsx('my-2 block text-sm font-medium', label && 'formKeysColumn')}>
                 {label}
             </label>
-            <div className={clsx('flex items-center', 
-                label && 'formValuesColumn', 
-                tail && 'gap-2',
-            )}>
-                <div className={'relative'} suppressHydrationWarning>
+            <div className={clsx( 'flex items-center', label && 'formValuesColumn', tail && 'gap-2', fieldName === 'name' && 'w-full justify-center' )}>
+                <div className={clsx('relative', fieldName === 'name' && 'w-full')} suppressHydrationWarning>
                     <input
                         id={fieldName} name={fieldName}
                         value={value} placeholder={placeholder}
@@ -46,9 +43,10 @@ export function InputField({
                         min='0'
                         className={clsx(
                             inputType === 'number' ? 'no-arrows w-[46px]' : 'w-fit',
-                            'pr-4 cursor-text items-baseline text-sm rounded-lg border-0 outline-0 placeholder:text-gray-400 focus:!border-0',
+                            'pr-4 cursor-text items-baseline text-sm rounded-lg border-0 outline-0 placeholder:text-gray-300 focus:!border-0',
                             className, 
-                            `placeholder:${adjustLightness(colour, 0.95) || 'grey'}`
+                            `placeholder:${adjustLightness(colour, 0.95) || 'grey'}`,
+                            fieldName === 'name' && 'w-full'
                         )}
                         style={{ backgroundColor: adjustLightness(colour, 0.95), color: colour }}
                         onChange={handleInput}
