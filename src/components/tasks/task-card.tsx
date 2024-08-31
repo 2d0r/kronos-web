@@ -6,8 +6,8 @@ import Button from '@/components/buttons/button';
 import { Dropdown, InputField, MultiSelectionField } from '@/components/form-fields';
 import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { TaskWithRelations } from '@/lib/types';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { DayOfWeek, Event, TimeOfDay } from '@prisma/client';
+import { useSearchParams } from 'next/navigation';
+import { DayOfWeek, Event, RepeatUnit, TimeOfDay } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { editTaskPrisma, createTaskPrisma } from '@/lib/actions';
 import { getDate, parseISO } from 'date-fns';
@@ -30,8 +30,9 @@ export default function TaskCard() {
 
     const router = useRouter();
     const searchParams = useSearchParams();
+    const eventId = searchParams.get('event'); 
+    const taskId = searchParams.get('task');
 
-    const eventIdParam = searchParams.get('event');
     const tasks = useTasks();
     const events = useEvents();
     const mindsets = useMindsets();
@@ -43,18 +44,22 @@ export default function TaskCard() {
 
     // STATES
 
-    const [ taskId, setTaskId ] = useState<string>(searchParams.get('task') || 'new');
     const [ initialTask, setInitialTask ] = useState<TaskWithRelations>({} as TaskWithRelations);
     const [ taskCache, setTaskCache ] = useState<TaskWithRelations>({} as TaskWithRelations);
     const [ isNewTask, setIsNewTask ] = useState<boolean>(false);
-    const [ endRepeat, setEndRepeat ] = useState<(string | null)>('No');
-    const [ idealStart, setIdealStart ] = useState<boolean>(false);
-    const [ repeatUnit, setRepeatUnit ] = useState<string | null>('sessions');
     const [ mindsetColour, setMindsetColour] = useState<string>(taskCache.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
-    const [ deadline, setDeadline ] = useState<boolean>(false);
-    const [ taskIsEdited, setTaskIsEdited ] = useState<boolean>(false);
-    const [ taskIsReady, setTaskIsReady ] = useState<boolean>(false);
-    const [ eventId, setEventId ] = useState<string>(eventIdParam || '');
+
+    interface Toggles {
+        endRepeat: ('yes' | 'no' | 'duration' | 'date' | 'repetitions'); idealStart: boolean; repeatUnit: RepeatUnit | null; deadline: boolean; taskIsReady: boolean; taskIsEdited: boolean;
+    }
+    const [ toggles, setToggles ] = useState<Toggles>({
+        endRepeat: 'no',
+        idealStart: false,
+        repeatUnit: 'sessions',
+        deadline: false,
+        taskIsEdited: false,
+        taskIsReady: false,
+    });
     
 
 
@@ -135,7 +140,6 @@ export default function TaskCard() {
         const taskId = taskCache.id;
 
         // We wait 1 sec for formAction and then signal the parent component to update its tasks and events
-        // setTimeout(() => onTaskUpdate(taskCache.id, isNewTask ? 'create' : 'edit'), 1000);
         setTimeout(async () => {
             const updatedTask = await fetchTask(taskId);
             dispatch(setTasks([...tasks.filter(task => task.id !== taskId), updatedTask]));
@@ -198,31 +202,22 @@ export default function TaskCard() {
     // Signal task as ready to submit once the compulsory fields are filled
     useEffect(() => {
         // Check if task was edited
-        (initialTask !== taskCache) ? setTaskIsEdited(true) : setTaskIsEdited(false);
         // Check if new task has enough valid inputs to be added
-        (
-            taskCache.name 
-            && taskCache.id
-            && taskCache.mindset
-            && taskCache.priority
-            && (taskCache.duration > 0 || (taskCache.startTime && taskCache.endTime))
-        ) ? setTaskIsReady(true) : setTaskIsReady(false);
+        setToggles(toggles => ({...toggles, 
+            taskIsEdited: initialTask !== taskCache,
+            taskIsReady: !!(
+                taskCache.name 
+                && taskCache.id
+                && taskCache.mindset
+                && taskCache.priority
+                && (taskCache.duration > 0 || (taskCache.startTime && taskCache.endTime))
+            ),
+        }));
         // console.log('taskCache', taskCache);
     }, [taskCache, initialTask]);
     useEffect(() => {
-        const newTaskId = searchParams.get('task');
-        console.log('taskId', newTaskId);
-        setTaskId(newTaskId || 'new');
         setInitialTask(convertPropsToDate(tasks?.find(task => task.id === taskId) || null));
     }, [searchParams]);
-
-    // Send onTaskUpdate every second, until state is successful
-    // useEffect(() => {
-    //     if (state.success === false) { 
-    //         const formSubmitInterval = setInterval(() => onTaskUpdate(taskCache.id, isNewTask ? 'create' : 'edit'), 1000);
-    //         return () => clearInterval(formSubmitInterval);
-    //     }
-    // }, [state])
 
     
     return (<AnimatePresence>{searchParams.get('task') && searchParams.get('status') === 'edit' && (
@@ -391,7 +386,7 @@ export default function TaskCard() {
                     {/* For repeating tasks */}
                     {taskCache.repeat && (<div className=''>
                         <div className='flex mb-2 items-top *:mb-0 overflow-x-scroll items-center gap-2'>
-                            {repeatUnit === 'sessions' ? (<>
+                            {toggles.repeatUnit === 'sessions' ? (<>
                                 <InputField 
                                     fieldName='repeatFrequency'
                                     placeholder=''
@@ -444,14 +439,14 @@ export default function TaskCard() {
                         <button 
                             type='button'
                             onClick={() => { 
-                                setIdealStart(!idealStart);
+                                setToggles(toggles => ({ ...toggles, idealStart: !toggles.idealStart }));
                                 setTaskCache(prevTask => ({ ...prevTask, startTime: null }));
                             }}
-                            style={{color: idealStart || taskCache.idealStart ? 'black' : 'lightgrey'}}
+                            style={{color: toggles.idealStart || taskCache.idealStart ? 'black' : 'lightgrey'}}
                             className='text-left cursor-pointer font-medium my-2 formKeysColumn'
                             >Ideal start
                         </button>
-                        { (idealStart || taskCache.idealStart) ? 
+                        { (toggles.idealStart || taskCache.idealStart) ? 
                         <InputField 
                             fieldName='idealStart'
                             placeholder='Enter start time'
@@ -513,16 +508,16 @@ export default function TaskCard() {
                                     <button 
                                         type='button'
                                         onClick={() => {
-                                            const newEndRepeat = endRepeat === 'date' ? 'yes' : 'date';
-                                            setEndRepeat(newEndRepeat);
+                                            const newEndRepeat = toggles.endRepeat === 'date' ? 'yes' : 'date';
+                                            setToggles(toggles => ({...toggles, endRepeat: newEndRepeat}));
                                             setTaskCache(prevTask => ({ ...prevTask, totalDuration: null, totalRepetitions: null,
                                                 deadline: newEndRepeat === 'yes' ? null : prevTask.deadline,
                                             }));
                                         }}
-                                        style={{color: endRepeat === 'date' || taskCache.deadline ? 'black' : 'lightgrey'}}
+                                        style={{color: toggles.endRepeat === 'date' || taskCache.deadline ? 'black' : 'lightgrey'}}
                                         className='text-left'
                                     >On a date</button>
-                                    {(endRepeat === 'date' || taskCache.deadline) ? <InputField 
+                                    {(toggles.endRepeat === 'date' || taskCache.deadline) ? <InputField 
                                         fieldName='endRepeatDate'
                                         placeholder='End repeat on date'
                                         inputType='date'
@@ -536,16 +531,16 @@ export default function TaskCard() {
                                     <button 
                                         type='button'
                                         onClick={() => {
-                                            const newEndRepeat = endRepeat === 'duration' ? 'yes' : 'duration';
-                                            setEndRepeat(newEndRepeat);
+                                            const newEndRepeat = toggles.endRepeat === 'duration' ? 'yes' : 'duration';
+                                            setToggles(toggles => ({...toggles, newEndRepeat}));
                                             setTaskCache(prevTask => ({ ...prevTask, deadline: null, totalRepetitions: null,
                                                 totalDuration: newEndRepeat === 'yes' ? null : prevTask.totalDuration,
                                             }));
                                         }}
-                                        style={{color: endRepeat === 'duration' || taskCache.totalDuration ? 'black' : 'lightgrey'}}
+                                        style={{color: toggles.endRepeat === 'duration' || taskCache.totalDuration ? 'black' : 'lightgrey'}}
                                         className='text-left'
                                     >After a total duration</button>
-                                    {(endRepeat === 'duration' || taskCache.totalDuration) ? <InputField 
+                                    {(toggles.endRepeat === 'duration' || taskCache.totalDuration) ? <InputField 
                                         fieldName='totalDuration'
                                         placeholder='0'
                                         inputType='number'
@@ -559,16 +554,16 @@ export default function TaskCard() {
                                     <button 
                                         type='button'
                                         onClick={() => {
-                                            const newEndRepeat = endRepeat === 'repetitions' ? 'yes' : 'repetitions';
-                                            setEndRepeat(newEndRepeat);
+                                            const newEndRepeat = toggles.endRepeat === 'repetitions' ? 'yes' : 'repetitions';
+                                            setToggles(toggles => ({...toggles, newEndRepeat}));
                                             setTaskCache(prevTask => ({ ...prevTask, deadline: null, totalDuration: null,
                                                 totalRepetitions: newEndRepeat === 'yes' ? null : prevTask.totalRepetitions,
                                             }));
                                         }}
-                                        style={{color: endRepeat === 'repetitions' || taskCache.totalRepetitions ? 'black' : 'lightgrey'}}
+                                        style={{color: toggles.endRepeat === 'repetitions' || taskCache.totalRepetitions ? 'black' : 'lightgrey'}}
                                         className='text-left'
                                     >After a number of repetitions</button>
-                                    {(endRepeat === 'repetitions' || taskCache.totalRepetitions) ? <InputField 
+                                    {(toggles.endRepeat === 'repetitions' || taskCache.totalRepetitions) ? <InputField 
                                         fieldName='totalRepetitions'
                                         placeholder='0'
                                         inputType='number'
@@ -586,12 +581,12 @@ export default function TaskCard() {
                         <div className='flex h-8 gap-2 items-center'>
                             <button
                                 type='button' 
-                                onClick={() => {setDeadline(!deadline)}}
-                                style={{color: deadline ? 'black' : 'lightgrey'}}
+                                onClick={() => setToggles(toggles => ({...toggles, deadline: !toggles.deadline}))}
+                                style={{color: toggles.deadline ? 'black' : 'lightgrey'}}
                                 className='font-medium formKeysColumn'>
                                 Deadline
                             </button>
-                            {deadline && <InputField 
+                            {toggles.deadline && <InputField 
                                 fieldName='totalDuration'
                                 placeholder='Deadline'
                                 inputType='date'
@@ -631,7 +626,7 @@ export default function TaskCard() {
                     >Delete task
                 </button>
                 <div className='flex gap-4'>
-                    { taskIsEdited && !isNewTask ?
+                    { toggles.taskIsEdited && !isNewTask ?
                         <button 
                             type='reset' 
                             className='text-gray-400'
@@ -641,9 +636,9 @@ export default function TaskCard() {
                         </button> : <></>
                     }
                     <Button type='submit' 
-                        className={`task-card h-8 text-black ${taskIsReady ? '' : 'bg-gray-300 cursor-not-allowed'}`}
-                        disabled={!taskIsReady}
-                        style={{ backgroundColor: taskIsReady ? mindsetColour : '' }}
+                        className={`task-card h-8 text-black ${toggles.taskIsReady ? '' : 'bg-gray-300 cursor-not-allowed'}`}
+                        disabled={!toggles.taskIsReady}
+                        style={{ backgroundColor: toggles.taskIsReady ? mindsetColour : '' }}
                         onClick={handleTaskSubmit}
                         >{isNewTask ? 'Add task' : 'Save'}
                     </Button>
