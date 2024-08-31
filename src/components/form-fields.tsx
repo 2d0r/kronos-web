@@ -29,6 +29,8 @@ export function InputField({
         onChange(event);
     }
 
+    const lightColour = adjustLightness(colour, 0.95);
+
     return (<>
         <div className={clsx('flex items-baseline',  label && 'gap-2', fieldName === 'name' && 'justify-center w-full')}>
             <label htmlFor={fieldName} className={clsx('my-2 block text-sm font-medium', label && 'formKeysColumn')}>
@@ -45,10 +47,10 @@ export function InputField({
                             inputType === 'number' ? 'no-arrows w-[46px]' : 'w-fit',
                             'pr-4 cursor-text items-baseline text-sm rounded-lg border-0 outline-0 placeholder:text-gray-300 focus:!border-0',
                             className, 
-                            `placeholder:${adjustLightness(colour, 0.95) || 'grey'}`,
+                            `placeholder:${lightColour}`,
                             fieldName === 'name' && 'w-full'
                         )}
-                        style={{ backgroundColor: adjustLightness(colour, 0.95), color: colour }}
+                        style={{ backgroundColor: lightColour, color: colour }}
                         onChange={handleInput}
                         step={inputType === 'time' ? '60' : ['duration', 'totalDuration'].includes(fieldName) ? '5' : '1'}
                         hidden={hidden} 

@@ -20,7 +20,7 @@ import { ArrowRight } from 'lucide-react';
 import { useTasks, setTasks, setEvents, useEvents, useMindsets } from '@/store/store';
 import { useDispatch } from 'react-redux';
 import { fetchEventsOfTask, fetchTask } from '@/lib/data';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
 import { useSetSearchParams } from '@/utils/app-utils';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import useWindowSize from '@/lib/useWindowSize';
@@ -220,7 +220,8 @@ export default function TaskCard() {
     }, [searchParams]);
 
     
-    return (<AnimatePresence>{searchParams.get('task') && searchParams.get('status') === 'edit' && (
+    return (<AnimatePresence>
+        {searchParams.get('task') && searchParams.get('status') === 'edit' && (
         // Overlay
         <motion.div className='z-50 absolute w-full h-full left-0 top-0 flex md:items-center justify-center bg-black/20 backdrop-blur-sm md:py-4 pt-4'
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} 
@@ -255,7 +256,7 @@ export default function TaskCard() {
             <div className='w-full md:h-auto h-[calc(100vh-8rem)] flex md:flex-row flex-col md:overflow-hidden overflow-y-auto'>
 
                 {/* Settings panel */}
-                <div className='md:w-[350px] w-full md:h-[70vh] py-2 border-r-[0.5px] flex flex-col md:overflow-y-scroll task-input-fields'>
+                <motion.div className='md:w-[350px] w-full md:h-[70vh] py-2 border-r-[0.5px] flex flex-col md:overflow-y-scroll task-input-fields' layout layoutScroll>
                     <Dropdown 
                         fieldName='mindset'
                         prompt='Pick a mindset'
@@ -302,6 +303,8 @@ export default function TaskCard() {
                         />
                     </div>
 
+                    <LayoutGroup>
+
                     {/* Scheduled */}
                     <div>
                     <button 
@@ -316,7 +319,9 @@ export default function TaskCard() {
                         style={{color: taskCache.fixed ? 'black' : 'lightgrey'}}
                         >Scheduled
                     </button>
-                    {taskCache.fixed && (<>
+
+                    <AnimatePresence>
+                    {taskCache.fixed && (<motion.div className='overflow-hidden flex-grow-0 flex-shrink-0' initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} layout layoutScroll>
                         <div className='flex items-start gap-2'>
                         <div className='flex flex-col gap-2'>
                             <InputField 
@@ -367,11 +372,12 @@ export default function TaskCard() {
                             {/* } */}
                         </div>
                         </div>
-                    </>)}
-                    </div>
-                    {/* <div className='divider'></div> */}
+                    </motion.div>)}
+                    </AnimatePresence>
 
-                    <div>
+                    </div>
+
+                    <div className='overflow-hidden'>
                     {/* Repeat? */}
                     <button 
                         type='button'
@@ -384,8 +390,9 @@ export default function TaskCard() {
                     >Repeat</button>
 
                     {/* For repeating tasks */}
-                    {taskCache.repeat && (<div className=''>
-                        <div className='flex mb-2 items-top *:mb-0 overflow-x-scroll items-center gap-2'>
+                    <AnimatePresence>
+                    {taskCache.repeat && (<motion.div className='flex-grow-0 flex-shrink-0' initial={{ height: 0 }} animate={{ height: '' }} exit={{ height: 0 }} layout layoutScroll>
+                        <div className='flex mb-2 items-top *:mb-0 overflow-x-scroll items-center gap-2 h-'>
                             {toggles.repeatUnit === 'sessions' ? (<>
                                 <InputField 
                                     fieldName='repeatFrequency'
@@ -425,17 +432,17 @@ export default function TaskCard() {
                                 list={timeSpanList.filter(el => el.toLowerCase() !== 'hour')} // Removed hourly repetition
                                 value={taskCache.repeatTimespan || 'Day'}
                                 onChange={(event: any) => handleInputOnChange('repeatTimespan', event.target.value)}
-                                bgColour={mindsetColour}
+                                bgColour={mindsetColour} colour={mindsetColour}
                                 state={state}
                             />
                         </div>
-                    </div>)}
+                    </motion.div>)}
+                    </AnimatePresence>
                     </div>
 
                     {/* Ideal start */}
-                    {!taskCache.fixed && (<>
-                    {/* <div className='divider'></div> */}
-                    <div className='flex'>
+                    <AnimatePresence>
+                    {!taskCache.fixed && (<motion.div className='flex overflow-hidden' initial={{ height: 0 }} animate={{ height: '' }} exit={{ height: 0 }} transition={{ ease: false }} layout layoutScroll>
                         <button 
                             type='button'
                             onClick={() => { 
@@ -460,10 +467,13 @@ export default function TaskCard() {
                                 handleInputOnChange('idealStart', `${timeBits[0]}:${timeBits[1]}`);
                             }}
                         /> : <></>}
-                    </div></>)}
+                    </motion.div>)}
+                    </AnimatePresence>
                     
                     {/* Preferred times and days */}
-                    {!taskCache.fixed && (<>
+                    <AnimatePresence>
+                    {!taskCache.fixed && (<motion.div className='flex flex-col gap-2 overflow-hidden flex-grow-0 flex-shrink-0' 
+                    initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ ease: false }} layout layoutScroll>
                         {(!taskCache.repeat || taskCache.repeatTimespan !== 'hour') && (<div>
                             <MultiSelectionField
                                 fieldName='preferredTimeOfDay'
@@ -490,8 +500,11 @@ export default function TaskCard() {
                                 onChange={(value: string[]) => handleInputOnChange('preferredDayOfWeek', value as DayOfWeek[])}
                             />
                         </div>)}
-                    </>)}
-                    {taskCache.repeat && (<>
+                    </motion.div>)}
+                    </AnimatePresence>
+
+                    {/* End repeat */}
+                    {taskCache.repeat && (<motion.div className='overflow-hidden flex-grow-0 flex-shrink-0' initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} transition={{ ease: false }} layout layoutScroll>
                         {/* <div className={'divider'}></div> */}
                         <div className='flex flex-col gap-2'>
                             <button 
@@ -503,7 +516,8 @@ export default function TaskCard() {
                                 }}
                                 style={{color: taskCache.endRepeat ? 'black' : 'lightgrey'}}
                             >End repeat</button>
-                            {(taskCache.repeat && taskCache.endRepeat) && (<>
+                            <AnimatePresence>
+                            {(taskCache.repeat && taskCache.endRepeat) && (<motion.div className='overflow-hidden' initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} layout layoutScroll>
                                 <div className='flex h-8 gap-2 items-center pl-2'>
                                     <button 
                                         type='button'
@@ -532,7 +546,7 @@ export default function TaskCard() {
                                         type='button'
                                         onClick={() => {
                                             const newEndRepeat = toggles.endRepeat === 'duration' ? 'yes' : 'duration';
-                                            setToggles(toggles => ({...toggles, newEndRepeat}));
+                                            setToggles(toggles => ({...toggles, endRepeat: newEndRepeat}));
                                             setTaskCache(prevTask => ({ ...prevTask, deadline: null, totalRepetitions: null,
                                                 totalDuration: newEndRepeat === 'yes' ? null : prevTask.totalDuration,
                                             }));
@@ -555,7 +569,7 @@ export default function TaskCard() {
                                         type='button'
                                         onClick={() => {
                                             const newEndRepeat = toggles.endRepeat === 'repetitions' ? 'yes' : 'repetitions';
-                                            setToggles(toggles => ({...toggles, newEndRepeat}));
+                                            setToggles(toggles => ({...toggles, endRepeat: newEndRepeat}));
                                             setTaskCache(prevTask => ({ ...prevTask, deadline: null, totalDuration: null,
                                                 totalRepetitions: newEndRepeat === 'yes' ? null : prevTask.totalRepetitions,
                                             }));
@@ -573,9 +587,10 @@ export default function TaskCard() {
                                         onChange={(event: any) => handleInputOnChange('totalRepetitions', Number(event.target.value))}
                                     /> : <></>}
                                 </div>
-                            </>)}
+                            </motion.div>)}
+                            </AnimatePresence>
                         </div>
-                    </>)}
+                    </motion.div>)}
                     
                     {(taskCache.fixed && !taskCache.repeat) && (
                         <div className='flex h-8 gap-2 items-center'>
@@ -596,8 +611,10 @@ export default function TaskCard() {
                             />}
                         </div>
                     )}
+
+                    </LayoutGroup>
                     
-                </div>
+                </motion.div>
 
                 {/* Notes and checklist panel */}
                 <div className='md:w-[400px] w-full md:h-[70vh] flex flex-col task-card'>

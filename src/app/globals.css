@@ -162,8 +162,8 @@ ul[data-type="taskList"] {
 .remove-default-focus {
   @apply: focus-visible:!border-none focus-visible:!outline-none focus:!ring-transparent;
 }
-.task-input-fields > div {
-  @apply px-4 py-2 border-b-[0.5px] border-b-black/5 min-h-[3.125rem];
+.task-input-fields > div, .task-form-field {
+  @apply px-4 py-2 border-b-[0.5px] border-b-black/5 min-h-[3.125rem] flex-grow-0 flex-shrink-0;
 }
 .task-card {
   .tiptap input[type="checkbox"] {
@@ -183,45 +183,35 @@ ul[data-type="taskList"] {
 .tiptap:focus-visible {
   @apply border-none outline-none;
 }
-
 .tiptap {
-
   ul, ol {
     padding: 0 1rem;
-
     li {
       display: list-item;
       list-style-type: disc;
     }
   }
-
   h3 {
     @apply pt-2;
   }
-
   > * + * {
     margin-top: 0.3em;
   }
-
   ul[data-type="taskList"] {
     list-style: none;
     padding: 0;
-  
     li {
       display: flex;
       align-items: center;
-  
       > label {
         flex: 0 0 auto;
         margin-right: 0.5rem;
         user-select: none;
       }
-  
       > div {
         flex: 1 1 auto;
       }
     }
-
     input[type="checkbox"] {
       cursor: pointer;
       background-color: transparent;
@@ -229,9 +219,7 @@ ul[data-type="taskList"] {
       color: white;
       border-radius: 24px;
     }
-    
   }
-
   p.is-editor-empty:first-child::before {
     color: rgba(255,255,255,0.2);
     content: attr(data-placeholder);
