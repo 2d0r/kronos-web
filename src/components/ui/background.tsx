@@ -19,8 +19,8 @@ export default function Background() {
 
     return (
         <div className='absolute top-0 left-0 w-screen h-screen -z-50' style={{
-            backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(colour, 0.5)}, ${adjustLightness(colour, 0.7)})`
-            }}>
-        </div>
+            // backgroundImage: `linear-gradient(to bottom right, ${adjustLightness(colour, 0.5)}, ${adjustLightness(colour, 0.7)})`
+            backgroundColor: adjustLightness(colour, 0.5),
+        }}></div>
     );
 }

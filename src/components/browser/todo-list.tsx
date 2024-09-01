@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { TaskType, Task, Mindset, Status } from '@prisma/client';
 import ToDoItem from './todo-item';
 import Checkbox from './checkbox';
-import { PRIORITY_ORDER } from '@/lib/definitions';
+import { NEUTRAL_MINDSET_COLOUR, PRIORITY_ORDER } from '@/lib/definitions';
 import { SortItem, TaskWithRelations } from '@/lib/types';
 import { convertEmptyPropsToNull, convertPropsToDate, dateToDDMMYYYY, minutesToDisplayDuration } from '@/utils/date-utils';
 import { useTasks, setTasks, useSearchQuery, setSearchQuery } from '@/store/store';
 import { useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { adjustLightness } from '@/utils/colour-utils';
 
 type Filters = {
     mindset: string, 
@@ -111,11 +112,13 @@ export default function TodoList ({
                 <div className='flex gap-2 w-full items-start justify-center'>
                     {todoList.map((task, idx) => {
                         task = convertEmptyPropsToNull(task);
+                        const taskColour = task.mindset?.colour || NEUTRAL_MINDSET_COLOUR;
+                        const taskColourLight = adjustLightness(taskColour, 0.2);
 
                         return(
                             <div key={task.id} 
                                 className='flex flex-col items-center justify-start gap-2 w-[200px] p-4 rounded-lg text-white'
-                                style={{ background: task.mindset?.colour }}
+                                style={{ background: filters.type === 'project' ? taskColourLight : taskColour }}
                             >
                                 <Checkbox type={task.type} status={task.status} taskId={task.id} fill='white' width='36' height='36'
                                     onTaskStatusUpdated={handleTaskStatusUpdate}
@@ -123,7 +126,8 @@ export default function TodoList ({
                                 <Link href={pathname + `?task=${task.id}&status=edit`} className='text-lg'>{task.name}</Link>
                                 <span className='text-sm'>{task.notes}</span>
                                 <div className='w-full flex flex-col gap-2 items-start'>
-                                    { todoList.filter(subtask => Array.isArray(subtask.tasksParent) && subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
+                                    { todoList.filter(subtask => Array.isArray(subtask.tasksParent) && 
+                                    subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
                                         return(<div className={'flex gap-2 items-center text-sm'} key={innerTask.id}>
                                             <Checkbox taskId={innerTask.id} status={innerTask.status} type={innerTask.type}
                                                 height='20' width='20' fill='white'

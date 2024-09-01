@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { useMindsetColour } from '@/store/store';
 import { adjustLightness } from '@/utils/colour-utils';
+import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 
 interface ToDoItemProps {
     task: TaskWithRelations, 
@@ -44,7 +45,7 @@ export default function ToDoItem ({
         <div className={'flex gap-2 items-center ' + className}>
             <Checkbox type={task.type} repeat={task.repeat} taskId={task.id} status={task.status} 
                 onTaskStatusUpdated={onTaskStatusUpdated}
-                fill={task.mindset?.colour}
+                fill={adjustLightness(task.mindset?.colour || NEUTRAL_MINDSET_COLOUR, 0.2)}
             />
             <Link href={pathname + `?task=${task.id}&status=edit`} className='cursor-pointer'>{task.name}</Link>
         </div>
