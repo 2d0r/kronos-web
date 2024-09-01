@@ -1,21 +1,18 @@
 import prisma from '@/lib/db';
 
 type Params = {
-    eventId: string
+    taskId: string
 }
 
 export async function GET(req: Request, context: { params: Params }) {
-    const id = context.params.eventId;
+    const id = context.params.taskId;
     try {
-        const event = await prisma.event.findUnique({
+        const mindset = await prisma.mindset.findUnique({
             where: {
                 id: id
             },
-            include: { 
-                task: true,
-            } // Include the subtasks relation
         });
-        return Response.json({message: 'OK', event});
+        return Response.json({message: 'OK', mindset});
     } catch (error) {
         console.error('Error fetching event by id via route handler', error);
         return Response.json(

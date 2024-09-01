@@ -618,3 +618,8 @@ export const fetchMindsets = async () => {
   const data = await response.json();
   return data.mindsets;
 }
+export const fetchMindsetOfTask = async (taskId: string) => {
+  const response = await fetch(`/mindset/${taskId}`);
+  const data = await response.json();
+  return data.mindset;
+}

@@ -111,7 +111,7 @@ export default function TaskBrowser () {
                 { filters.type !== 'goal' &&
                     <Dropdown 
                         fieldName='chooseMindset'
-                        list={mindsets.length ? mindsets.map(el => el.display || '') : ['All']}
+                        list={mindsets.length ? [ 'All', ...mindsets.map(el => el.display || '')] : ['All']}
                         defaultValue='All'
                         onChange={handleMindsetFilter}
                         prompt=''
@@ -129,13 +129,13 @@ export default function TaskBrowser () {
                         colour={mindsetColour} bgColour={mindsetColour}
                         className='!outline-0 border-0 w-full no-form'
                     />
-                    <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleSortDirection()}>
+                    <div className='h-8 w-8 flex items-center justify-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleSortDirection()}>
                         {filters.sort[1] === 'Ascending' ? <ArrowUpIcon width={18} color={mindsetColour} /> : <ArrowDownIcon width={18} color={mindsetColour} />}
                     </div>
                 </div>
                 {/* Table view toggle */}
-                { filters.type !== 'goal' && windowWidth && windowWidth > 500 &&
-                    <div className='h-8 w-8 flex items-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
+                { filters.type === 'task' && windowWidth && windowWidth > 500 &&
+                    <div className='h-8 w-8 flex items-center justify-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
                         {filters.tableView ? <ListBulletIcon width={24} color={mindsetColour} /> : <TableCellsIcon width={24} color={mindsetColour} />}
                     </div>
                 }

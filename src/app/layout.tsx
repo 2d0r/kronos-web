@@ -7,6 +7,7 @@ import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import TaskCard from '@/components/tasks/task-card';
 import Background from '@/components/ui/background';
 import { adjustLightness } from '@/utils/colour-utils';
+import Doing from '@/components/doing';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -37,6 +38,7 @@ export default async function RootLayout({
       </head>
       <body className={inter.className} suppressHydrationWarning={true} style={{ backgroundColor: adjustLightness(mindsetColour, 0.5) }}>
         <StoreProvider tasks={tasks} events={events} mindsets={mindsets} mindsetColour={mindsetColour} timespans={[]} searchQuery='' >
+          <Doing />
           {children}
           <TaskCard />
           <Background />

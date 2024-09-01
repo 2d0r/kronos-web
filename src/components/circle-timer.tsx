@@ -6,7 +6,7 @@ import { minutesToTimerDisplay } from '@/utils/date-utils';
 import { AdjustmentsVerticalIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
 
 export default function CircleTimer ({ duration } : {duration: number}) {
@@ -27,7 +27,7 @@ export default function CircleTimer ({ duration } : {duration: number}) {
     }
 
     const handleExit = () => {
-
+        setPlaying(false);
     }
 
     const renderTime = ({remainingTime} : {remainingTime: number}) => {
@@ -44,6 +44,12 @@ export default function CircleTimer ({ duration } : {duration: number}) {
           </div>
         );
     };
+
+    useEffect(() => {
+        if (searchParams.get('status') === 'doing') {
+            setPlaying(true);
+        }
+    }, [searchParams])
 
     return (<>
         <CountdownCircleTimer
