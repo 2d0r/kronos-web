@@ -6,6 +6,9 @@ import Checkbox from './checkbox';
 import { TaskWithRelations } from '@/lib/types';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { PencilSquareIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { useMindsetColour } from '@/store/store';
+import { adjustLightness } from '@/utils/colour-utils';
 
 interface ToDoItemProps {
     task: TaskWithRelations, 
@@ -18,14 +21,16 @@ export default function ToDoItem ({
     task, className, onTaskStatusUpdated, onTaskDelete
 } : ToDoItemProps) {
     
-    const [ showEdit, setShowEdit ] = useState<boolean>(false);
+    const [ showOptions, setShowOptions ] = useState<boolean>(false);
     const pathname = usePathname();
+    const mindsetColour = useMindsetColour();
+    const lightMindsetColour = adjustLightness(mindsetColour, 0.5);
 
     const handleHoverIn = () => {
-        setShowEdit(true);
+        setShowOptions(true);
     }
     const handleHoverOut = () => {
-        setShowEdit(false);
+        setShowOptions(false);
     }
     const handleTaskDelete = async (taskId: string) => {
         await fetch(`/task/${taskId}`, {
@@ -44,14 +49,12 @@ export default function ToDoItem ({
             <Link href={pathname + `?task=${task.id}&status=edit`} className='cursor-pointer'>{task.name}</Link>
         </div>
         <div className='flex gap-2'>
-            <Link 
-                href={`?task=${task.id}&status=edit`}
-                className='text-sm text-gray-400 cursor-pointer'
-            >{showEdit && 'Edit'}</Link>
-            <button 
-                onClick={() => handleTaskDelete(task.id)}
-                className='text-sm text-gray-400 cursor-pointer'
-            >{showEdit && 'Delete'}</button>
+            <Link href={`?task=${task.id}&status=edit`} className='cursor-pointer' >
+                {showOptions && <PencilSquareIcon color={lightMindsetColour} width={18} />}
+            </Link>
+            <button onClick={() => handleTaskDelete(task.id)} className='cursor-pointer'>
+                {showOptions && <TrashIcon color={lightMindsetColour} width={18} />}
+            </button>
         </div>
     </div>);
     
