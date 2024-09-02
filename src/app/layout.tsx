@@ -26,17 +26,19 @@ export default async function RootLayout({
   const events = await getEventsWithRelations();
   const mindsets = await getMindsetsWithRelations();
   let mindsetColour = await getCurrentMindsetColour() || NEUTRAL_MINDSET_COLOUR;
+  let mindsetColourLight = adjustLightness(mindsetColour, 0.5);
 
   setInterval(async () => {
     mindsetColour = await getCurrentMindsetColour() || NEUTRAL_MINDSET_COLOUR;
+    mindsetColourLight = adjustLightness(mindsetColour, 0.5);
   }, 1000 * 60);
 
   return (
     <html lang='en' suppressHydrationWarning={true}  >
       <head>
-        <meta name="theme-color" content={mindsetColour}/>
+        <meta name="theme-color" content={mindsetColourLight}/>
       </head>
-      <body className={inter.className} suppressHydrationWarning={true} style={{ backgroundColor: adjustLightness(mindsetColour, 0.5) }}>
+      <body className={inter.className} suppressHydrationWarning={true} style={{ backgroundColor: mindsetColourLight }}>
         <StoreProvider tasks={tasks} events={events} mindsets={mindsets} mindsetColour={mindsetColour} timespans={[]} searchQuery='' >
           <Doing />
           {children}
