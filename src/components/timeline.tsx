@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Menu from './menu';
 import TransportControls from './buttons/transport-controls';
 import { Mindset } from '@prisma/client';
-import { fetchEvents, fetchTasks, fetchUpcomingEvents } from '@/lib/data';
+import { fetchCurrentMindsetColour, fetchEvents, fetchTasks, fetchUpcomingEvents } from '@/lib/data';
 import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { EventWithRelations } from '@/lib/types';
 import { addDaysToDate, convertPropsToDate } from '@/utils/date-utils';
@@ -63,9 +63,11 @@ export default function Timeline() {
         });
         setTimeout(async () => {
             const newEvents = await fetchEvents();
-            dispatch(setEvents(newEvents));
             const newTasks = await fetchTasks();
+            dispatch(setEvents(newEvents));
             dispatch(setTasks(newTasks));
+            // const newMindsetColour = await fetchCurrentMindsetColour();
+            // dispatch(setMindsetColour(newMindsetColour));
         }, 1000);
     }
 

@@ -54,7 +54,7 @@ export function InputField({
                         onChange={handleInput}
                         step={inputType === 'time' ? '60' : ['duration', 'totalDuration'].includes(fieldName) ? '5' : '1'}
                         hidden={hidden} 
-                        suppressHydrationWarning aria-describedby='task-error'
+                        suppressHydrationWarning aria-describedby='task-error' autoComplete='false'
                     />
                 </div>
                 <div className={tail ? 'mr-2' : ''}>{tail}</div>
@@ -178,6 +178,7 @@ export function SelectionField({
                 aria-describedby='task-error'
                 onChange={handleSelect}
                 checked={checked}
+                autoComplete='false'
             />
             <label
                 htmlFor={item}
@@ -258,6 +259,7 @@ export function MultiSelectionField({
                     aria-describedby='task-error'
                     onChange={handleSelect}
                     checked={checked}
+                    autoComplete='false'
                 />
                 <label
                     htmlFor={item}

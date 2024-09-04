@@ -5,14 +5,14 @@ import TopBar from '@/components/ui/top-bar';
 import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { adjustLightness } from '@/utils/colour-utils';
 import clsx from 'clsx';
-import CalendarComponent from '@/components/calendar/calendar-hexaflexa';
+import CalendarComponent from '@/components/calendar/calendar';
 import TaskBrowser from '@/components/browser/task-browser';
 import Button from './buttons/button';
 import { deleteAllEvents } from '@/lib/actions';
 import { addDaysToDate } from '@/utils/date-utils';
 import { organiseTimespan } from '@/lib/organise-timespan';
-import { fetchEvents, fetchTasks } from '@/lib/data';
-import { setTasks, setEvents, useMindsetColour } from '@/store/store';
+import { fetchCurrentMindsetColour, fetchEvents, fetchTasks } from '@/lib/data';
+import { setTasks, setEvents, useMindsetColour, setMindsetColour } from '@/store/store';
 import { useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 
@@ -47,9 +47,11 @@ export default function TestView ({back} : TestViewProps) {
         });
         setTimeout(async () => {
             const newEvents = await fetchEvents();
-            dispatch(setEvents(newEvents));
             const newTasks = await fetchTasks();
+            dispatch(setEvents(newEvents));
             dispatch(setTasks(newTasks));
+            // const newMindsetColour = await fetchCurrentMindsetColour();
+            // dispatch(setMindsetColour(newMindsetColour));
         }, 1000);
     }
 

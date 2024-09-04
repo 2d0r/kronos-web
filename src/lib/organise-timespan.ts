@@ -2,7 +2,7 @@
 
 import prisma from '@/lib/db';
 import { addMinutesToDate, calcRepeatIntervalInMinutes, minutesBetweenDates, getStartAndEndOfDay } from '@/utils/date-utils';
-import { getEvents, getTasksByIds, getTasksToSchedule } from '@/lib/data';
+import { fetchCurrentMindsetColour, fetchEvents, fetchTasks, getEvents, getTasksByIds, getTasksToSchedule } from '@/lib/data';
 import { deleteEventsById, deleteFlexEventsInTimespan } from '@/lib/actions';
 import { DEFAULT_TIMES_OF_DAY } from '@/lib/definitions';
 import { eventsToSchedule,TaskWithRelations } from '@/lib/types';
@@ -351,4 +351,7 @@ export const organiseTimespan = async ({
 
     // Update organised timespan in the db
     updateOrganisedTimespans(timespan);
+
+    // Update redux store
+    // setTimeout(async () => await updateStore(), 1000);
 }

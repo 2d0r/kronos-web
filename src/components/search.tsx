@@ -25,9 +25,10 @@ export default function SearchBar() {
     const [ isFocused, setIsFocused ] = useState<boolean>(false);
 
     const placeholder = windowWidth && windowWidth < 500 ? 'Search' 
-        : pathname === '/' ? 'Search tasks, notes...' 
-        : pathname.endsWith('/browser') ? 'Search tasks, projects, goals...' 
-        : pathname.endsWith('/calendar') ? 'Search events, dates...'
+        : pathname === '/' ? 'Search tasks' 
+        : pathname.endsWith('/browser') ? 'Search tasks, projects' 
+        : pathname.endsWith('/calendar') ? 'Search events'
+        : pathname.endsWith('/organiser') ? 'Search tasks, events'
     : '';
 
 
@@ -60,6 +61,7 @@ export default function SearchBar() {
                 defaultValue={searchParams.get('query')?.toString()}
                 onChange={(event) => handleSearchQuery(event)}
                 autoFocus={isFocused}
+                autoComplete='false'
                 // initial={{ width: 0 }} whileTap={{ width: '100%' }}
             />
         </motion.div>

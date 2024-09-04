@@ -623,3 +623,8 @@ export const fetchMindsetOfTask = async (taskId: string) => {
   const data = await response.json();
   return data.mindset;
 }
+export const fetchCurrentMindsetColour = async () => {
+  const response = await fetch(`/mindset/currentMindsetColour`);
+  const data = await response.json();
+  return data.currentMindsetColour;
+}

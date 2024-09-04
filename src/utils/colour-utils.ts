@@ -1,3 +1,5 @@
+import { NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
+
 export const recolorSVG = (
     svgElement: SVGElement, 
     targetColor: string, 
@@ -63,7 +65,7 @@ export const colourLuminance = (hex: string, lum: number) => {
 
 export const adjustLightness = (hexCode: string, tone: number) => {
     // Remove the "#" symbol from the hex code
-    let color = hexCode.replace('#', '');
+    let color = typeof hexCode === 'string' ? hexCode.replace('#', '') : NEUTRAL_MINDSET_COLOUR;
   
     // Convert each of the RGB components from hex to integer (0-255)
     let r = parseInt(color.substring(0, 2), 16);

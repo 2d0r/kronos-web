@@ -3,11 +3,9 @@
 import { TaskType } from '@prisma/client';
 import { useEffect, useState } from 'react';
 import { Dropdown } from '@/components/form-fields';
-import { DEFAULT_MINDSET_LIST } from '@/lib/definitions';
 import { Filters, SortItem } from '@/lib/types';
 import '@/app/globals.css';
 import { adjustLightness } from '@/utils/colour-utils';
-import { History } from 'lucide-react';
 import Link from 'next/link';
 import TodoList from '@/components/browser/todo-list';
 import { useSearchParams } from 'next/navigation';
@@ -16,7 +14,7 @@ import { ArchiveBoxIcon, ArrowDownIcon, ArrowUpIcon, ListBulletIcon, TableCellsI
 import useWindowSize from '@/lib/useWindowSize';
 import clsx from 'clsx';
 
-export default function TaskBrowser () {
+export default function TaskBrowser ({ height } : {height?: string}) {
 
     const searchParams = useSearchParams();
     const mindsets = useMindsets();
@@ -77,7 +75,8 @@ export default function TaskBrowser () {
     }, [searchParams]);
 
     return(
-        <div className='flex flex-col items-center gap-2 md:gap-4 md:w-auto w-full'>
+        <div className='flex flex-col items-center gap-2 md:gap-4 md:w-auto w-full'
+        style={{ height: height || 'none', overflow: height ? 'scroll' : '' }}>
             {/* Tab bar */}
             <div className='flex gap-4 items-center justify-center'>
                 <button 

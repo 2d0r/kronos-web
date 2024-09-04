@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { adjustLightness } from '@/utils/colour-utils';
+import clsx from 'clsx';
 
 type Filters = {
     mindset: string, 
@@ -117,14 +118,17 @@ export default function TodoList ({
 
                         return(
                             <div key={task.id} 
-                                className='flex flex-col items-center justify-start gap-2 w-[200px] p-4 rounded-lg text-white'
+                                className={clsx('flex items-center justify-start gap-2 w-[200px] p-4 rounded-lg text-white',
+                                    filters.type === 'goal' ? 'flex-col items-center text-center text-lg' : 'text-md'
+                                )}
                                 style={{ background: filters.type === 'project' ? taskColourLight : taskColour }}
                             >
                                 <Checkbox type={task.type} status={task.status} taskId={task.id} fill='white' width='36' height='36'
                                     onTaskStatusUpdated={handleTaskStatusUpdate}
                                 />
-                                <Link href={pathname + `?task=${task.id}&status=edit`} className='text-lg'>{task.name}</Link>
+                                <Link href={pathname + `?task=${task.id}&status=edit`}>{task.name}</Link>
                                 <span className='text-sm'>{task.notes}</span>
+                                {task.tasksChild?.length &&
                                 <div className='w-full flex flex-col gap-2 items-start'>
                                     { todoList.filter(subtask => Array.isArray(subtask.tasksParent) && 
                                     subtask.tasksParent?.some((parentTask: Task) => parentTask.id === task.id)).map(innerTask => {
@@ -136,7 +140,7 @@ export default function TodoList ({
                                             <span>{innerTask.name}</span>
                                         </div>);
                                     })}
-                                </div>
+                                </div>}
                             </div>
                         );
                     })}

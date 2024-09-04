@@ -45,7 +45,7 @@ export default function Doing() {
     // const [ startDate, endDate ] = [ new Date(start), new Date(end) ]
 
     const handleTaskStarted = async (taskId: string, eventId: string | null) => {
-        console.log('handleTaskStarted - taskId:', taskId, 'eventId:', eventId);
+        // console.log('handleTaskStarted - taskId:', taskId, 'eventId:', eventId);
         let newTask: TaskWithRelations = taskId ? await fetchTask(taskId) || {} as TaskWithRelations : {} as TaskWithRelations;
         setTask(newTask);
         setMindsetColour(newTask.mindset?.colour || NEUTRAL_MINDSET_COLOUR);
@@ -61,7 +61,7 @@ export default function Doing() {
             newEvent = await fetchEventById(eventId) || {} as EventWithRelations;
             newEvent = convertPropsToDate(newEvent)
             setEvent(newEvent);
-            console.log('handleTaskStarted - newEvent:', newEvent);
+            // console.log('handleTaskStarted - newEvent:', newEvent);
         } else {
             const response = await createEventPrisma({
                 startTime: new Date(),
@@ -81,7 +81,7 @@ export default function Doing() {
             currEventDuration > 60 ? 'medium' : 'small';
         setCardHeight(cardSize === 'small' ? '20vh' : cardSize === 'medium' ? '30vh' : '50vh');
         setCardMinHeight(cardSize === 'small' ? '100px' : cardSize === 'medium' ? '150px' : '300px');
-        console.log('handleTaskStarted - cardSize:', cardSize);
+        // console.log('handleTaskStarted - cardSize:', cardSize);
     }
 
     useEffect(() => {

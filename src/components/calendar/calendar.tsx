@@ -22,8 +22,6 @@ export default function CalendarComponent ( { startWeekToday = false } : { start
     const router = useRouter();
     const { windowWidth } = useWindowSize();
 
-    console.log('windowWidth', windowWidth);
-
     const timezone = 'Europe/Bucharest' // Intl.DateTimeFormat().resolvedOptions().timeZone;
     const startDate: string = utcDateToString(new Date());
 
@@ -86,7 +84,7 @@ export default function CalendarComponent ( { startWeekToday = false } : { start
     // HANDLERS 
 
     const onEventSelected = (event: any) => {
-        router.push(`?task=${event.detail.taskId}&event=${event.detail.id}status=edit`);
+        router.push(`?task=${event.detail.taskId}&event=${event.detail.id}&status=edit`);
     }
     const onStartDateChanged = (event: any) => {
     }
@@ -114,7 +112,6 @@ export default function CalendarComponent ( { startWeekToday = false } : { start
     }, [events]);
     useEffect(() => {
         const newDaysCount = windowWidth ? windowWidth <= 400 ? 2 : windowWidth <= 900 ? 4 : 7 : 7;
-        console.log('newDaysCount', newDaysCount);
         setTimegridConfig(prevConfig => ({ ...prevConfig,
             daysConfig: { ...prevConfig.daysConfig, daysCount: newDaysCount, fullWeek: newDaysCount === 7 }
         }));

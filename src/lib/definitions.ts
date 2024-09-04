@@ -42,6 +42,11 @@ export const PRIORITY_ORDER = {
 export const QUEUE_LENGTH = 10;
 export const SMALL_CARD_HEIGHT = 200;
 export const TIME_DAY_LIST = Object.keys(DEFAULT_TIMES_OF_DAY) as [string, ...string[]];
+export const ORGANISER_TIMESPANS = {
+    'Today': 1,
+    '3 Days': 3,
+    'One Week': 7,
+};
 
 
 // Mindsets 

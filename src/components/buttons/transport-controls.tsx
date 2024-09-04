@@ -31,7 +31,7 @@ export default function TransportControls ({ eventId, taskId, context, className
             <Link href={`/task?task=${taskId}&event=${eventId}&status=doing`}>
                 <PlaySVG fill={mindsetColour} />
             </Link>
-            <Link href={`?task=${taskId}status=edit`}>
+            <Link href={`?task=${taskId}&status=edit`}>
                 <Edit2 color={mindsetColour} fill={mindsetColour} />
             </Link>
         </>}
