@@ -38,7 +38,7 @@ export default async function RootLayout({
       <head>
         <meta name="theme-color" content={mindsetColourLight}/>
       </head>
-      <body className={inter.className} suppressHydrationWarning={true} style={{ backgroundColor: mindsetColourLight }}>
+      <body className={`${inter.className} overscroll-none`} suppressHydrationWarning={true} style={{ backgroundColor: mindsetColourLight }}>
         <StoreProvider tasks={tasks} events={events} mindsets={mindsets} mindsetColour={mindsetColour} timespans={[]} searchQuery='' >
           <Doing />
           {children}
