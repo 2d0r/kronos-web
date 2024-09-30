@@ -20,7 +20,7 @@ export default function OrganiseButton({colour, onOrganise} : {
 
     return (
         <div className='flex items-center md:py-0 py-4'>
-            <Button className='rounded-l-lg rounded-r-none from-neutral-950 flex items-center justify-center p-6 h-[4rem] md:w-[10rem] w-[40vw]' 
+            <Button className='rounded-l-lg rounded-r-none from-neutral-950 flex items-center justify-center p-6 h-[4rem] md:w-full w-[40vw]' 
             style={{ background: colour }}
             onClick={() => onOrganise(numDays)}>
                 Organise
@@ -32,7 +32,7 @@ export default function OrganiseButton({colour, onOrganise} : {
                 prompt='Choose timespan'
                 onChange={handleDropdown} 
                 bgColour={adjustLightness(colour, 0.1)} colour={colour}
-                className='rounded-l-none h-[4rem] text-center text-lg md:w-[10rem] w-[40vw]'
+                className='rounded-l-none h-[4rem] text-center text-lg md:w-full md:min-w-[6rem] w-[40vw]'
             />
         </div>
     )

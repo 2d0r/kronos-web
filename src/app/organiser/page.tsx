@@ -1,11 +1,8 @@
-import TestView2 from '@/components/test-view-2';
-import TimelineBoard from '@/components/ui/timeline-board';
+import Organiser from '@/components/organiser';
 
 export default async function Page() {
-    return (
-        <TimelineBoard cardClassName='!mt-[10vh] overflow-scroll hide-scrollbar'>
-            <TestView2 back={true} />
-        </TimelineBoard>
-    );
+    return (<>
+        <Organiser cardClassName='!mt-[10vh] overflow-scroll hide-scrollbar' />
+    </>);
     
 }

@@ -14,7 +14,10 @@ import { ArchiveBoxIcon, ArrowDownIcon, ArrowUpIcon, ListBulletIcon, TableCellsI
 import useWindowSize from '@/lib/useWindowSize';
 import clsx from 'clsx';
 
-export default function TaskBrowser ({ height } : {height?: string}) {
+export default function TaskBrowser ({ height, width, direction = 'vertical', filterButtons = ['mindset', 'sort', 'tableView', 'logbook'] } : {
+    height?: string, width?: string, direction?: ('vertical' | 'horizontal'),
+    filterButtons?: ('mindset' | 'sort' | 'tableView' | 'logbook')[],
+}) {
 
     const searchParams = useSearchParams();
     const mindsets = useMindsets();
@@ -75,8 +78,14 @@ export default function TaskBrowser ({ height } : {height?: string}) {
     }, [searchParams]);
 
     return(
-        <div className='flex flex-col items-center gap-2 md:gap-4 md:w-auto w-full'
-        style={{ height: height || 'none', overflow: height ? 'scroll' : '' }}>
+        <div className={clsx('flex gap-2 md:gap-4 md:w-auto w-full',
+            direction === 'vertical' && 'flex-col items-center'
+        )}
+        style={{ 
+            height: height || 'none', 
+            width: width || 'none',
+            overflow: height ? 'scroll' : '',
+        }}>
             {/* Tab bar */}
             <div className='flex gap-4 items-center justify-center'>
                 <button 
@@ -107,7 +116,7 @@ export default function TaskBrowser ({ height } : {height?: string}) {
 
             {/* Filter and sort */}
             <div className='flex gap-4 items-center justify-center w-full'>
-                { filters.type !== 'goal' &&
+                { filters.type !== 'goal' && filterButtons.includes('mindset') &&
                     <Dropdown 
                         fieldName='chooseMindset'
                         list={mindsets.length ? [ 'All', ...mindsets.map(el => el.display || '')] : ['All']}
@@ -119,33 +128,37 @@ export default function TaskBrowser ({ height } : {height?: string}) {
                     />
                 }
                 <div className='rounded-md flex items-center' style={{ backgroundColor: adjustLightness(mindsetColour, 0.95) }}>
-                    <Dropdown 
-                        fieldName='chooseMindset'
-                        list={['Priority', 'Date', 'Duration']}
-                        defaultValue={filters.sort[0]}
-                        onChange={handleSort}
-                        prompt=''
-                        colour={mindsetColour} bgColour={mindsetColour}
-                        className='!outline-0 border-0 w-full no-form'
-                    />
+                    { filterButtons.includes('sort') && 
+                        <Dropdown 
+                            fieldName='chooseMindset'
+                            list={['Priority', 'Date', 'Duration']}
+                            defaultValue={filters.sort[0]}
+                            onChange={handleSort}
+                            prompt=''
+                            colour={mindsetColour} bgColour={mindsetColour}
+                            className='!outline-0 border-0 w-full no-form'
+                        />
+                    }
                     <div className='h-8 w-8 flex items-center justify-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleSortDirection()}>
                         {filters.sort[1] === 'Ascending' ? <ArrowUpIcon width={18} color={mindsetColour} /> : <ArrowDownIcon width={18} color={mindsetColour} />}
                     </div>
                 </div>
                 {/* Table view toggle */}
-                { filters.type === 'task' && windowWidth && windowWidth > 500 &&
+                { filters.type === 'task' && windowWidth && windowWidth > 500 && filterButtons.includes('tableView') &&
                     <div className='h-8 w-8 flex items-center justify-center cursor-pointer border-gray-200 rounded-md' onClick={() => handleTableToggle()}>
                         {filters.tableView ? <ListBulletIcon width={24} color={mindsetColour} /> : <TableCellsIcon width={24} color={mindsetColour} />}
                     </div>
                 }
-                <Link 
-                    href={filters.logbookView ? '/browser' : '/browser?logbook=true'} 
-                    className={clsx('h-10 w-10 flex items-center justify-center cursor-pointer border-gray-200 rounded-md')} 
-                    style={{ backgroundColor: filters.logbookView ? adjustLightness(mindsetColour, 0.95) : 'transparent' }}
-                    onClick={() => handleLogbookToggle()}
-                >
-                    <ArchiveBoxIcon width={24} color={mindsetColour} opacity={filters.logbookView ? 1 : 0.5}/>
-                </Link>
+                {filterButtons.includes('logbook') && 
+                    <Link 
+                        href={filters.logbookView ? '/browser' : '/browser?logbook=true'} 
+                        className={clsx('h-10 w-10 flex items-center justify-center cursor-pointer border-gray-200 rounded-md')} 
+                        style={{ backgroundColor: filters.logbookView ? adjustLightness(mindsetColour, 0.95) : 'transparent' }}
+                        onClick={() => handleLogbookToggle()}
+                    >
+                        <ArchiveBoxIcon width={24} color={mindsetColour} opacity={filters.logbookView ? 1 : 0.5}/>
+                    </Link>
+                    }
             </div>
 
             {/* Task list */}
