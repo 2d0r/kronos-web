@@ -13,6 +13,8 @@ import { organiseTimespan } from '@/lib/organise-timespan';
 import { adjustLightness } from '@/utils/colour-utils';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import Button from '../buttons/button';
+import { TrashIcon } from 'lucide-react';
 
 export default function TaskDrawer({className, onToggleDrawer} : {className?: string, onToggleDrawer: (bool: boolean) => void}) {
 
@@ -55,32 +57,35 @@ export default function TaskDrawer({className, onToggleDrawer} : {className?: st
 
     return (
     <motion.div 
-        className={clsx(className, 'fixed md:top-1/2 md:-translate-y-1/2 h-[30vh] md:h-[80vh] p-6 w-screen md:w-[24vw] bg-white shadow-xl',
-            (windowWidth && windowWidth > 768) ?
-                showDrawer ? 'right-0' : 'left-[98vw]'
-                : showDrawer ? 'bottom-0' : 'top-screen',
-            (windowWidth && windowWidth > 768) ? 'rounded-l-3xl shadow-xl' : 'rounded-t-3xl shadow-[-20px_-10px_25px_-5px_rgb(0,0,0,0.1)]'
+        className={clsx(className, 'fixed z-[51] md:z-40 flex flex-col md:top-1/2 md:-translate-y-1/2 h-[40vh] md:h-[80vh] p-6 md:py-4 w-screen md:w-[24vw] bg-white shadow-xl',
+            (windowWidth && windowWidth > 768) ? 'rounded-l-3xl shadow-xl' : 'rounded-t-3xl shadow-above',
+            (windowWidth && windowWidth > 768) ? showDrawer ? 'right-0' : 'left-[98vw] pl-[2vw]'
+                : showDrawer ? 'bottom-0' : 'top-[97vh]',
         )}
         transition={{ duration: 0.2 }} 
         // initial={{ translateY: '-50%', top: '50%' }} animate={{ translateY: '-50%', top: '50%' }}
     >
-        <TaskBrowser height='90%' direction='vertical' filterButtons={['mindset', 'sort']} />
-        <div className={('container w-full h-[10%] flex flex-row gap-4 md:pb-4 justify-center items-center')}>
+        {/* Drawer handle */}
+        {windowWidth && windowWidth > 768 ? 
+            <div className='bg-gray-200 h-10 w-1 rounded-sm cursor-pointer fixed left-[6px] top-1/2 -translate-y-1/2' onClick={toggleDrawer}></div>
+            : <div className='w-full flex justify-center cursor-pointer h-0' onClick={toggleDrawer}>
+                <div className='bg-gray-200 h-1 w-10 rounded-full cursor-pointer -mt-4 mb-2' ></div>
+            </div>}
+        <div className='overflow-y-scroll h-[80%]'>
+            <TaskBrowser height='100%' direction='vertical' filterButtons={['mindset', 'sort']} />
+        </div>
+        <div className={('container w-full h-[10%] flex flex-row gap-4 justify-start items-start my-2 md:my-0')}>
             {/* <div className='divider' hidden={windowWidth && windowWidth <= 768 || false}></div> */}
             <OrganiseButton onOrganise={handleOrganise} colour={mindsetColour} />
             {/* Delete all events */}
-            {/* <Button 
+            <Button 
                 className='rounded-lg from-neutral-950 p-6 md:w-1/4 h-[4rem] items-center justify-center flex' 
                 style={{ background: adjustLightness(mindsetColour, 0.95) }}
                 onClick={handleDeleteAllEvents}
                 ><TrashIcon color={mindsetColour} width={24} />
-            </Button> */}
+            </Button>
             {/* <div className='divider' hidden={windowWidth && windowWidth <= 768 || false}></div> */}
         </div>
-        {/* Drawer handle */}
-        <div className={clsx('fixed bg-gray-200 h-10 w-1 rounded-sm cursor-pointer',
-            windowWidth && windowWidth > 768 ? 'fixed left-[6px] top-1/2 -translate-y-1/2' :
-            'rotate-90 top-[6px] left-1/2 -translate-x-1/2'
-        )} onClick={toggleDrawer}></div>
+        
     </motion.div>)
 }

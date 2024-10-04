@@ -40,6 +40,7 @@ module.exports = {
     experimental: {
       swcPlugins: [["next-superjson-plugin", {}]],
       missingSuspenseWithCSRBailout: false,
+      forceSwcTransforms: true,
     },
   
     // ...other config

@@ -59,7 +59,7 @@ export const idealRepsXIdealDays = (
     // TO DO: move getting ideal reps into main function
     const idealReps = getIdealReps(task, timespan, firstRepStart); // Get ideal repetition time for tasks that have already had events scheduled
     const idealDaysAsNum = idealDays.map(day => day.getTime());
-    console.log(task.name, '> idealReps', idealReps, '> idealDays', idealDays);
+    console.log(task.name, '> idealReps =', idealReps.map(date => date.toLocaleString('en-GB', {hour12: false, day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'})));
     idealReps.forEach(rep => {
         const repDay = new Date(rep.setUTCHours(0,0,0,0));
         if (idealDaysAsNum.includes(repDay.getTime())) {
@@ -207,7 +207,6 @@ export const findGapsInTimespan = (timespan: [Date, Date], events: (BasicEvent[]
     // Find existing events in the timespan
     const eventsInTimespan = filterEventsInTimespan(timespan, events);
     const eventTimes = eventsInTimespan.map(event => [event.startTime, event.endTime]).sort((a, b) => a[0].getTime() - b[0].getTime());
-    console.log('eventTimes', eventTimes);
 
     // Get the timegaps between the events
     let timeGaps : [Date, Date][] = [];

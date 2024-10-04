@@ -6,7 +6,7 @@ import Button from '@/components/buttons/button';
 import { Dropdown, InputField, MultiSelectionField } from '@/components/form-fields';
 import { priorityList, dayOfWeekList, timeOfDayList, timeSpanList, NEUTRAL_MINDSET_COLOUR } from '@/lib/definitions';
 import { TaskWithRelations } from '@/lib/types';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { DayOfWeek, Event, RepeatUnit, TimeOfDay } from '@prisma/client';
 import { useRouter } from 'next/navigation';
 import { editTaskPrisma, createTaskPrisma } from '@/lib/actions';
@@ -30,6 +30,7 @@ export default function TaskCard() {
 
     const router = useRouter();
     const searchParams = useSearchParams();
+    const pathname = usePathname();
     const eventId = searchParams.get('event'); 
     const taskId = searchParams.get('task');
 
@@ -158,14 +159,15 @@ export default function TaskCard() {
         router.back();
     }
     const handleClickClose = () => {
+        router.back();
         // const params = new URLSearchParams(searchParams);
-        if (searchParams.get('task') && searchParams.get('task') !== 'new') {
-            // params.set('status', 'doing');
-            // replace(`${pathname}?${params.toString()}`);
-            setSearchParams('status', 'doing');
-        } else if (searchParams.get('task') && searchParams.get('task') === 'new') {
-            router.back();
-        }
+        // if (pathname.includes('/task') && searchParams.get('task') && searchParams.get('task') !== 'new') {
+        //     // params.set('status', 'doing');
+        //     // replace(`${pathname}?${params.toString()}`);
+        //     setSearchParams('status', 'doing');
+        // } else {
+        //     router.back();
+        // }
     }
 
 
@@ -180,8 +182,8 @@ export default function TaskCard() {
                 .then((data) => setTaskCache(
                     {
                         ...data.task, 
-                        startTime: data.task.startTime ? new Date(data.task.startTime) : null, 
-                        endTime: data.task.endTime ? new Date(data.task.endTime) : null,
+                        startTime: data.task?.startTime ? new Date(data.task.startTime) : null, 
+                        endTime: data.task?.endTime ? new Date(data.task.endTime) : null,
                         // firstSessionStartTime: new Date(data.task.firstSessionStartTime),
                         // latestSessionStartTime: new Date(data.task.latestSessionStartTime),
                     }));

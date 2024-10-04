@@ -135,7 +135,7 @@ export default function CalendarComponent ( { startWeekToday = false } : { start
                 borderRadius: '10px',
                 position: 'relative'
             }}
-            className='hide-scrollbar'
+            // className='hide-scrollbar'
         />
     </Suspense></>);
 }

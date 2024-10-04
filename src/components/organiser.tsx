@@ -36,11 +36,15 @@ export default function Organiser ({
     )}>
         <TopBar back={back} searchBar={true} />
         {showMenu && <Menu />}
+        {/* <div className='flex gap-0'>
+            <div className='flex items-center w-full'></div>
+            <div className='w-[100vw] md:w-[24vw] md:min-w-[18rem]'></div>
+        </div> */}
         <motion.div id='whiteBoard' ref={divRef} 
             className={clsx(cardClassName, 
                 'w-full md:max-h-[80vh] h-full md:h-[80vh]',
-                'bg-white mt-[8vh] md:mt-[20vh] p-4 flex rounded-t-3xl md:rounded-3xl shadow-xl overflow-hidden',
-                showDrawer ? 'md:w-[70vw] ml-[3vw]' : 'md:w-[80vw]',
+                'bg-white mt-[8vh] md:mt-[20vh]  p-4 flex rounded-t-3xl md:rounded-3xl shadow-xl overflow-hidden',
+                showDrawer ? 'md:w-[70vw] md:ml-[2.5vw] md:h-full h-[55vh] pb-[5vh]' : 'md:w-[80vw] ',
             )}
             initial={{ y: windowWidth && windowWidth > 500 ? -300 : 300, opacity: 0, minHeight: '30vh' }} 
             animate={{ y: 0, opacity: 1, minHeight: 'none' }} 
@@ -50,7 +54,7 @@ export default function Organiser ({
         >
             <CalendarComponent  startWeekToday={true} />
         </motion.div>
-        <TaskDrawer className='w-[100vw] md:w-[24vw] min-w-[18rem]' onToggleDrawer={(bool) => {setShowDrawer(bool)}} />
+        <TaskDrawer className='w-[100vw] md:w-[25vw] md:justify-between' onToggleDrawer={(bool) => {setShowDrawer(bool)}} />
         <BottomBar />
     </div>);
 };
