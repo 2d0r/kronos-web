@@ -162,7 +162,7 @@ export default function TaskBrowser ({ height, width, direction = 'vertical', fi
             </div>
 
             {/* Task list */}
-            <div className='flex h-2/3 w-full items-start justify-center gap-6 overflow-clip'>
+            <div className='flex h-2/3 w-full items-start justify-center gap-6 overflow-scroll'>
                 <TodoList
                     mindsets={mindsets}
                     filters={filters}

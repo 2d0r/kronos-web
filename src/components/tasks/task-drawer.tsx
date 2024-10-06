@@ -15,10 +15,13 @@ import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import Button from '../buttons/button';
 import { TrashIcon } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import AddTaskButton from '../buttons/add-task-button';
 
 export default function TaskDrawer({className, onToggleDrawer} : {className?: string, onToggleDrawer: (bool: boolean) => void}) {
 
     const dispatch = useDispatch();
+    const searchParams = useSearchParams();
     const mindsetColour = useMindsetColour();
     const { windowWidth } = useWindowSize();
     const [ showDrawer, setShowDrawer ] = useState<boolean>(true);
@@ -57,12 +60,14 @@ export default function TaskDrawer({className, onToggleDrawer} : {className?: st
 
     return (
     <motion.div 
-        className={clsx(className, 'fixed z-[51] md:z-40 flex flex-col md:top-1/2 md:-translate-y-1/2 h-[40vh] md:h-[80vh] p-6 md:py-4 w-screen md:w-[24vw] bg-white shadow-xl',
-            (windowWidth && windowWidth > 768) ? 'rounded-l-3xl shadow-xl' : 'rounded-t-3xl shadow-above',
+        className={clsx(className, 'fixed md:z-30 flex flex-col md:top-1/2 md:-translate-y-1/2 h-[40vh] md:h-[80vh] p-6 pb-2 md:py-4 w-screen md:w-[24vw] bg-white shadow-xl',
+            (windowWidth && windowWidth > 768) ? 'rounded-l-3xl shadow-xl' : 'rounded-t-3xl',
             (windowWidth && windowWidth > 768) ? showDrawer ? 'right-0' : 'left-[98vw] pl-[2vw]'
                 : showDrawer ? 'bottom-0' : 'top-[97vh]',
+            searchParams.get('task') ? 'z-40' : 'z-[51]'
         )}
-        transition={{ duration: 0.2 }} 
+        style={{ boxShadow: windowWidth && windowWidth <= 768 ? '0 -4px 10px 0px rgba(0, 0, 0, 0.1), 0 -2px 8px 0px rgba(0, 0, 0, 0.02)' : '' }}
+        transition={{ duration: 0.2 }}
         // initial={{ translateY: '-50%', top: '50%' }} animate={{ translateY: '-50%', top: '50%' }}
     >
         {/* Drawer handle */}
@@ -74,16 +79,17 @@ export default function TaskDrawer({className, onToggleDrawer} : {className?: st
         <div className='overflow-y-scroll h-[80%]'>
             <TaskBrowser height='100%' direction='vertical' filterButtons={['mindset', 'sort']} />
         </div>
-        <div className={('container w-full h-[10%] flex flex-row gap-4 justify-start items-start my-2 md:my-0')}>
+        <div className={('container w-full flex gap-4 md:justify-start justify-center mb-2 md:my-0')}>
             {/* <div className='divider' hidden={windowWidth && windowWidth <= 768 || false}></div> */}
             <OrganiseButton onOrganise={handleOrganise} colour={mindsetColour} />
             {/* Delete all events */}
-            <Button 
+            {/* <Button 
                 className='rounded-lg from-neutral-950 p-6 md:w-1/4 h-[4rem] items-center justify-center flex' 
                 style={{ background: adjustLightness(mindsetColour, 0.95) }}
                 onClick={handleDeleteAllEvents}
                 ><TrashIcon color={mindsetColour} width={24} />
-            </Button>
+            </Button> */}
+            {windowWidth && windowWidth < 768 && <AddTaskButton />}
             {/* <div className='divider' hidden={windowWidth && windowWidth <= 768 || false}></div> */}
         </div>
         

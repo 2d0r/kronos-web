@@ -14,8 +14,8 @@ export default function Button ({onClick, className, style, ...props} : Props) {
             onClick={async () => {
                 if (onClick) await onClick();
             }} 
-            className={clsx('items-center rounded-lg px-4 text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
-                className,
+            className={clsx(className, 
+                'items-center rounded-lg px-4 text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 aria-disabled:cursor-not-allowed aria-disabled:opacity-50',
             )} 
             style={style}
         />

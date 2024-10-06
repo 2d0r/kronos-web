@@ -1,8 +1,9 @@
 import Organiser from '@/components/organiser';
+import { Suspense } from 'react';
 
 export default async function Page() {
-    return (<>
-        <Organiser cardClassName='!mt-[10vh] overflow-scroll hide-scrollbar' />
-    </>);
+    return (<Suspense>
+        <Organiser cardClassName='overflow-scroll hide-scrollbar' />
+    </Suspense>);
     
 }

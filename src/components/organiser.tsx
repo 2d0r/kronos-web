@@ -42,19 +42,19 @@ export default function Organiser ({
         </div> */}
         <motion.div id='whiteBoard' ref={divRef} 
             className={clsx(cardClassName, 
-                'w-full md:max-h-[80vh] h-full md:h-[80vh]',
-                'bg-white mt-[8vh] md:mt-[20vh]  p-4 flex rounded-t-3xl md:rounded-3xl shadow-xl overflow-hidden',
-                showDrawer ? 'md:w-[70vw] md:ml-[2.5vw] md:h-full h-[55vh] pb-[5vh]' : 'md:w-[80vw] ',
+                'bg-white mt-[8vh] md:mt-[10vh] p-4 flex rounded-t-3xl md:rounded-3xl shadow-xl overflow-hidden',
+                showDrawer ? 'md:w-[70vw] md:ml-[2.5vw] pb-[5vh]' : 'md:w-[80vw] w-full',
+                showDrawer ? 'md:h-[80vh] h-[55vh]' : 'md:h-[80vh] h-full',
             )}
-            initial={{ y: windowWidth && windowWidth > 500 ? -300 : 300, opacity: 0, minHeight: '30vh' }} 
+            initial={{ y: windowWidth && windowWidth > 768 ? -300 : 300, opacity: 0, minHeight: '30vh' }} 
             animate={{ y: 0, opacity: 1, minHeight: 'none' }} 
-            exit={{ y: windowWidth && windowWidth > 500 ? -300 : 300 }} 
+            exit={{ y: windowWidth && windowWidth > 768 ? -300 : 300 }} 
             transition={{ duration: 0.2 }}
             layout='position'
         >
             <CalendarComponent  startWeekToday={true} />
         </motion.div>
         <TaskDrawer className='w-[100vw] md:w-[25vw] md:justify-between' onToggleDrawer={(bool) => {setShowDrawer(bool)}} />
-        <BottomBar />
+        {windowWidth && windowWidth > 768 && <BottomBar />}
     </div>);
 };
