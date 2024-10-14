@@ -571,60 +571,59 @@ export const getMindsetDisplayValues = async () => {
 }
 
 
-// DATA FETCH
+// DATA FETCH VIA ROUTE HANDLERS
 
 export const fetchEvents = async () => {
-  const response = await fetch('/event');
+  const response = await fetch('/api/event');
   const data = await response.json();
   const newEvents = data.events;
   return newEvents as EventWithRelations[];
 }
 export const fetchUpcomingEvents = async (count?: number) => {
-  // const response = await fetch(`/event?count=${count}`);
-  const address = count ? `/event/upcoming/${count}` : '/event/upcoming';
+  const address = count ? `/api/event/upcoming-${count}` : '/api/event/upcoming';
   const response = await fetch(address);
   const data = await response.json();
   const upcomingEvents = data.events;
   return upcomingEvents as EventWithRelations[];
 }
 export const fetchTasks = async () => {
-  const response = await fetch('/task/api');
+  const response = await fetch('/api/task');
   const data = await response.json();
   const newTasks = data.tasks;
   return newTasks;
 }
 export const fetchTask = async (taskId: string) => {
-  const response = await fetch(`/task/${taskId}`);
+  const response = await fetch(`/api/task/${taskId}`);
   const data = await response.json();
   return data.task;
 }
 export const fetchEventsOfTask = async (taskId: string) => {
-  const response = await fetch(`/event/task/${taskId}`);
+  const response = await fetch(`/api/event/of-task-${taskId}`);
   const data = await response.json();
   return data.events;
 }
 export const fetchEventById = async (eventId: string) => {
-  const response = await fetch(`/event/${eventId}`);
+  const response = await fetch(`/api/event/${eventId}`);
   const data = await response.json();
   return data.event;
 }
 export const fetchTaskOfEvent = async (eventId: string) => {
-  const response = await fetch(`/task/event/${eventId}`);
+  const response = await fetch(`/api/task/event/${eventId}`);
   const data = await response.json();
   return data.task;
 }
 export const fetchMindsets = async () => {
-  const response = await fetch(`/mindset`);
+  const response = await fetch(`/api/mindset`);
   const data = await response.json();
   return data.mindsets;
 }
 export const fetchMindsetOfTask = async (taskId: string) => {
-  const response = await fetch(`/mindset/${taskId}`);
+  const response = await fetch(`/api/mindset/of-task-${taskId}`);
   const data = await response.json();
   return data.mindset;
 }
 export const fetchCurrentMindsetColour = async () => {
-  const response = await fetch(`/mindset/currentMindsetColour`);
+  const response = await fetch(`/api/event/current-mindset-colour`);
   const data = await response.json();
   return data.currentMindsetColour;
 }

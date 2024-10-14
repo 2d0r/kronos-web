@@ -62,7 +62,7 @@ export default function TodoList ({
     // HANDLERS
 
     const handleTaskStatusUpdate = async (taskId: string, status: Status) => {
-        const response = await fetch(`/task/${taskId}`, {
+        const response = await fetch(`/api/task/${taskId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

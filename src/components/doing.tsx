@@ -1,9 +1,9 @@
 'use client';
 
-import { getEventById, fetchTask, fetchMindsetOfTask, fetchEventById } from '@/lib/data';
+import { fetchTask, fetchEventById } from '@/lib/data';
 import { EventWithRelations, TaskWithRelations } from '@/lib/types';
 import React, { useEffect, useState } from 'react';
-import { addMinutesToDate, convertPropsToDate, dateToHHMM, getLocalStartAndEnd, minutesBetweenDates, minutesToDisplayDuration } from '@/utils/date-utils';
+import { addMinutesToDate, convertPropsToDate, dateToHHMM, minutesBetweenDates } from '@/utils/date-utils';
 import { adjustLightness } from '@/utils/colour-utils';
 import NotesEditor from '@/components/notes-editor/notes-editor';
 import CircleTimer from '@/components/circle-timer';

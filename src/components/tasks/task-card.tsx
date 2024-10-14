@@ -151,7 +151,7 @@ export default function TaskCard() {
         router.back();
     };
     const handleDeleteTask = async (taskId: string) => {
-        await fetch(`/task/${taskId}`, {
+        await fetch(`/api/task/${taskId}`, {
             method: 'DELETE' // Deletes all linked events and then the task
         });
         dispatch(setTasks(tasks.filter(task => task.id !== taskId)));
@@ -177,7 +177,7 @@ export default function TaskCard() {
     useEffect(() => {
         if (taskId && taskId !== 'new') {
             setIsNewTask(false);
-            fetch(`/task/${taskId}`)
+            fetch(`/api/task/${taskId}`)
                 .then((response) => response.json())
                 .then((data) => setTaskCache(
                     {

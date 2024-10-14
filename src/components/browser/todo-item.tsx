@@ -34,7 +34,7 @@ export default function ToDoItem ({
         setShowOptions(false);
     }
     const handleTaskDelete = async (taskId: string) => {
-        await fetch(`/task/${taskId}`, {
+        await fetch(`/api/task/${taskId}`, {
             method: 'DELETE'
         });
         onTaskDelete(taskId);

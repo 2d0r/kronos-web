@@ -1,11 +1,11 @@
 import prisma from '@/lib/db';
 
 type Params = {
-    id: string
+    slug: string
 }
 
 export async function GET(req: Request, context: { params: Params }) {
-    const id = context.params.id;
+    const id = context.params.slug;
     try {
         const task = await prisma.task.findUnique({
             where: {
@@ -38,29 +38,12 @@ export async function GET(req: Request, context: { params: Params }) {
 }
 
 export async function DELETE (req: Request, context: { params: Params }) {
-    const id = context.params.id;
-    try {
-        await prisma.event.deleteMany({
-            where: { taskId: id },
-        });
-        // return Response.json({message: 'Deleted task via API route'});
-    } catch (error) {
-        console.error('Error deleting task\'s events', error);
-        return Response.json(
-            {
-                message: 'Error deleting task\'s events',
-                error,
-            },
-            {
-                status: 500,
-            }
-        );
-    }
+    const id = context.params.slug;
     try {
         await prisma.task.delete({
             where: { id: id },
         });
-        return Response.json({message: 'Deleted task via API route'});
+        return Response.json({message: 'Deleted task via route handler'});
     } catch (error) {
         console.error('Error deleting task via route handler', error);
         return Response.json(
@@ -98,7 +81,7 @@ export async function PUT(req: Request, context: { params: Params }) {
 }
 
 export async function PATCH (req: Request, context: { params: Params }) {
-    const { id } = context.params;
+    const id = context.params.slug;
     const body = await req.json();
     const { status } = body;
 

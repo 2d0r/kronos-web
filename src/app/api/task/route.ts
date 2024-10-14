@@ -1,9 +1,5 @@
 import prisma from '@/lib/db';
 
-type Params = {
-    taskId: string
-}
-
 export async function GET(req: Request) {
     try {
         const tasks = await prisma.task.findMany({
