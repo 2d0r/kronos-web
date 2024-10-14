@@ -20,9 +20,9 @@ export default function Menu({onBlur}: {onBlur?: () => void}) {
                 <MenuCard title='Organiser' href='/organiser'>
                     <SparklesIcon color={mindsetColour} height={24} />
                 </MenuCard>
-                <MenuCard title='Calendar' href='/calendar'>
+                {/* <MenuCard title='Calendar' href='/calendar'>
                     <CalendarIcon color={mindsetColour} height={24} />
-                </MenuCard>
+                </MenuCard> */}
                 <MenuCard title='Tasks & Projects' href='/browser'>
                     <ListBulletIcon color={mindsetColour} height={24} />
                 </MenuCard>
@@ -47,7 +47,7 @@ export default function Menu({onBlur}: {onBlur?: () => void}) {
                 style={{ color: mindsetColour }}>
                 { !pathname.includes('/task') && <Link href={'/'} className='menu-link'>Timeline</Link>}
                 <Link href={'/organiser'} className='menu-link'>Organiser</Link>
-                <Link href={'/calendar'} className='menu-link'>Calendar</Link>
+                {/* <Link href={'/calendar'} className='menu-link'>Calendar</Link> */}
                 <Link href={'/browser'} className='menu-link'>Tasks & Projects</Link>
                 {/* <Link href={pathname} className='menu-link'>Stats</Link> */}
                 <Link href={'/browser?logbook=true'} className='menu-link'>Logbook</Link>

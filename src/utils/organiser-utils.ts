@@ -9,6 +9,7 @@ import { createTimespan, getIntersectingTimespans, scheduleEventForTask, updateT
 import { getTimezoneOffset } from 'date-fns-tz';
 import { findEventsInTimespan } from '@/lib/data';
 import { getTaskRepeatPhase } from './task-utils';
+import { organiseTimespan } from '@/lib/organise-timespan';
 
 // Can only calculate for tasks that had their first session already scheduled
 export const getIdealReps = (task: Task, timespan: [Date, Date], idealFirstRepTime?: Date): Date[] => {
@@ -418,8 +419,6 @@ export const updateOrganisedTimespans = async (organisedTimespan: [Date, Date]) 
         // If no overlap, just add the new one
         await createTimespan(organisedTimespan, 'organised');
     }
-    
-
 }
 
 export const countFreeTimeInTimespan = async (timespan: [Date, Date], events?: EventWithRelations[]) => {
@@ -469,4 +468,67 @@ export const countEventsOfTaskToBeScheduled = (task: TaskWithRelations, timespan
         console.error('Database error: Task is missing repetition data.');
         return 0;
     }
+}
+
+// Subtract one timespan from another
+export const timespanMinusTimespan = (subtractFrom: [Date, Date], subtract: [Date, Date]): [Date, Date][] => {
+    // Excludes
+    if (subtract[1] <= subtractFrom[0] || subtractFrom[1] <= subtract[0]) {
+        return [subtractFrom];
+    }
+    // Reverse includes
+    if (subtract[0] <= subtractFrom[0] && subtractFrom[1] <= subtract[0]) {
+        return [];
+    }
+    // Includes
+    if (subtractFrom[0] < subtract[0] && subtract[1] < subtractFrom[1]) {
+        return [[subtractFrom[0], subtract[0]], [subtract[1], subtractFrom[1]]];
+    }
+    if (subtractFrom[0] < subtract[0]) {
+        return [[subtractFrom[0], subtract[0]]];
+    }
+    if (subtract[1] < subtractFrom[1]) {
+        return [[subtract[1], subtractFrom[1]]];
+    }
+    return [];
+}
+
+// Subtract multiple timespans from a timespan
+export const timespanMinusTimespans = (subtractFrom: [Date, Date], subtract: [Date, Date][]): [Date, Date][] => {
+    // Create dictionary of keypoints
+    // 'From' and 'until' as in resulting timespan starts from [Date] and ends until [Date]
+    let result: [Date, Date][] = [];
+    let timeline = { [subtractFrom[0].getTime()]: 'from', [subtractFrom[1].getTime()]: 'until' };
+    subtract.forEach(timespan => {
+        if (subtractFrom[0] < timespan[0] && timespan[0] < subtractFrom[1]) {
+            timeline[timespan[0].getTime()] = 'until';
+        }
+        if (subtractFrom[0] < timespan[1] && timespan[1] < subtractFrom[1]) {
+            timeline[timespan[1].getTime()] = 'from';
+        }
+    });
+    // Look through sorted dictionary and find adjancent from-until. Those are resulting timespans
+    const sortedTimestamps: number[] = Object.keys(timeline).sort().map(el => Number(el));
+    for (let i = 0; i < sortedTimestamps.length - 1; i++) {
+        if (timeline[sortedTimestamps[i]] === 'from' && timeline[sortedTimestamps[i + 1]] === 'until' ) {
+            result.push([new Date(sortedTimestamps[i]), new Date(sortedTimestamps[i + 1])]);
+        }
+    }
+    return result;
+}
+
+export const organiseWeekAhead = async () => {
+    // Find unorganised gaps in the next 7 days
+    const now = new Date();
+    const next7Days = [now, addDays(now, 7)] as [Date, Date];
+    const organisedTimespansThisWeek = await getIntersectingTimespans(next7Days);
+    let unorganisedGaps: [Date, Date][] = timespanMinusTimespans(next7Days, organisedTimespansThisWeek?.map(el => [el.startTime, el.endTime] as [Date, Date]) || []);
+    console.log('unorganisedGaps', unorganisedGaps);
+    // Organise events in those gaps
+    unorganisedGaps.forEach(gap => {
+        // Only organise if unorganised gap is at least 30 minutes
+        if (minutesBetweenDates(gap[0], gap[1]) >= 30) {
+            organiseTimespan({ timespan: gap });
+        }
+    });
 }

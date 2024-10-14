@@ -6,7 +6,7 @@ import TaskBrowser from '../browser/task-browser';
 import { setEvents, setMindsetColour, setTasks, useMindsetColour } from '@/store/store';
 import useWindowSize from '@/lib/useWindowSize';
 import { useDispatch } from 'react-redux';
-import { deleteAllEvents } from '@/lib/actions';
+import { deleteAllEvents, deleteAllOrganisedTimespans } from '@/lib/actions';
 import { fetchCurrentMindsetColour, fetchEvents, fetchTasks } from '@/lib/data';
 import { addDaysToDate } from '@/utils/date-utils';
 import { organiseTimespan } from '@/lib/organise-timespan';
@@ -30,6 +30,8 @@ export default function TaskDrawer({className, onToggleDrawer} : {className?: st
         await deleteAllEvents();
         const newEvents = await fetchEvents();
         dispatch(setEvents(newEvents));
+        // Emtpy timespans db of organised timespans
+        await deleteAllOrganisedTimespans();
     }
     const handleOrganise = async (daysAhead: number = 30) => {
         const currentTime = new Date();

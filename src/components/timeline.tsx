@@ -18,6 +18,7 @@ import Button from './buttons/button';
 import { organiseTimespan } from '@/lib/organise-timespan';
 import clsx from 'clsx';
 import { PlusIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { organiseWeekAhead } from '@/utils/organiser-utils';
 
 export default function Timeline() {
 
@@ -76,7 +77,10 @@ export default function Timeline() {
 
     useEffect(() => {
         handleEventsUpdate();
-        const timePassingInterval = setInterval(() => handleEventsUpdate(), 300000); // every 5 minutes
+        // Organise one week ahead
+        organiseWeekAhead();
+        // Update timespan
+        const timePassingInterval = setInterval(() => handleEventsUpdate(), 60000); // every minute
         return () => clearInterval(timePassingInterval);
     }, []);
     useEffect(() => {

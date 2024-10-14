@@ -577,7 +577,18 @@ export const updateTimespan = async (id: string, timespan: [Date, Date]) => {
       },
     })
   } catch (error) {
-    console.error('Error updating organised timespans.');
-    // throw new Error('Database error: Failed to update organised timespans.');
+    console.error('Error updating organised timespans ❌', error);
+  }
+}
+
+export const deleteAllOrganisedTimespans = async () => {
+  try {
+    await prisma.timespan.deleteMany({
+      where: {
+        type: 'organised'
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting all organised timespans ❌', error);
   }
 }

@@ -4,12 +4,13 @@ import clsx from 'clsx';
 import CalendarComponent from '@/components/calendar/calendar';
 import { useSearchParams } from 'next/navigation';
 import useWindowSize from '@/lib/useWindowSize';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import TopBar from './ui/top-bar';
 import { motion } from 'framer-motion';
 import BottomBar from './ui/bottom-bar';
 import Menu from './menu';
 import TaskDrawer from './tasks/task-drawer';
+import { organiseWeekAhead } from '@/utils/organiser-utils';
 
 interface TimelineBoardProps {
     children?: JSX.Element | JSX.Element[];
@@ -29,6 +30,11 @@ export default function Organiser ({
 
     const divRef = useRef<HTMLDivElement>(null);
     const drawerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        // Organise one week ahead
+        organiseWeekAhead();
+    }, []);
 
     return (
     <div className={clsx(timelineClassName, 'w-screen h-screen flex flex-col gap-8 justify-start',
