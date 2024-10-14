@@ -66,7 +66,7 @@ export default function TaskDrawer({className, onToggleDrawer} : {className?: st
             (windowWidth && windowWidth > 768) ? 'rounded-l-3xl shadow-xl' : 'rounded-t-3xl',
             (windowWidth && windowWidth > 768) ? showDrawer ? 'right-0' : 'left-[98vw] pl-[2vw]'
                 : showDrawer ? 'bottom-0' : 'top-[97vh]',
-            searchParams.get('task') ? 'z-40' : 'z-[51]'
+            searchParams.get('task') ? 'z-40' : 'z-[51]',
         )}
         style={{ boxShadow: windowWidth && windowWidth <= 768 ? '0 -4px 10px 0px rgba(0, 0, 0, 0.1), 0 -2px 8px 0px rgba(0, 0, 0, 0.02)' : '' }}
         transition={{ duration: 0.2 }}

@@ -44,11 +44,11 @@ export default function SearchBar() {
     }, []);
 
     return (!hidden &&
-        <motion.div className={clsx('relative flex rounded-3xl cursor-pointer', isFocused && 'bg-white/10 ')} 
+        <motion.div className={clsx('relative flex rounded-3xl cursor-pointer transition-all duration-300', isFocused && 'bg-white/10 ')} 
         onClick={() => setIsFocused(true)} onBlur={() => setIsFocused(false)}>
-            <label htmlFor='search' className='cursor-pointer peer-focus:outline-none' >
+            <motion.label htmlFor='search' className='cursor-pointer peer-focus:outline-none'>
                 <MagnifyingGlassIcon color={mindsetColour || 'white'} width={24} className='absolute left-3 top-1/2 -translate-y-1/2 peer-focus:font-bold' />
-            </label>
+            </motion.label>
             <motion.input
                 id='search'
                 className='peer block bg-transparent border-0 py-[9px] pl-10 

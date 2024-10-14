@@ -1,9 +1,7 @@
 'use client';
 
-import PauseSVG from '@/components/svg/pause-svg';
-import PlaySVG from '@/components/svg/play-svg';
 import { minutesToTimerDisplay } from '@/utils/date-utils';
-import { AdjustmentsVerticalIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { AdjustmentsVerticalIcon, PauseCircleIcon, PlayCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -76,7 +74,8 @@ export default function CircleTimer ({ duration } : {duration: number}) {
                 </div>
             </Link>
             <div className='cursor-pointer' onClick={handlePlayPause}>
-                { playing ? <PauseSVG /> : <PlaySVG /> }
+                {/* { playing ? <PauseSVG /> : <PlaySVG /> } */}
+                { playing ? <PauseCircleIcon width={48}/> : <PlayCircleIcon width={48} />}
             </div>
             <div className='cursor-pointer' onClick={handleEditTask}>
                 <AdjustmentsVerticalIcon width={32} />

@@ -92,9 +92,9 @@ input::-ms-input-placeholder { /* Edge 12 -18 */
   color: red;
 }
 
-rect {
+/* rect {
   fill: cyan;
-}
+} */
 
 
 /* Tiptap markdown text editor */

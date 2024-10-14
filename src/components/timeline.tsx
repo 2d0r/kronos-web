@@ -19,6 +19,8 @@ import { organiseTimespan } from '@/lib/organise-timespan';
 import clsx from 'clsx';
 import { PlusIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import { organiseWeekAhead } from '@/utils/organiser-utils';
+import LoadingAnimation from './ui/loading-animation';
+import KronosSVG from './svg/kronos-svg';
 
 export default function Timeline() {
 
@@ -32,6 +34,7 @@ export default function Timeline() {
 
     const [ eventQueue, setEventQueue ] = useState<EventWithRelations[]>([]);
     const [ mindsetQueue, setMindsetQueue ] = useState<Mindset[]>([]);
+    const [ loaded, setLoaded ] = useState<boolean>(false);
 
     // HANDLERS
 
@@ -46,6 +49,7 @@ export default function Timeline() {
         // Update events queue, sorted by startTime
         const newEventsQueue = upcomingEvents.sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
         setEventQueue(newEventsQueue);
+        setLoaded(true);
         // console.log('newEventsQueue', newEventsQueue);
 
         // Update mindsets queue
@@ -122,24 +126,25 @@ export default function Timeline() {
             )}
             
             {/* Empty timeline */}
-            { eventQueue.length === 0 && !showMenu && (<div className='flex flex-col gap-8 items-center md:w-[24rem] w-full' style={{ color: mindsetColour }}>
-                <span className='text-xl'>Nothing coming next</span>
-                <div className='flex md:flex-row flex-col gap-4 justify-center items-center text-md w-full md:p-0 p-2'>
-                    <Button 
-                    className='rounded-md p-6 border text-md text-center md:w-full w-[70vw] flex flex-col gap-2 items-center' 
-                    style={{ color: mindsetColour, borderColor: mindsetColour }}
-                    onClick={() => handleOrganiseToday(1)}>
-                        <SparklesIcon width={24} color={mindsetColour}/>
-                        Organise today
-                    </Button>
-                    <Link href={`${pathname}?task=new&status=edit`}
-                    className='rounded-md p-6 border text-md md:w-full w-[70vw] text-center flex flex-col gap-2 items-center' 
-                    style={{ color: mindsetColour, borderColor: mindsetColour }}>
-                        <PlusIcon width={24} color={mindsetColour}/>
-                        Create a task
-                    </Link>
-                </div>
-            </div>)}
+            { eventQueue.length === 0 && !showMenu && (
+                loaded ? <div className='flex flex-col gap-8 items-center md:w-[24rem] w-full' style={{ color: mindsetColour }}>
+                    <span className='text-xl'>Nothing coming next</span>
+                    <div className='flex md:flex-row flex-col gap-4 justify-center items-center text-md w-full md:p-0 p-2'>
+                        <Button className='rounded-md p-6 border text-md text-center md:w-full w-[70vw] flex flex-col gap-2 items-center' 
+                        style={{ color: mindsetColour, borderColor: mindsetColour }}
+                        onClick={() => handleOrganiseToday(1)}>
+                            <SparklesIcon width={24} color={mindsetColour}/>
+                            Organise today
+                        </Button>
+                        <Link href={`${pathname}?task=new&status=edit`}
+                        className='rounded-md p-6 border text-md md:w-full w-[70vw] text-center flex flex-col gap-2 items-center' 
+                        style={{ color: mindsetColour, borderColor: mindsetColour }}>
+                            <PlusIcon width={24} color={mindsetColour}/>
+                            Create a task
+                        </Link>
+                    </div>
+                </div> : <LoadingAnimation mindsetColour={mindsetColour}/>
+            )}
 
             {/* Menu cards */}
             <AnimatePresence>
