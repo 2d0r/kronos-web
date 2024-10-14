@@ -16,10 +16,10 @@ export async function GET(req: Request) {
         });
         return Response.json({message: 'OK', events: events});
     } catch (error) {
-        console.error('Error fetchings events via route handler', error);
+        console.error('Error fetching events via route handler', error);
         return Response.json(
             {
-                message: 'Error fetchings events via route handler',
+                message: 'Error fetching events via route handler',
                 error,
             },
             {

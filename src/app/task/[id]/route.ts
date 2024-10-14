@@ -24,10 +24,10 @@ export async function GET(req: Request, context: { params: Params }) {
         });
         return Response.json({message: 'OK', task});
     } catch (error) {
-        console.error('Error fetchings tasks via route handler', error);
+        console.error('Error fetching tasks via route handler', error);
         return Response.json(
             {
-                message: 'Error fetchings tasks via route handler',
+                message: 'Error fetching tasks via route handler',
                 error,
             },
             {

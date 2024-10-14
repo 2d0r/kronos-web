@@ -6,25 +6,30 @@ type Params = {
 
 export async function GET(req: Request, context: { params: Params }) {
     const count = context.params.count;
-    // const { searchParams } = new URL(req.url);
-    // const count = searchParams.get('count'); // Example filter parameter
+    const now = new Date();
 
     try {
         const events = await prisma.event.findMany({
-            include: { 
-                task: true,
-            }, // Include the subtasks relation
+            where: {
+                OR: [
+                    { startTime: { gt: now }},
+                    { endTime: { gt: now }},
+                ]
+            },
             orderBy: {
                 startTime: 'asc'
             },
+            include: { 
+                task: true,
+            }, 
             take: count ? Number(count) : undefined,
         });
         return Response.json({message: 'OK', events: events});
     } catch (error) {
-        console.error('Error fetchings upcoming events via route handler', error);
+        console.error('Error fetching upcoming events via route handler', error);
         return Response.json(
             {
-                message: 'Error fetchings upcoming events via route handler',
+                message: 'Error fetching upcoming events via route handler',
                 error,
             },
             {

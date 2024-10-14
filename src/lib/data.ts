@@ -581,7 +581,7 @@ export const fetchEvents = async () => {
 }
 export const fetchUpcomingEvents = async (count?: number) => {
   // const response = await fetch(`/event?count=${count}`);
-  const address = count ? `/event/upcoming/${count}` : '/event/upcoming'
+  const address = count ? `/event/upcoming/${count}` : '/event/upcoming';
   const response = await fetch(address);
   const data = await response.json();
   const upcomingEvents = data.events;
